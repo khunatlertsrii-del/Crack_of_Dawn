@@ -1,0 +1,28 @@
+# โฟลเดอร์ขยะที่ Unity สร้างขึ้นมาเอง (ห้ามเอาขึ้น GitHub)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+
+# ไฟล์ระบบของ Visual Studio และไฟล์ชั่วคราวอื่นๆ
+/.vs/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# ไฟล์แจ้งเตือนตอนโปรแกรมแครช
+sysinfo.txt
