@@ -62,8 +62,7 @@ public class ScreenEffectManager : MonoBehaviour
         canvasObj.transform.SetParent(transform);
         screenCanvas = canvasObj.AddComponent<Canvas>();
         screenCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        // เปลี่ยนเป็น -1 เพื่อให้อยู่ข้างหลัง UI หลัก (ที่ปกติเป็น 0) จะได้ไม่บังหลอดเลือดและกระสุน
-        screenCanvas.sortingOrder = -1; 
+        screenCanvas.sortingOrder = 999; // ให้อยู่บนสุดเหมือนเดิม เพื่ออารมณ์ Cinematic!
 
         canvasObj.AddComponent<CanvasScaler>();
 

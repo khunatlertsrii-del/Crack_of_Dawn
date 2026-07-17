@@ -57,7 +57,6 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     private Rigidbody2D rb;
     private Coroutine blinkCoroutine;
     private float timeSinceLastHit;
-
     // =========================================================
     // UNITY LIFECYCLE
     // =========================================================

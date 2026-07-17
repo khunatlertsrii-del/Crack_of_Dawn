@@ -3564,12 +3564,12 @@ MonoBehaviour:
   slowMoColor: {r: 1, g: 0.9, b: 0.5, a: 0.15}
   filterTransitionSpeed: 5
   enableCinematicBorders: 1
-  borderTexture: {fileID: 0}
-  borderColor: {r: 1, g: 0.8, b: 0, a: 1}
+  borderTexture: {fileID: 2800000, guid: eab8ac2c0505e3c45870dc07c2e7c6e9, type: 3}
+  borderColor: {r: 0, g: 0, b: 0, a: 1}
   borderHeightPercent: 0.15
   normalScrollSpeed: 0.5
-  adrenalineScrollSpeed: 3
-  adrenalineDecaySpeed: 2
+  adrenalineScrollSpeed: 4
+  adrenalineDecaySpeed: 4
 --- !u!114 &1572172858
 MonoBehaviour:
   m_ObjectHideFlags: 0

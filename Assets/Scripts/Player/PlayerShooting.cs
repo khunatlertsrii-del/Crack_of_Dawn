@@ -69,6 +69,10 @@ public class PlayerShooting : MonoBehaviour
     [Tooltip("ลาก Text (TextMeshPro) จาก Canvas มาใส่ตรงนี้เพื่อแสดงกระสุน (ถ้าไม่ใส่จะไม่มี UI กระสุน)")]
     [SerializeField] private TextMeshProUGUI ammoText;
 
+    // Dynamic HUD
+    private RectTransform ammoRect;
+    private Vector2 ammoOriginalPos;
+
     // =========================================================
     // UNITY LIFECYCLE
     // =========================================================
@@ -90,6 +94,12 @@ public class PlayerShooting : MonoBehaviour
         reloadAction.AddBinding("<Gamepad>/buttonWest");
 
         CurrentAmmo = ammoCapacity;
+
+        if (ammoText != null)
+        {
+            ammoRect = ammoText.GetComponent<RectTransform>();
+            if (ammoRect != null) ammoOriginalPos = ammoRect.anchoredPosition;
+        }
 
         // Auto-create gun pivot if not assigned
         if (gunPivot == null)
@@ -143,6 +153,15 @@ public class PlayerShooting : MonoBehaviour
         AimAtMouse();
         HandleShooting();
         UpdateMuzzleFlash();
+
+        // Dynamic HUD หลบขอบจอ
+        if (ammoRect != null && SlowMotionManager.Instance != null)
+        {
+            float direction = (ammoRect.anchorMin.y >= 0.5f) ? -1f : 1f;
+            float targetY = SlowMotionManager.Instance.IsSlowMotionActive ? ammoOriginalPos.y + (150f * direction) : ammoOriginalPos.y;
+            Vector2 targetPos = new Vector2(ammoOriginalPos.x, targetY);
+            ammoRect.anchoredPosition = Vector2.Lerp(ammoRect.anchoredPosition, targetPos, 10f * Time.unscaledDeltaTime);
+        }
         UpdateAmmoUI();
     }
 
