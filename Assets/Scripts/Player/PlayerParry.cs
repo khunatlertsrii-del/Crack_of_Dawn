@@ -169,6 +169,9 @@ public class PlayerParry : MonoBehaviour
         
         // เล่น Effect ปัดกระสุน!
         HitEffect.Instance?.PlayParryEffect(bullet.transform.position);
+
+        // ระเบิดขอบจอ (Adrenaline!)
+        ScreenEffectManager.Instance?.TriggerAdrenaline();
     }
 }
 

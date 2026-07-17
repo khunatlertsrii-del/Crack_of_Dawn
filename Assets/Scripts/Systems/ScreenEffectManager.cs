@@ -21,6 +21,27 @@ public class ScreenEffectManager : MonoBehaviour
     [Tooltip("ความเร็วในการค่อยๆ เปลี่ยนสีฟิลเตอร์")]
     public float filterTransitionSpeed = 5f;
 
+    [Header("Cinematic Borders (ขอบจอตอนเปิดสโลว์)")]
+    public bool enableCinematicBorders = true;
+    [Tooltip("ลาก Texture ลายขอบมาใส่ตรงนี้ (อย่าลืมตั้ง Wrap Mode เป็น Repeat)")]
+    public Texture borderTexture; 
+    [Tooltip("สีของขอบ (แนะนำสีเหลือง หรือดำ)")]
+    public Color borderColor = new Color(1f, 0.8f, 0f, 1f);
+    [Tooltip("ความสูงของขอบจอ (0.15 = 15% ของจอ)")]
+    public float borderHeightPercent = 0.15f;
+    [Tooltip("ความเร็วตอนปกติ")]
+    public float normalScrollSpeed = 0.5f;
+    [Tooltip("ความเร็วตอนปะทะ (Adrenaline!)")]
+    public float adrenalineScrollSpeed = 3f;
+    [Tooltip("ความเร็วในการกลับคืนสู่สปีดปกติ")]
+    public float adrenalineDecaySpeed = 2f;
+
+    private RawImage topBorder;
+    private RawImage bottomBorder;
+    private float currentScrollSpeed;
+    private float scrollPositionTop;
+    private float scrollPositionBottom;
+
     private Image damageImage;
     private Image slowMoImage;
     private float currentDamageTimer = 0f;
@@ -53,7 +74,32 @@ public class ScreenEffectManager : MonoBehaviour
         slowMoImage.color = new Color(slowMoColor.r, slowMoColor.g, slowMoColor.b, 0f);
         SetFullScreen(slowMoImage.rectTransform);
 
-        // 3. สร้าง Image สำหรับ Damage Vignette (อยู่ข้างบนสุด)
+        // 3. สร้าง Cinematic Borders (อยู่บนสุดของ Slow-Mo แต่ใต้ Damage)
+        GameObject topObj = new GameObject("TopBorder");
+        topObj.transform.SetParent(canvasObj.transform, false);
+        topBorder = topObj.AddComponent<RawImage>();
+        topBorder.raycastTarget = false;
+        topBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
+        if (borderTexture != null) topBorder.texture = borderTexture;
+        RectTransform rtTop = topBorder.rectTransform;
+        rtTop.anchorMin = new Vector2(0, 1f - borderHeightPercent);
+        rtTop.anchorMax = new Vector2(1, 1);
+        rtTop.offsetMin = Vector2.zero;
+        rtTop.offsetMax = Vector2.zero;
+
+        GameObject botObj = new GameObject("BottomBorder");
+        botObj.transform.SetParent(canvasObj.transform, false);
+        bottomBorder = botObj.AddComponent<RawImage>();
+        bottomBorder.raycastTarget = false;
+        bottomBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
+        if (borderTexture != null) bottomBorder.texture = borderTexture;
+        RectTransform rtBot = bottomBorder.rectTransform;
+        rtBot.anchorMin = new Vector2(0, 0);
+        rtBot.anchorMax = new Vector2(1, borderHeightPercent);
+        rtBot.offsetMin = Vector2.zero;
+        rtBot.offsetMax = Vector2.zero;
+
+        // 4. สร้าง Image สำหรับ Damage Vignette (อยู่ข้างบนสุด)
         GameObject dmgObj = new GameObject("DamageVignette");
         dmgObj.transform.SetParent(canvasObj.transform, false);
         damageImage = dmgObj.AddComponent<Image>();
@@ -101,6 +147,52 @@ public class ScreenEffectManager : MonoBehaviour
             // อัปเดตสีเผื่อผู้เล่นปรับเล่นกลางเกม
             c.r = slowMoColor.r; c.g = slowMoColor.g; c.b = slowMoColor.b;
             slowMoImage.color = c;
+        }
+
+        // 3. อัปเดต Cinematic Borders (ขอบจอวิ่ง)
+        if (enableCinematicBorders && topBorder != null && bottomBorder != null)
+        {
+            // ดึง Texture เผื่อมีการอัปเดตจาก Inspector
+            if (borderTexture != null)
+            {
+                topBorder.texture = borderTexture;
+                bottomBorder.texture = borderTexture;
+            }
+
+            // เลื่อนความเร็วกลับเข้าสู่โหมดปกติ
+            currentScrollSpeed = Mathf.Lerp(currentScrollSpeed, normalScrollSpeed, adrenalineDecaySpeed * Time.unscaledDeltaTime);
+
+            // ขยับแกน UV
+            scrollPositionTop += currentScrollSpeed * Time.unscaledDeltaTime;
+            scrollPositionBottom -= currentScrollSpeed * Time.unscaledDeltaTime; // เลื่อนสวนทางกัน
+
+            topBorder.uvRect = new Rect(scrollPositionTop, 0, 1, 1);
+            bottomBorder.uvRect = new Rect(scrollPositionBottom, 0, 1, 1);
+
+            // เฟดความชัดเมื่อเปิดสโลว์
+            float targetAlpha = SlowMotionManager.Instance != null && SlowMotionManager.Instance.IsSlowMotionActive ? borderColor.a : 0f;
+            Color cTop = topBorder.color;
+            Color cBot = bottomBorder.color;
+            
+            cTop.a = Mathf.Lerp(cTop.a, targetAlpha, filterTransitionSpeed * Time.unscaledDeltaTime);
+            cBot.a = Mathf.Lerp(cBot.a, targetAlpha, filterTransitionSpeed * Time.unscaledDeltaTime);
+            
+            cTop.r = borderColor.r; cTop.g = borderColor.g; cTop.b = borderColor.b;
+            cBot.r = borderColor.r; cBot.g = borderColor.g; cBot.b = borderColor.b;
+
+            topBorder.color = cTop;
+            bottomBorder.color = cBot;
+        }
+    }
+
+    /// <summary>
+    /// เรียกฟังก์ชันนี้เมื่อเกิดการปะทะ (โดนดาเมจ, แพรี่) เพื่อให้ขอบจอวิ่งเร็วขึ้น
+    /// </summary>
+    public void TriggerAdrenaline()
+    {
+        if (enableCinematicBorders)
+        {
+            currentScrollSpeed = adrenalineScrollSpeed;
         }
     }
 
