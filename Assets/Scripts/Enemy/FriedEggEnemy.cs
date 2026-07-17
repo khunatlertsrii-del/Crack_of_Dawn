@@ -513,10 +513,6 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         }
 
         // เพิ่มคอมโบ Style Rank และหลอด Crispy Mode
-        if (StyleRankManager.Instance != null)
-        {
-            StyleRankManager.Instance.AddStyle(isCritical);
-        }
         if (CrispyModeManager.Instance != null)
         {
             CrispyModeManager.Instance.AddHeat(isCritical);

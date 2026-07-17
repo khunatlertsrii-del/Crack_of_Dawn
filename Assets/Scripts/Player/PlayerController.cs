@@ -461,7 +461,6 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Better Jump Gravity:
     /// - ตกเร็วขึ้นเมื่อเริ่มตก (fallMultiplier)
-    /// - ตกเร็วขึ้นถ้าปล่อยปุ่ม Jump (lowJumpMultiplier) → Variable Jump Height
     /// </summary>
     private void ApplyBetterJumpGravity()
     {
@@ -471,11 +470,6 @@ public class PlayerController : MonoBehaviour
         {
             // กำลังตก → เพิ่มแรงโน้มถ่วง
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
-        }
-        else if (rb.linearVelocity.y > 0 && !isJumpHeld)
-        {
-            // กำลังขึ้น + ปล่อยปุ่ม Jump → ตัดแรงกระโดด (กระโดดเตี้ย)
-            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
         }
     }
 

@@ -30,8 +30,8 @@ public class UIManager : MonoBehaviour
     private RectTransform slowMoRect;
     private Vector2 hpOriginalPos;
     private Vector2 slowMoOriginalPos;
-    [SerializeField] private Text killCountText;
-    [SerializeField] private Text scoreText;
+    // UI
+    // (Removed Score and KillCount)
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private GameObject victoryPanel;
     [SerializeField] private Text gameOverScoreText;
@@ -205,12 +205,12 @@ public class UIManager : MonoBehaviour
 
     private void HandleEnemyKilled(int totalKills)
     {
-        UpdateKillCount(totalKills);
+        // UI removed
     }
 
     private void HandleScoreChanged(int score)
     {
-        UpdateScore(score);
+        // UI removed
     }
 
     private void HandleGameStateChanged(GameManager.GameState state)
@@ -232,14 +232,12 @@ public class UIManager : MonoBehaviour
 
     private void UpdateKillCount(int kills)
     {
-        if (killCountText != null)
-            killCountText.text = $"KILLS: {kills}";
+        // UI removed
     }
 
     private void UpdateScore(int score)
     {
-        if (scoreText != null)
-            scoreText.text = $"SCORE: {score:N0}";
+        // UI removed
     }
 
     private void ShowGameOver()
@@ -306,24 +304,6 @@ public class UIManager : MonoBehaviour
             slowMoSlider = CreateSlider("SlowMo_Bar",
                 new Vector2(20, -50), new Vector2(200, 15),
                 slowMoBarColor, "SLOW-MO");
-        }
-
-        // === Kill Count (มุมขวาบน) ===
-        if (killCountText == null)
-        {
-            killCountText = CreateText("KillCount",
-                new Vector2(-20, -20), "KILLS: 0",
-                TextAnchor.UpperRight,
-                new Vector2(1, 1), new Vector2(1, 1));
-        }
-
-        // === Score (ใต้ Kill Count) ===
-        if (scoreText == null)
-        {
-            scoreText = CreateText("Score",
-                new Vector2(-20, -45), "SCORE: 0",
-                TextAnchor.UpperRight,
-                new Vector2(1, 1), new Vector2(1, 1));
         }
 
         // === Game Over Panel ===

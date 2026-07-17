@@ -108,7 +108,6 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         // เรียกจอแดง!
         ScreenEffectManager.Instance?.PlayDamageEffect();
-        ScreenEffectManager.Instance?.TriggerAdrenaline();
 
         Debug.Log($"[Player] โดนยิง! Damage: {damage} | HP: {CurrentHealth}/{maxHealth}");
 
