@@ -366,12 +366,7 @@ public class PlayerController : MonoBehaviour
     {
         if (wallJumpLockTimer > 0) return; // ล็อคการเคลื่อนที่ชั่วขณะหลัง Wall Jump
 
-        // ดึงความเร็วพื้นฐานมาคูณกับ Multiplier ของร่าง Crispy (ถ้ามี)
         float currentMoveSpeed = moveSpeed;
-        if (CrispyModeManager.Instance != null)
-        {
-            currentMoveSpeed *= CrispyModeManager.Instance.CurrentSpeedMultiplier;
-        }
 
         float targetSpeed = MoveInput * currentMoveSpeed;
         float speedDifference = targetSpeed - rb.linearVelocity.x;

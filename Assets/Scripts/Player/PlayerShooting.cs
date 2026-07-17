@@ -211,10 +211,8 @@ public class PlayerShooting : MonoBehaviour
     {
         if (isReloading) return;
 
-        bool isCrispy = CrispyModeManager.Instance != null && CrispyModeManager.Instance.IsCrispyActive;
-
-        // เช็คกดปุ่มรีโหลดแมนนวล (ถ้าร่างกรอบ ไม่ต้องรีโหลดเพราะกระสุนไม่จำกัด)
-        if (reloadAction.WasPressedThisFrame() && CurrentAmmo < ammoCapacity && !isCrispy)
+        // เช็คกดปุ่มรีโหลดแมนนวล
+        if (reloadAction.WasPressedThisFrame() && CurrentAmmo < ammoCapacity)
         {
             StartCoroutine(ReloadRoutine());
             return;
@@ -227,23 +225,13 @@ public class PlayerShooting : MonoBehaviour
 
         if (isShooting && fireTimer <= 0)
         {
-            if (CurrentAmmo > 0 || isCrispy) // ถ้าร่างกรอบ ยิงได้เสมอ
+            if (CurrentAmmo > 0)
             {
                 Fire();
                 
-                if (!isCrispy)
-                {
-                    CurrentAmmo--;
-                }
+                CurrentAmmo--;
                 
-                // ดึง Multiplier จาก CrispyMode ถ้ามี
-                float finalFireRate = fireRate;
-                if (isCrispy)
-                {
-                    finalFireRate *= CrispyModeManager.Instance.CurrentFireRateMultiplier;
-                }
-                
-                fireTimer = 1f / finalFireRate;
+                fireTimer = 1f / fireRate;
             }
             else
             {
@@ -388,14 +376,7 @@ public class PlayerShooting : MonoBehaviour
     {
         if (ammoText != null)
         {
-            bool isCrispy = CrispyModeManager.Instance != null && CrispyModeManager.Instance.IsCrispyActive;
-
-            if (isCrispy)
-            {
-                ammoText.text = "AMMO: INFINITE!";
-                ammoText.color = Color.yellow;
-            }
-            else if (isReloading)
+            if (isReloading)
             {
                 ammoText.text = "RELOADING...";
                 ammoText.color = Color.white;

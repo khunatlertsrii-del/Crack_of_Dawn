@@ -512,11 +512,7 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
             GameManager.Instance.EnemyKilled(isCritical);
         }
 
-        // เพิ่มคอมโบ Style Rank และหลอด Crispy Mode
-        if (CrispyModeManager.Instance != null)
-        {
-            CrispyModeManager.Instance.AddHeat(isCritical);
-        }
+
 
         // เล่น Death Animation/Effect
         StartCoroutine(DeathSequence(isCritical));

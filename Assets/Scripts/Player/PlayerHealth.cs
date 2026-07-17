@@ -95,9 +95,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (!IsAlive) return;
         if (IsInvincible) return;
 
-        // อมตะเมื่ออยู่ในร่างกรอบทอง!
-        if (CrispyModeManager.Instance != null && CrispyModeManager.Instance.IsCrispyActive)
-            return;
+
 
         CurrentHealth -= damage;
         CurrentHealth = Mathf.Max(0, CurrentHealth);
