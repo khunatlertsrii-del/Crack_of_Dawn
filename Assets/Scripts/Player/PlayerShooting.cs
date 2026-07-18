@@ -22,6 +22,9 @@ public class PlayerShooting : MonoBehaviour
     [Tooltip("จุดหมุนปืน (Empty GameObject เป็น Child ของ Player)")]
     [SerializeField] private Transform gunPivot;
 
+    [Tooltip("จุดหมุนหัว (Empty GameObject สำหรับหมุนหัวตามเมาส์)")]
+    [SerializeField] private Transform headPivot;
+
     [Tooltip("จุดปากกระบอกปืน (Child ของ GunPivot)")]
     [SerializeField] private Transform muzzlePoint;
 
@@ -51,6 +54,9 @@ public class PlayerShooting : MonoBehaviour
     [Header("Gun Visual")]
     [Tooltip("SpriteRenderer ของปืน (สำหรับ Flip)")]
     [SerializeField] private SpriteRenderer gunSprite;
+
+    [Tooltip("SpriteRenderer ของหัว (สำหรับ Flip ไม่ให้หัวกลับด้าน)")]
+    [SerializeField] private SpriteRenderer headSprite;
 
     // ===================== Internal =====================
     private InputAction shootAction;
@@ -194,12 +200,26 @@ public class PlayerShooting : MonoBehaviour
         }
 
         gunPivot.rotation = Quaternion.Euler(0, 0, angle);
+        
+        // หมุนหัวด้วย (ถ้ามี)
+        if (headPivot != null)
+        {
+            headPivot.rotation = Quaternion.Euler(0, 0, angle);
+        }
 
-        // Flip Gun Sprite (ไม่ให้ปืนกลับหัวตอนเล็งขึ้น)
+        // Flip Gun Sprite (ไม่ให้ปืนกลับหัวตอนเล็งขึ้น/ลง)
+        bool shouldFlipY = (angle > 90 || angle < -90) && transform.localScale.x > 0
+                || (angle <= 90 && angle >= -90) && transform.localScale.x < 0;
+
         if (gunSprite != null)
         {
-            gunSprite.flipY = (angle > 90 || angle < -90) && transform.localScale.x > 0
-                || (angle <= 90 && angle >= -90) && transform.localScale.x < 0;
+            gunSprite.flipY = shouldFlipY;
+        }
+
+        // Flip Head Sprite (ไม่ให้หัวกลับด้าน)
+        if (headSprite != null)
+        {
+            headSprite.flipY = shouldFlipY;
         }
     }
 

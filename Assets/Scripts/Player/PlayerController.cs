@@ -334,13 +334,31 @@ public class PlayerController : MonoBehaviour
 
     private void CheckWall()
     {
-        // ยิง Ray ไปทางที่ Player หันหน้า (เพิ่มระยะเป็น 0.8f ให้ชนกำแพงง่ายขึ้นและกระโดดได้ทันทีที่เฉียด)
-        float rayLength = 0.8f;
-        Vector2 dir = IsFacingRight ? Vector2.right : Vector2.left;
-        Vector2 origin = (Vector2)transform.position;
+        // ยิงเลเซอร์ออกจากกลางตัวละคร (แม่นยำกว่า transform.position ที่อาจจะอยู่ตรงเท้า)
+        Vector2 origin = playerCollider.bounds.center;
+        
+        // ระยะเลเซอร์ = ครึ่งนึงของความกว้างตัวละคร + 0.3f ให้เลยออกไปแตะกำแพง
+        float rayLength = playerCollider.bounds.extents.x + 0.3f;
+        
+        bool hitRight = CastRay(origin, Vector2.right, rayLength);
+        bool hitLeft = CastRay(origin, Vector2.left, rayLength);
+        
+        isTouchingWall = hitRight || hitLeft;
+        
+        if (isTouchingWall)
+        {
+            if (hitRight && hitLeft)
+                wallDirection = MoveInput > 0 ? 1 : -1;
+            else if (hitRight)
+                wallDirection = 1;
+            else if (hitLeft)
+                wallDirection = -1;
+        }
+    }
 
-        RaycastHit2D[] hits = Physics2D.RaycastAll(origin, dir, rayLength);
-        isTouchingWall = false;
+    private bool CastRay(Vector2 origin, Vector2 dir, float length)
+    {
+        RaycastHit2D[] hits = Physics2D.RaycastAll(origin, dir, length);
         foreach (var hit in hits)
         {
             if (hit.collider == null) continue;
@@ -348,14 +366,9 @@ public class PlayerController : MonoBehaviour
             if (hit.collider.gameObject == gameObject) continue;
             if (hit.collider.transform.IsChildOf(transform)) continue;
             if (hit.collider.isTrigger) continue;
-            isTouchingWall = true;
-            break;
+            return true;
         }
-
-        if (isTouchingWall)
-        {
-            wallDirection = IsFacingRight ? 1 : -1;
-        }
+        return false;
     }
 
     // =========================================================
@@ -630,7 +643,7 @@ public class PlayerController : MonoBehaviour
         if (isTouchingWall)
         {
             wallCoyoteCounter = wallCoyoteTime;
-            wallDirection = IsFacingRight ? 1 : -1;
+            // ไม่ต้องเซ็ต wallDirection ตรงนี้แล้ว เพราะ CheckWall จัดการให้แล้ว
         }
         else
         {
@@ -656,9 +669,15 @@ public class PlayerController : MonoBehaviour
     {
         if (wallJumpLockTimer > 0) return;
 
-        if (MoveInput > 0 && !IsFacingRight)
+        // หันหน้าตามเมาส์
+        if (Camera.main == null || UnityEngine.InputSystem.Mouse.current == null) return;
+
+        Vector2 mouseScreenPos = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, Mathf.Abs(Camera.main.transform.position.z)));
+
+        if (mouseWorldPos.x > transform.position.x && !IsFacingRight)
             Flip();
-        else if (MoveInput < 0 && IsFacingRight)
+        else if (mouseWorldPos.x < transform.position.x && IsFacingRight)
             Flip();
     }
 
