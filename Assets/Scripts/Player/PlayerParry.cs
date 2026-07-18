@@ -126,7 +126,12 @@ public class PlayerParry : MonoBehaviour
                         var enemy = hit.GetComponent<FriedEggEnemy>();
                         if (enemy != null)
                         {
-                            enemy.TakeDamage(parryDamage, hit.transform.position, false);
+                            Vector2 hitDirection = (hit.transform.position - transform.position).normalized;
+                            enemy.TakeDamage(parryDamage, hit.transform.position, false, hitDirection);
+
+                            // เลือดสาด 360 องศา และแปะหน้าจอ!
+                            if (HitEffect.Instance != null) HitEffect.Instance.PlayMeleeHitEffect(hit.transform.position);
+                            if (ScreenEffectManager.Instance != null) ScreenEffectManager.Instance.PlayScreenBloodSplatter(Random.Range(1, 4));
                         }
                     }
                 }

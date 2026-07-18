@@ -52,6 +52,29 @@ public class HitEffect : MonoBehaviour
     [Tooltip("Particle ตอนกระสุนชนกำแพง/พื้น (แนะนำฝุ่น/ควัน)")]
     [SerializeField] private GameObject impactParticlePrefab;
 
+    [Header("Blood & Gore Settings (Procedural)")]
+    [Tooltip("จำนวนเลือดเวลายิงโดนไข่แดง (Critical)")]
+    [SerializeField] private int criticalBloodCount = 12;
+    [Tooltip("จำนวนเลือดเวลายิงโดนไข่ขาว (Normal)")]
+    [SerializeField] private int normalBloodCount = 5;
+    [Tooltip("จำนวนเลือดเวลาเอาดาบ/กระทะฟาด (Melee)")]
+    [SerializeField] private int meleeBloodCount = 20;
+    
+    [Tooltip("แรงสาดเลือด (Min/Max) เวลายิงปืน")]
+    [SerializeField] private Vector2 shootBloodForce = new Vector2(5f, 15f);
+    [Tooltip("แรงสาดเลือด (Min/Max) เวลาฟาดประชิด")]
+    [SerializeField] private Vector2 meleeBloodForce = new Vector2(8f, 20f);
+    
+    [Tooltip("ความกว้างของกรวยเลือดเวลายิง (องศา) - ค่ายิ่งเยอะ ยิ่งกระจายกว้าง")]
+    [SerializeField] private float shootBloodSpreadAngle = 45f;
+    [Tooltip("แรงดึงดูดของเลือด (Min/Max)")]
+    [SerializeField] private Vector2 bloodGravityScale = new Vector2(1f, 3f);
+    [Tooltip("ขนาดของหยดเลือด (Min/Max)")]
+    [SerializeField] private Vector2 bloodSizeRange = new Vector2(0.05f, 0.2f);
+    
+    [Tooltip("ระยะเวลาที่คราบเลือดติดกำแพง (วินาที) ก่อนจะสลายตัว")]
+    [SerializeField] public float bloodDecalDuration = 20f;
+
     private bool isHitstopActive = false;
 
     private void Awake()
@@ -72,7 +95,7 @@ public class HitEffect : MonoBehaviour
     /// เล่นเอฟเฟกต์ Critical Hit (ยิงโดนไข่แดง!)
     /// Hitstop ยาวกว่า + Screen Shake แรงกว่า + Particle สีเหลืองส้ม
     /// </summary>
-    public void PlayCriticalHitEffect(Vector2 hitPoint)
+    public void PlayCriticalHitEffect(Vector2 hitPoint, Vector2 hitDirection)
     {
         // Hitstop
         StartCoroutine(HitstopCoroutine(criticalHitstopDuration));
@@ -84,14 +107,14 @@ public class HitEffect : MonoBehaviour
         }
 
         // Particles
-        SpawnHitParticles(hitPoint, isCritical: true);
+        SpawnHitParticles(hitPoint, isCritical: true, hitDirection);
     }
 
     /// <summary>
     /// เล่นเอฟเฟกต์ Normal Hit (ยิงโดนไข่ขาว)
     /// Hitstop สั้น + Screen Shake เบา
     /// </summary>
-    public void PlayNormalHitEffect(Vector2 hitPoint)
+    public void PlayNormalHitEffect(Vector2 hitPoint, Vector2 hitDirection)
     {
         StartCoroutine(HitstopCoroutine(normalHitstopDuration));
 
@@ -100,7 +123,23 @@ public class HitEffect : MonoBehaviour
             CameraFollow.Instance.ShakeCamera(normalShakeIntensity, normalShakeDuration);
         }
 
-        SpawnHitParticles(hitPoint, isCritical: false);
+        SpawnHitParticles(hitPoint, isCritical: false, hitDirection);
+    }
+
+    /// <summary>
+    /// เล่นเอฟเฟกต์ Melee Hit (ฟันระยะประชิด)
+    /// เลือดสาด 360 องศา ปริมาณเยอะสะใจ
+    /// </summary>
+    public void PlayMeleeHitEffect(Vector2 hitPoint)
+    {
+        StartCoroutine(HitstopCoroutine(criticalHitstopDuration * 2f)); // Hitstop นานกว่าปกติเพื่อความหนักแน่น
+
+        if (CameraFollow.Instance != null)
+        {
+            CameraFollow.Instance.ShakeCamera(criticalShakeIntensity * 1.5f, criticalShakeDuration);
+        }
+
+        SpawnMeleeParticles(hitPoint);
     }
 
     /// <summary>
@@ -174,7 +213,7 @@ public class HitEffect : MonoBehaviour
     // PARTICLES
     // =========================================================
 
-    private void SpawnHitParticles(Vector2 hitPoint, bool isCritical)
+    private void SpawnHitParticles(Vector2 hitPoint, bool isCritical, Vector2 hitDirection)
     {
         GameObject prefab = isCritical ? criticalHitParticlePrefab : normalHitParticlePrefab;
 
@@ -186,7 +225,7 @@ public class HitEffect : MonoBehaviour
         else
         {
             // Default: สร้าง Particle แบบง่ายๆ ถ้าไม่มี Prefab
-            SpawnDefaultParticles(hitPoint, isCritical);
+            SpawnDefaultParticles(hitPoint, isCritical, hitDirection);
         }
     }
 
@@ -194,35 +233,97 @@ public class HitEffect : MonoBehaviour
     /// สร้าง Particle Effect แบบ Procedural (ไม่ต้องมี Prefab)
     /// ใช้ตอนยังไม่มี Art Asset
     /// </summary>
-    private void SpawnDefaultParticles(Vector2 hitPoint, bool isCritical)
+    private void SpawnDefaultParticles(Vector2 hitPoint, bool isCritical, Vector2 hitDirection)
     {
-        int particleCount = isCritical ? 12 : 5;
+        int particleCount = isCritical ? criticalBloodCount : normalBloodCount;
         Color particleColor = isCritical
             ? new Color(1f, 0.7f, 0.1f) // สีไข่แดง (เหลืองส้ม)
             : new Color(1f, 1f, 0.9f);  // สีไข่ขาว (ขาวนวล)
 
+        // ทิศทางหลักคือกระเด็นตามกระสุนที่วิ่งทะลุ หรือสวนกลับ
+        // (ปกติถ้ายิงโดนของเหลว มันจะมีเศษที่กระเด็นตามทางกระสุน และกระเด็นสวนทางเล็กน้อย)
+        // เพื่อความชัวร์ เราจะให้มันพุ่งตาม direction ของกระสุน 
+        // ถ้าต้องการให้พุ่งสวนทาง ให้ใส่ -hitDirection ตอนส่งค่ามา
+        
+        if (cachedCircleSprite == null) cachedCircleSprite = CreateCircleSprite();
+
         for (int i = 0; i < particleCount; i++)
         {
             GameObject p = new GameObject($"HitParticle_{i}");
-            p.transform.position = hitPoint;
+            p.transform.position = hitPoint + Random.insideUnitCircle * 0.2f;
 
             var sr = p.AddComponent<SpriteRenderer>();
-            sr.sprite = CreateCircleSprite();
+            sr.sprite = cachedCircleSprite;
             sr.color = particleColor;
             sr.sortingOrder = 100;
-            p.transform.localScale = Vector3.one * Random.Range(0.05f, 0.15f);
+            p.transform.localScale = Vector3.one * Random.Range(bloodSizeRange.x, bloodSizeRange.y);
 
             var rb = p.AddComponent<Rigidbody2D>();
-            rb.gravityScale = Random.Range(1f, 3f);
-            Vector2 randomDir = Random.insideUnitCircle.normalized;
-            float force = isCritical ? Random.Range(5f, 12f) : Random.Range(2f, 6f);
-            rb.AddForce(randomDir * force, ForceMode2D.Impulse);
+            rb.gravityScale = Random.Range(bloodGravityScale.x, bloodGravityScale.y);
+            
+            // กระจายเป็นรูปกรวย (Cone) พุ่งตามกระสุน (hitDirection)
+            // เพิ่มความกว้างของกรวยด้วยการสุ่มมุมเล็กน้อย
+            float angleOffset = Random.Range(-shootBloodSpreadAngle, shootBloodSpreadAngle);
+            Vector2 sprayDir = Quaternion.Euler(0, 0, angleOffset) * hitDirection;
+
+            // เพิ่มความแรงในการสาด
+            float force = Random.Range(shootBloodForce.x, shootBloodForce.y);
+            if (!isCritical) force *= 0.6f; // ถ้าโดนไข่ขาวให้กระเด็นเบากว่าหน่อย
+
+            rb.AddForce(sprayDir.normalized * force, ForceMode2D.Impulse);
             rb.angularVelocity = Random.Range(-360f, 360f);
 
-            Destroy(p, 1.5f);
+            // ใส่ Collider เป็น Trigger เพื่อตรวจจับกำแพง (โดยไม่ผลักผู้เล่น)
+            var col = p.AddComponent<CircleCollider2D>();
+            col.radius = 0.5f;
+            col.isTrigger = true;
+
+            // ใส่ BloodParticle สคริปต์
+            p.AddComponent<BloodParticle>();
+
+            // ปิดการชนกันเองของ Layer เดียวกัน (ถ้าเป็นไปได้ควรไปตั้งใน Project Settings > Physics 2D)
+            // ชั่วคราว: ใส่ IgnoreCollision 
         }
     }
 
+    private void SpawnMeleeParticles(Vector2 hitPoint)
+    {
+        int particleCount = meleeBloodCount;
+        Color particleColor = new Color(1f, 0.7f, 0.1f); // สีไข่แดง
+
+        if (cachedCircleSprite == null) cachedCircleSprite = CreateCircleSprite();
+
+        for (int i = 0; i < particleCount; i++)
+        {
+            GameObject p = new GameObject($"MeleeParticle_{i}");
+            p.transform.position = hitPoint + Random.insideUnitCircle * 0.3f; // สุ่มจุดเกิดนิดๆ จะได้ไม่ทับกัน
+
+            var sr = p.AddComponent<SpriteRenderer>();
+            sr.sprite = cachedCircleSprite;
+            sr.color = particleColor;
+            sr.sortingOrder = 100;
+            p.transform.localScale = Vector3.one * Random.Range(bloodSizeRange.x, bloodSizeRange.y * 1.5f); // ใหญ่กว่าปกตินิดนึง
+
+            var rb = p.AddComponent<Rigidbody2D>();
+            rb.gravityScale = Random.Range(bloodGravityScale.x, bloodGravityScale.y);
+            
+            // กระจาย 360 องศา!
+            Vector2 sprayDir = Random.insideUnitCircle.normalized;
+
+            // เพิ่มความแรงสุดๆ
+            float force = Random.Range(meleeBloodForce.x, meleeBloodForce.y);
+            rb.AddForce(sprayDir * force, ForceMode2D.Impulse);
+            rb.angularVelocity = Random.Range(-360f, 360f);
+
+            var col = p.AddComponent<CircleCollider2D>();
+            col.radius = 0.5f;
+            col.isTrigger = true;
+
+            p.AddComponent<BloodParticle>();
+        }
+    }
+
+    private Sprite cachedCircleSprite;
     /// <summary>สร้าง Sprite วงกลมขาว (Placeholder)</summary>
     private Sprite CreateCircleSprite()
     {

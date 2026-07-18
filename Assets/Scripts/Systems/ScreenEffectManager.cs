@@ -36,6 +36,16 @@ public class ScreenEffectManager : MonoBehaviour
     [Tooltip("ความเร็วในการกลับคืนสู่สปีดปกติ")]
     public float adrenalineDecaySpeed = 2f;
 
+    [Header("Screen Blood Settings (เลือดเปื้อนจอ)")]
+    [Tooltip("ขนาดคราบเลือดบนจอ (Min/Max)")]
+    public Vector2 screenBloodSizeRange = new Vector2(60f, 180f);
+    [Tooltip("ความโปร่งแสงตอนแรกเริ่ม (0.0 - 1.0)")]
+    public float screenBloodInitialAlpha = 0.7f;
+    [Tooltip("ระยะเวลาที่เลือดค่อยๆ ไหลและจางหายไป (วินาที)")]
+    public float screenBloodFadeDuration = 2f;
+    [Tooltip("ความเร็วในการไหลย้อยลงมา")]
+    public float screenBloodDripSpeed = 50f;
+
     private RawImage topBorder;
     private RawImage bottomBorder;
     private float currentScrollSpeed;
@@ -208,5 +218,110 @@ public class ScreenEffectManager : MonoBehaviour
             Color c = damageColor;
             damageImage.color = c;
         }
+    }
+
+    // =========================================================
+    // SCREEN BLOOD SPLATTER (เลือดสาดติดกล้อง)
+    // =========================================================
+
+    public void PlayScreenBloodSplatter(int amount = 3)
+    {
+        if (screenCanvas == null) return;
+
+        for (int i = 0; i < amount; i++)
+        {
+            StartCoroutine(ScreenBloodCoroutine());
+        }
+    }
+
+    private System.Collections.IEnumerator ScreenBloodCoroutine()
+    {
+        // 1. สร้าง GameObject สำหรับคราบเลือด
+        GameObject bloodObj = new GameObject("ScreenBlood");
+        bloodObj.transform.SetParent(screenCanvas.transform, false);
+
+        // 2. ใส่ Image Component
+        Image img = bloodObj.AddComponent<Image>();
+        img.raycastTarget = false;
+        
+        // ใช้ Sprite วงกลม (ถ้ายังไม่มีก็สร้าง Procedural ให้เลย)
+        if (cachedCircleSprite == null) cachedCircleSprite = CreateCircleSprite();
+        img.sprite = cachedCircleSprite;
+        
+        // สุ่มสีไข่แดง (เหลือง/ส้ม)
+        Color bloodColor = new Color(1f, Random.Range(0.6f, 0.9f), 0.1f, 1f);
+        img.color = bloodColor;
+
+        // 3. สุ่มตำแหน่งและขนาด (เน้นให้กระเด็นติดขอบจอ เพื่อไม่ให้บังกลางจอ)
+        RectTransform rt = img.rectTransform;
+        
+        bool isLeft = Random.value > 0.5f;
+        bool isTop = Random.value > 0.5f;
+        
+        float randomX = isLeft 
+            ? Random.Range(-50f, Screen.width * 0.3f) 
+            : Random.Range(Screen.width * 0.7f, Screen.width + 50f);
+            
+        float randomY = isTop 
+            ? Random.Range(Screen.height * 0.7f, Screen.height + 50f) 
+            : Random.Range(-50f, Screen.height * 0.3f);
+            
+        Vector2 screenPos = new Vector2(randomX, randomY);
+        
+        // ทำให้ยืดๆ บี้ๆ แบบของเหลวกระแทกเลนส์
+        float size = Random.Range(screenBloodSizeRange.x, screenBloodSizeRange.y);
+        img.color = new Color(bloodColor.r, bloodColor.g, bloodColor.b, screenBloodInitialAlpha);
+        rt.sizeDelta = new Vector2(size * Random.Range(0.8f, 1.2f), size * Random.Range(0.8f, 1.2f));
+        
+        // ตำแหน่ง Anchor ที่มุมซ้ายล่าง เพื่อให้อิงจาก pixel (Screen Position) ได้ง่ายๆ
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.zero;
+        rt.anchoredPosition = screenPos;
+        
+        // สุ่มหมุน
+        rt.rotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+
+        // 4. แสดงค้างไว้แป๊บนึง
+        yield return new WaitForSeconds(Random.Range(0.5f, 1.5f));
+
+        // 5. ค่อยๆ Fade Out (ไหลย้อยลงมานิดๆ)
+        float fadeTimer = screenBloodFadeDuration;
+        while (fadeTimer > 0)
+        {
+            fadeTimer -= Time.deltaTime;
+            float alpha = (fadeTimer / screenBloodFadeDuration) * screenBloodInitialAlpha;
+            img.color = new Color(bloodColor.r, bloodColor.g, bloodColor.b, alpha);
+            
+            // ไหลลงช้าๆ
+            rt.anchoredPosition -= new Vector2(0, screenBloodDripSpeed * Time.deltaTime);
+            
+            yield return null;
+        }
+
+        // 6. ทำลายทิ้ง
+        Destroy(bloodObj);
+    }
+
+    private Sprite cachedCircleSprite;
+    private Sprite CreateCircleSprite()
+    {
+        Texture2D tex = new Texture2D(32, 32);
+        Color[] pixels = new Color[32 * 32];
+        Vector2 center = new Vector2(16, 16);
+
+        for (int y = 0; y < 32; y++)
+        {
+            for (int x = 0; x < 32; x++)
+            {
+                float dist = Vector2.Distance(new Vector2(x, y), center);
+                // สร้างขอบเบลอๆ เล็กน้อยให้ดูเหมือนของเหลว
+                float alpha = 1f - Mathf.Clamp01((dist - 12f) / 4f);
+                pixels[y * 32 + x] = new Color(1, 1, 1, alpha);
+            }
+        }
+
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 100f);
     }
 }

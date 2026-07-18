@@ -92,7 +92,7 @@ public class EnemyBullet : MonoBehaviour
             if (damageable != null && damageable.IsAlive)
             {
                 // โดนกระสุนปัด ดาเมจแรง 3 เท่า!
-                damageable.TakeDamage(damage * 3f, transform.position, true);
+                damageable.TakeDamage(damage * 3f, transform.position, true, rb.linearVelocity.normalized);
             }
             Destroy(gameObject);
             return;
@@ -122,7 +122,7 @@ public class EnemyBullet : MonoBehaviour
 
             if (damageable != null && damageable.IsAlive)
             {
-                damageable.TakeDamage(damage, transform.position, false);
+                damageable.TakeDamage(damage, transform.position, false, rb.linearVelocity.normalized);
             }
 
             Destroy(gameObject);

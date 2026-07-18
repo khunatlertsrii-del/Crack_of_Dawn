@@ -424,7 +424,7 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
     /// เรียกโดย Bullet เมื่อกระสุนโดนตัว
     /// ตรวจว่าโดน "ไข่แดง" (Critical) หรือ "ไข่ขาว" (Body Shot)
     /// </summary>
-    public void HandleBulletHit(Vector2 hitPoint, float damage)
+    public void HandleBulletHit(Vector2 hitPoint, float damage, Vector2 hitDirection)
     {
         if (!IsAlive) return;
 
@@ -436,13 +436,13 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
             Debug.Log("🎯 CRITICAL HIT! ยิงโดนไข่แดง!");
             
             // ใช้ค่าจาก Inspector มาคูณดาเมจ
-            TakeDamage(damage * yolkDamageMultiplier, hitPoint, true);
+            TakeDamage(damage * yolkDamageMultiplier, hitPoint, true, hitDirection);
         }
         else
         {
             // ========== BODY SHOT — ยิงโดนไข่ขาว ==========
             Debug.Log($"💫 Body Shot — ไข่ขาวเหลือ HP: {currentHealth - whiteDamagePerHit}");
-            TakeDamage(whiteDamagePerHit, hitPoint, false);
+            TakeDamage(whiteDamagePerHit, hitPoint, false, hitDirection);
         }
     }
 
@@ -450,7 +450,7 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
     // IDamageable IMPLEMENTATION
     // =========================================================
 
-    public void TakeDamage(float damage, Vector2 hitPoint, bool isCritical)
+    public void TakeDamage(float damage, Vector2 hitPoint, bool isCritical, Vector2 hitDirection)
     {
         if (!IsAlive) return;
 
@@ -467,11 +467,11 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         {
             if (isCritical)
             {
-                HitEffect.Instance.PlayCriticalHitEffect(hitPoint);
+                HitEffect.Instance.PlayCriticalHitEffect(hitPoint, hitDirection);
             }
             else
             {
-                HitEffect.Instance.PlayNormalHitEffect(hitPoint);
+                HitEffect.Instance.PlayNormalHitEffect(hitPoint, hitDirection);
             }
         }
 
@@ -500,10 +500,12 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         // Hit Effect
         if (HitEffect.Instance != null)
         {
+            // ถ้าตาย ให้เลือดสาดกระจายออกทุกทิศทาง หรือใช้ hitPoint ชั่วคราวไปก่อน (เดี๋ยวปรับเป็น hitDirection ตอนตายได้)
+            Vector2 randomDir = Random.insideUnitCircle.normalized;
             if (isCritical)
-                HitEffect.Instance.PlayCriticalHitEffect(hitPoint);
+                HitEffect.Instance.PlayCriticalHitEffect(hitPoint, randomDir);
             else
-                HitEffect.Instance.PlayNormalHitEffect(hitPoint);
+                HitEffect.Instance.PlayNormalHitEffect(hitPoint, randomDir);
         }
 
         // แจ้ง GameManager

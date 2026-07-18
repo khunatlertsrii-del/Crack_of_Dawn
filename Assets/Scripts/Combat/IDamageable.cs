@@ -16,7 +16,8 @@ public interface IDamageable
     /// <param name="damage">จำนวน Damage ที่ได้รับ</param>
     /// <param name="hitPoint">ตำแหน่งที่โดนยิง (World Space)</param>
     /// <param name="isCritical">true = ยิงโดนจุดอ่อน (เช่น ไข่แดง)</param>
-    void TakeDamage(float damage, Vector2 hitPoint, bool isCritical);
+    /// <param name="hitDirection">ทิศทางที่กระสุนพุ่งมาชน</param>
+    void TakeDamage(float damage, Vector2 hitPoint, bool isCritical, Vector2 hitDirection);
 
     /// <summary>
     /// ตรวจว่ายังมีชีวิตอยู่ไหม

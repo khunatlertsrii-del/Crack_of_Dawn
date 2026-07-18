@@ -106,7 +106,7 @@ public class Bullet : MonoBehaviour
         {
             hasHit = true;
             // ส่งตำแหน่งที่โดน → FriedEggEnemy จะตัดสินว่าโดนไข่แดงหรือไข่ขาว
-            enemy.HandleBulletHit(transform.position, damage);
+            enemy.HandleBulletHit(transform.position, damage, direction);
             DestroyBullet();
             return;
         }
@@ -118,7 +118,7 @@ public class Bullet : MonoBehaviour
         if (damageable != null && damageable.IsAlive)
         {
             hasHit = true;
-            damageable.TakeDamage(damage, transform.position, false);
+            damageable.TakeDamage(damage, transform.position, false, direction);
             DestroyBullet();
             return;
         }

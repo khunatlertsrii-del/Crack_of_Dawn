@@ -90,7 +90,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     // IDamageable IMPLEMENTATION
     // =========================================================
 
-    public void TakeDamage(float damage, Vector2 hitPoint, bool isCritical)
+    public void TakeDamage(float damage, Vector2 hitPoint, bool isCritical, Vector2 hitDirection)
     {
         if (!IsAlive) return;
         if (IsInvincible) return;
