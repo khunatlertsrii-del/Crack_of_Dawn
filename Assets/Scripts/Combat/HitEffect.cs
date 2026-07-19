@@ -84,10 +84,20 @@ public class HitEffect : MonoBehaviour
     public float smokeFadeDuration = 1.5f;
     [Tooltip("ความเร็วในการขยายตัวของควัน")]
     public float smokeExpandSpeed = 2f;
-    [Tooltip("ขนาดควัน")]
+    [Tooltip("ขนาดควัน (พื้นฐาน)")]
     public float smokeBaseSize = 0.5f;
     [Tooltip("ใส่รูปทรงควันเอง (เว้นว่างไว้จะใช้วงกลมเบลอๆ อัตโนมัติ)")]
     public Sprite customSmokeSprite;
+
+    [Header("Smoke Amounts (ปรับปริมาณควัน)")]
+    [Tooltip("จำนวนควันเวลายิงโดนตัว (ธรรมดา)")]
+    public int gunSmokeCount = 2;
+    [Tooltip("จำนวนควันเวลายิงโดนจุดอ่อน (Critical)")]
+    public int gunCriticalSmokeCount = 5;
+    [Tooltip("จำนวนควันเวลาฟันระยะประชิด (Melee)")]
+    public int meleeSmokeCount = 3;
+    [Tooltip("ขนาดควันเวลาฟันประชิด (คูณจากขนาดพื้นฐาน)")]
+    public float meleeSmokeSizeMultiplier = 1.2f;
 
     private bool isHitstopActive = false;
 
@@ -326,7 +336,8 @@ public class HitEffect : MonoBehaviour
         }
 
         // เสกควันเลือด
-        SpawnSmokeParticles(hitPoint, bloodSmokeColor, isCritical ? 5 : 2, 1.0f);
+        int smokeCount = isCritical ? gunCriticalSmokeCount : gunSmokeCount;
+        SpawnSmokeParticles(hitPoint, bloodSmokeColor, smokeCount, 1.0f);
     }
 
     private void SpawnMeleeParticles(Vector2 hitPoint)
@@ -365,8 +376,8 @@ public class HitEffect : MonoBehaviour
             p.AddComponent<BloodParticle>();
         }
 
-        // เสกควันเลือดก้อนใหญ่
-        SpawnSmokeParticles(hitPoint, bloodSmokeColor, 8, 1.5f);
+        // เสกควันเลือดก้อนใหญ่ (ปรับจำนวนได้ใน Inspector)
+        SpawnSmokeParticles(hitPoint, bloodSmokeColor, meleeSmokeCount, meleeSmokeSizeMultiplier);
     }
 
     private void SpawnSmokeParticles(Vector2 position, Color color, int count, float sizeMultiplier)
