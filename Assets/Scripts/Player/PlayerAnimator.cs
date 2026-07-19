@@ -115,7 +115,11 @@ public class PlayerAnimator : MonoBehaviour
         Color targetColor = idleColor;
         Vector2 vel = playerController.Velocity;
 
-        if (playerController.IsWallSliding)
+        if (playerController.IsShadowDashing)
+        {
+            targetColor = new Color(0.1f, 0.1f, 0.1f, 0.8f); // เงาดำโปร่งใส
+        }
+        else if (playerController.IsWallSliding)
         {
             targetColor = wallSlideColor;
         }
@@ -163,6 +167,12 @@ public class PlayerAnimator : MonoBehaviour
                 targetScaleY = 1.1f;
                 targetScaleXMag = 0.92f;
             }
+        }
+        else if (playerController.IsShadowDashing)
+        {
+            // แดชทะลุมิติ → แบนลงนิด ยืดขวา
+            targetScaleY = 0.6f;
+            targetScaleXMag = 1.4f;
         }
 
         // Smooth lerp

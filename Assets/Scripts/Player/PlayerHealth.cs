@@ -42,7 +42,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     public float MaxHealth => maxHealth;
     public float HealthPercent => CurrentHealth / maxHealth;
     public bool IsAlive => CurrentHealth > 0;
-    public bool IsInvincible { get; private set; }
+    public bool IsInvincible => _isInvincible || _manualInvincible;
+    
+    private bool _isInvincible;
+    private bool _manualInvincible;
 
     // ===================== Events =====================
     /// <summary>เรียกเมื่อ HP เปลี่ยน (ส่ง % 0-1)</summary>
@@ -162,7 +165,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     private IEnumerator InvincibilityCoroutine()
     {
-        IsInvincible = true;
+        _isInvincible = true;
 
         // กระพริบ
         if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
@@ -170,7 +173,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
         yield return new WaitForSeconds(invincibilityDuration);
 
-        IsInvincible = false;
+        _isInvincible = false;
 
         // หยุดกระพริบ + แสดงตัวปกติ
         if (blinkCoroutine != null) StopCoroutine(blinkCoroutine);
@@ -191,6 +194,14 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     }
 
     // =========================================================
+    // MANUAL OVERRIDES (For Shadow Dash etc.)
+    // =========================================================
+    public void SetManualInvincible(bool val)
+    {
+        _manualInvincible = val;
+    }
+
+    // =========================================================
     // HEALING / RESET
     // =========================================================
 
@@ -207,7 +218,8 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     public void ResetHealth()
     {
         CurrentHealth = maxHealth;
-        IsInvincible = false;
+        _isInvincible = false;
+        _manualInvincible = false;
         SetSpriteAlpha(1f);
         OnHealthChanged?.Invoke(HealthPercent);
         ScreenEffectManager.Instance?.UpdateHealthPercent(HealthPercent);

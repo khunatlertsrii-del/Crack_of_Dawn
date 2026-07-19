@@ -23,6 +23,7 @@ public class BloodParticle : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collider)
     {
         if (hasSplat) return;
+        if (collider.isTrigger) return; // เมินโซนโปร่งใส (พวกวงมองเห็น, จุดสปอน)
 
         // ไม่ให้ติดกับผู้เล่นหรือศัตรู หรือเลือดด้วยกันเอง
         if (collider.CompareTag("Player") || collider.CompareTag("Enemy") || collider.GetComponent<BloodParticle>() != null)

@@ -19,10 +19,18 @@ public class DoorSpawner : MonoBehaviour
     [SerializeField] private GameObject enemyPrefab;
 
     [Header("Door Visuals")]
-    [Tooltip("Sprite ประตูตอนปิด")]
+    [Tooltip("ขนาดของประตู")]
+    [SerializeField] private Vector2 doorSize = new Vector2(1f, 2f);
+
+    [Tooltip("Sprite ประตูตอนปิด (ถ้าไม่ใส่จะใช้เป็นสีแทน)")]
+    [SerializeField] private Sprite closedSprite;
+    [Tooltip("Sprite ประตูตอนเปิด (ถ้าไม่ใส่จะใช้เป็นสีแทน)")]
+    [SerializeField] private Sprite openSprite;
+
+    [Tooltip("สีประตูตอนปิด")]
     [SerializeField] private Color closedColor = new Color(0.4f, 0.2f, 0.1f); // สีน้ำตาลเข้ม
     
-    [Tooltip("Sprite ประตูตอนเปิด")]
+    [Tooltip("สีประตูตอนเปิด")]
     [SerializeField] private Color openColor = new Color(0.1f, 0.1f, 0.1f); // สีดำ (มืดๆ)
 
     // Internal
@@ -39,12 +47,22 @@ public class DoorSpawner : MonoBehaviour
             GameObject visual = new GameObject("DoorVisual");
             visual.transform.SetParent(transform);
             visual.transform.localPosition = Vector3.zero;
-            visual.transform.localScale = new Vector3(1f, 2f, 1f); // ทรงประตู
+            visual.transform.localScale = new Vector3(doorSize.x, doorSize.y, 1f); 
             
             doorSprite = visual.AddComponent<SpriteRenderer>();
-            doorSprite.sprite = CreatePlaceholderSprite();
-            doorSprite.color = closedColor;
+            doorSprite.sprite = closedSprite != null ? closedSprite : CreatePlaceholderSprite();
+            doorSprite.color = closedSprite != null ? Color.white : closedColor;
             doorSprite.sortingOrder = -1; // ให้อยู่หลัง Player
+        }
+        else
+        {
+            // อัปเดตสเกลกรณีที่มี Visual อยู่แล้ว
+            doorSprite.transform.localScale = new Vector3(doorSize.x, doorSize.y, 1f);
+            if (closedSprite != null)
+            {
+                doorSprite.sprite = closedSprite;
+                doorSprite.color = Color.white;
+            }
         }
 
         // ตั้งค่า Trigger Collider ให้ใหญ่พอที่ผู้เล่นจะเดินมาชน
@@ -82,7 +100,15 @@ public class DoorSpawner : MonoBehaviour
         isOpened = true;
         if (doorSprite != null)
         {
-            doorSprite.color = openColor; // เปลี่ยนสีเป็นเปิด
+            if (openSprite != null)
+            {
+                doorSprite.sprite = openSprite;
+                doorSprite.color = Color.white;
+            }
+            else
+            {
+                doorSprite.color = openColor; // เปลี่ยนสีเป็นเปิด
+            }
         }
         
         Debug.Log("[DoorSpawner] Door Opened! Spawning enemies...");

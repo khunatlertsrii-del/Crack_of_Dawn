@@ -70,6 +70,15 @@ public class PlayerController : MonoBehaviour
     [Tooltip("เวลาหน่วงหลังหลุดจากกำแพงที่ยังกดโดดต่อได้ (วินาที)")]
     [SerializeField] private float wallCoyoteTime = 0.2f;
 
+    // ===================== SHADOW DASH =====================
+    [Header("Shadow Dash")]
+    [Tooltip("ความเร็วตอนพุ่ง")]
+    [SerializeField] private float dashSpeed = 20f;
+    [Tooltip("ระยะเวลาที่พุ่ง (วินาที)")]
+    [SerializeField] private float dashDuration = 0.2f;
+    [Tooltip("ดีเลย์ก่อนพุ่งครั้งต่อไป (วินาที)")]
+    [SerializeField] private float dashCooldown = 1f;
+    
     // ===================== GROUND / WALL CHECK =====================
     [Header("Ground & Wall Detection")]
     [Tooltip("จุดตรวจพื้น (ลาก Empty GameObject มาวางที่เท้า)")]
@@ -96,6 +105,7 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded { get; private set; }
     public bool IsWallSliding { get; private set; }
+    public bool IsShadowDashing { get; private set; }
     public bool IsFacingRight { get; private set; } = true;
     public float MoveInput { get; private set; }
     public Vector2 Velocity => rb.linearVelocity;
@@ -107,6 +117,7 @@ public class PlayerController : MonoBehaviour
     // Input Actions
     private InputAction moveAction;
     private InputAction jumpAction;
+    private InputAction dashAction;
 
     // Jump state
     private float coyoteTimeCounter;
@@ -123,6 +134,7 @@ public class PlayerController : MonoBehaviour
     private float dashTimer;
     private float dashCooldownTimer;
     private Vector2 dashDirection;
+
     private float initialGravityScale;
 
     // =========================================================
@@ -153,7 +165,10 @@ public class PlayerController : MonoBehaviour
         jumpAction.AddBinding("<Keyboard>/space");
         jumpAction.AddBinding("<Gamepad>/buttonSouth");
 
-        jumpAction.AddBinding("<Gamepad>/buttonSouth");
+        // Shadow Dash
+        dashAction = new InputAction("Dash", InputActionType.Button);
+        dashAction.AddBinding("<Keyboard>/leftShift");
+        dashAction.AddBinding("<Gamepad>/rightShoulder");
 
         // Auto-create ground/wall check points if not assigned
         if (groundCheck == null)
@@ -180,15 +195,18 @@ public class PlayerController : MonoBehaviour
     {
         moveAction.Enable();
         jumpAction.Enable();
+        dashAction.Enable();
 
         jumpAction.started += _ => OnJumpStarted();
         jumpAction.canceled += _ => OnJumpCanceled();
+        dashAction.performed += _ => OnDashPerformed();
     }
 
     private void OnDisable()
     {
         moveAction.Disable();
         jumpAction.Disable();
+        dashAction.Disable();
     }
 
     private void Update()
@@ -211,6 +229,17 @@ public class PlayerController : MonoBehaviour
         UpdateCoyoteTime();
         UpdateJumpBuffer();
         UpdateWallJumpLock();
+        
+        if (dashCooldownTimer > 0) dashCooldownTimer -= Time.deltaTime;
+
+        if (IsShadowDashing)
+        {
+            dashTimer -= Time.deltaTime;
+            if (dashTimer <= 0)
+            {
+                EndDash();
+            }
+        }
 
         // Try buffered jump
         TryBufferedJump();
@@ -227,9 +256,16 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        HandleMovement();
-        HandleWallSlide();
-        ApplyBetterJumpGravity();
+        if (IsShadowDashing)
+        {
+            rb.linearVelocity = dashDirection * dashSpeed;
+        }
+        else
+        {
+            HandleMovement();
+            HandleWallSlide();
+            ApplyBetterJumpGravity();
+        }
     }
 
     // =========================================================
@@ -452,6 +488,44 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // =========================================================
+    // SHADOW DASH
+    // =========================================================
+
+    private void OnDashPerformed()
+    {
+        if (dashCooldownTimer > 0) return;
+        if (IsShadowDashing) return;
+
+        // หาทิศทางพุ่ง ถ้ากดปุ่มเดินอยู่ก็พุ่งตามปุ่ม ถ้าไม่ได้กดให้พุ่งตามหน้า
+        float dashDir = MoveInput != 0 ? Mathf.Sign(MoveInput) : (IsFacingRight ? 1 : -1);
+        dashDirection = new Vector2(dashDir, 0);
+
+        IsShadowDashing = true;
+        dashTimer = dashDuration;
+        dashCooldownTimer = dashCooldown;
+
+        rb.linearVelocity = Vector2.zero;
+        rb.gravityScale = 0; // ปิดแรงโน้มถ่วงเพื่อไม่ให้ตก
+        
+        // I-Frame (อมตะชั่วขณะ)
+        var health = GetComponent<PlayerHealth>();
+        if (health != null) health.SetManualInvincible(true);
+
+        // ระเบิดขอบจอ (ความเร็ว)
+        ScreenEffectManager.Instance?.TriggerAdrenaline();
+    }
+
+    private void EndDash()
+    {
+        IsShadowDashing = false;
+        rb.gravityScale = initialGravityScale;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.3f, 0); // เบรกเล็กน้อยตอนจบ
+
+        // ปิด I-Frame
+        var health = GetComponent<PlayerHealth>();
+        if (health != null) health.SetManualInvincible(false);
+    }
 
     // =========================================================
     // TIMERS
