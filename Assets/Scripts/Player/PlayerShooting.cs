@@ -348,6 +348,13 @@ public class PlayerShooting : MonoBehaviour
 
     private void ShowMuzzleFlash()
     {
+        if (muzzlePoint != null)
+        {
+            Vector2 direction = (muzzlePoint.position - gunPivot.position).normalized;
+            HitEffect.Instance?.PlayMuzzleFlash(muzzlePoint.position, direction);
+        }
+        
+        // เก็บของเก่าไว้เผื่อมีการลากใส่ใน Inspector
         if (muzzleFlashSprite != null)
         {
             muzzleFlashSprite.enabled = true;

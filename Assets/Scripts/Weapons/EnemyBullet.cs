@@ -133,6 +133,7 @@ public class EnemyBullet : MonoBehaviour
         if (!other.isTrigger && !other.CompareTag("Enemy") && !other.CompareTag("Player"))
         {
             hasHit = true;
+            HitEffect.Instance?.PlayImpactEffect(transform.position);
             Destroy(gameObject);
         }
     }

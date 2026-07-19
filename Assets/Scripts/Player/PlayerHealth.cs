@@ -102,6 +102,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         timeSinceLastHit = 0f; // รีเซ็ตเวลารีเจนเมื่อโดนโจมตี
 
         OnHealthChanged?.Invoke(HealthPercent);
+        ScreenEffectManager.Instance?.UpdateHealthPercent(HealthPercent);
         OnDamaged?.Invoke(damage, hitPoint);
 
         // เรียกจอแดง!
@@ -199,6 +200,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (!IsAlive) return;
         CurrentHealth = Mathf.Min(maxHealth, CurrentHealth + amount);
         OnHealthChanged?.Invoke(HealthPercent);
+        ScreenEffectManager.Instance?.UpdateHealthPercent(HealthPercent);
     }
 
     /// <summary>รีเซ็ต HP เต็ม</summary>
@@ -208,6 +210,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         IsInvincible = false;
         SetSpriteAlpha(1f);
         OnHealthChanged?.Invoke(HealthPercent);
+        ScreenEffectManager.Instance?.UpdateHealthPercent(HealthPercent);
     }
 
     // =========================================================

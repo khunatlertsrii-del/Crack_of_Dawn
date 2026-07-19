@@ -379,6 +379,9 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
             // สร้าง Default Bullet
             SpawnDefaultEnemyBullet(direction);
         }
+
+        // เอฟเฟกต์แสงไฟปลายปืน
+        HitEffect.Instance?.PlayMuzzleFlash(firePoint.position, direction);
     }
 
     private void SpawnDefaultEnemyBullet(Vector2 direction)

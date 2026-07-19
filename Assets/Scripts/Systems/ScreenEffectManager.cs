@@ -6,12 +6,22 @@ public class ScreenEffectManager : MonoBehaviour
     public static ScreenEffectManager Instance { get; private set; }
 
     [Header("Damage Vignette (ขอบจอแดงตอนโดนตี)")]
-    [Tooltip("เปิด/ปิด จอแดง")]
+    [Tooltip("เปิด/ปิด จอแดงและจอเทา")]
     public bool enableDamageEffect = true;
-    [Tooltip("สีของจอตอนโดนตี (ปรับความเข้มที่ค่า Alpha)")]
-    public Color damageColor = new Color(1f, 0f, 0f, 0.4f);
+    [Tooltip("สีของขอบจอแดงตอนโดนตี (ปรับความเข้มที่ค่า Alpha)")]
+    public Color damageColor = new Color(0.8f, 0f, 0f, 0.7f);
     [Tooltip("ระยะเวลาที่จอจะแดงค้างไว้ก่อนจะค่อยๆ หายไป")]
     public float damageEffectDuration = 0.5f;
+
+    [Header("Health & Grayscale Settings (หน้าเทา)")]
+    [Tooltip("สีเทาที่จะมาบังจอเวลาโดนตี หรือ เลือดน้อย")]
+    public Color grayscaleColor = new Color(0.1f, 0.1f, 0.1f, 0.85f); // เทาเข้มทึบๆ
+    [Tooltip("เปิด/ปิด ให้หน้าจอเทาค้างไว้เวลาเลือดน้อย")]
+    public bool enableLowHealthGray = true;
+    [Tooltip("เปอร์เซ็นต์เลือดที่ถือว่าน้อย (0.0 - 1.0)")]
+    public float lowHealthThreshold = 0.3f;
+    
+    private float currentHealthPercent = 1f;
 
     [Header("Slow Motion Filter (ฟิลเตอร์ตอนเปิดสโลว์)")]
     [Tooltip("เปิด/ปิด ฟิลเตอร์ตอน Slow")]
@@ -109,15 +119,52 @@ public class ScreenEffectManager : MonoBehaviour
         rtBot.offsetMin = Vector2.zero;
         rtBot.offsetMax = Vector2.zero;
 
-        // 4. สร้าง Image สำหรับ Damage Vignette (อยู่ข้างบนสุด)
+        // 4. สร้าง Image สำหรับ Grayscale Overlay (หน้าเทา) (อยู่ใต้ Vignette)
+        GameObject grayObj = new GameObject("GrayscaleOverlay");
+        grayObj.transform.SetParent(canvasObj.transform, false);
+        grayscaleImage = grayObj.AddComponent<Image>();
+        grayscaleImage.raycastTarget = false;
+        grayscaleImage.color = new Color(grayscaleColor.r, grayscaleColor.g, grayscaleColor.b, 0f);
+        SetFullScreen(grayscaleImage.rectTransform);
+
+        // 5. สร้าง Image สำหรับ Damage Vignette (ขอบจอแดง อยู่บนสุด)
         GameObject dmgObj = new GameObject("DamageVignette");
         dmgObj.transform.SetParent(canvasObj.transform, false);
         damageImage = dmgObj.AddComponent<Image>();
         damageImage.raycastTarget = false;
         damageImage.color = new Color(damageColor.r, damageColor.g, damageColor.b, 0f);
+        damageImage.sprite = CreateVignetteSprite(); // สร้างภาพขอบแดงไล่สี
         SetFullScreen(damageImage.rectTransform);
+    }
+    
+    private Image grayscaleImage;
 
-        // คุณสามารถใส่ Sprite ขอบดำ/แดง (Vignette) ลงใน Image แทนสีพื้นๆ ได้ ถ้ามีการโยน Sprite เข้ามา
+    /// <summary>สร้างภาพ Vignette (ตรงกลางใส ขอบทึบ) แบบ Procedural</summary>
+    private Sprite CreateVignetteSprite()
+    {
+        int size = 128; // เล็กๆ แล้วให้ Canvas ขยายเอา
+        Texture2D tex = new Texture2D(size, size);
+        Color[] pixels = new Color[size * size];
+        Vector2 center = new Vector2(size / 2f, size / 2f);
+        float maxDist = size / 2f;
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                // หาระยะห่างจากตรงกลางจอ
+                float dist = Vector2.Distance(new Vector2(x, y), center);
+                // ขอบจอจะค่าใกล้ 1 ตรงกลางใกล้ 0
+                float factor = Mathf.Clamp01(dist / maxDist);
+                // ยกกำลังให้ตรงกลางกว้างๆ แล้วขอบแดงจัดๆ
+                factor = Mathf.Pow(factor, 3f);
+
+                pixels[y * size + x] = new Color(1f, 1f, 1f, factor); // ใช้สีขาวไล่ Alpha แล้วให้ Image.color เปลี่ยนสีเอา
+            }
+        }
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
     }
 
     private void SetFullScreen(RectTransform rt)
@@ -130,21 +177,43 @@ public class ScreenEffectManager : MonoBehaviour
 
     private void Update()
     {
-        // 1. อัปเดตขอบจอแดง
+        // 1. อัปเดตขอบจอแดง & หน้าเทา
+        float targetGrayAlpha = 0f;
+        
+        // ถ้าเลือดน้อย ให้หน้าเทาตลอด
+        if (enableLowHealthGray && currentHealthPercent <= lowHealthThreshold)
+        {
+            targetGrayAlpha = grayscaleColor.a * 0.8f; // เทาน้อยลงนิดนึงตอนเลือดน้อยเฉยๆ จะได้พอมองเห็น
+        }
+
         if (currentDamageTimer > 0)
         {
             currentDamageTimer -= Time.deltaTime; // ใช้ deltaTime ปกติ เพราะไม่อยากให้จอแดงช้าลงตอน SlowMo
-            float alpha = (currentDamageTimer / damageEffectDuration) * damageColor.a;
+            float factor = (currentDamageTimer / damageEffectDuration);
             
+            // ขอบจอแดง
             Color c = damageImage.color;
-            c.a = alpha;
+            c.a = factor * damageColor.a;
             damageImage.color = c;
+            
+            // หน้าเทาตอนโดนตี จะเอาอันที่มากกว่าระหว่าง เลือดน้อย กับ ตอนโดนตี
+            float impactGrayAlpha = factor * grayscaleColor.a;
+            targetGrayAlpha = Mathf.Max(targetGrayAlpha, impactGrayAlpha);
         }
         else
         {
             Color c = damageImage.color;
             c.a = 0f;
             damageImage.color = c;
+        }
+        
+        // ค่อยๆ เปลี่ยนสีหน้าเทาให้สมูท
+        if (grayscaleImage != null)
+        {
+            Color g = grayscaleImage.color;
+            g.a = Mathf.Lerp(g.a, targetGrayAlpha, 5f * Time.deltaTime);
+            g.r = grayscaleColor.r; g.g = grayscaleColor.g; g.b = grayscaleColor.b;
+            grayscaleImage.color = g;
         }
 
         // 2. อัปเดตฟิลเตอร์ Slow-Mo
@@ -193,6 +262,14 @@ public class ScreenEffectManager : MonoBehaviour
             topBorder.color = cTop;
             bottomBorder.color = cBot;
         }
+    }
+
+    /// <summary>
+    /// เรียกฟังก์ชันนี้จาก PlayerHealth เพื่อบอกว่าเลือดเหลือกี่เปอร์เซ็นต์
+    /// </summary>
+    public void UpdateHealthPercent(float percent)
+    {
+        currentHealthPercent = percent;
     }
 
     /// <summary>

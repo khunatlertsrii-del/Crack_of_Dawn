@@ -75,6 +75,20 @@ public class HitEffect : MonoBehaviour
     [Tooltip("ระยะเวลาที่คราบเลือดติดกำแพง (วินาที) ก่อนจะสลายตัว")]
     [SerializeField] public float bloodDecalDuration = 20f;
 
+    [Header("Smoke Settings (Procedural)")]
+    [Tooltip("ควันเลือด (สีแดง)")]
+    public Color bloodSmokeColor = new Color(0.8f, 0.1f, 0.1f, 0.6f);
+    [Tooltip("ควันฝุ่นกำแพง (สีเทา)")]
+    public Color impactSmokeColor = new Color(0.6f, 0.6f, 0.6f, 0.6f);
+    [Tooltip("ระยะเวลาที่ควันจะจางหายไป")]
+    public float smokeFadeDuration = 1.5f;
+    [Tooltip("ความเร็วในการขยายตัวของควัน")]
+    public float smokeExpandSpeed = 2f;
+    [Tooltip("ขนาดควัน")]
+    public float smokeBaseSize = 0.5f;
+    [Tooltip("ใส่รูปทรงควันเอง (เว้นว่างไว้จะใช้วงกลมเบลอๆ อัตโนมัติ)")]
+    public Sprite customSmokeSprite;
+
     private bool isHitstopActive = false;
 
     private void Awake()
@@ -179,6 +193,32 @@ public class HitEffect : MonoBehaviour
         {
             Instantiate(impactParticlePrefab, position, Quaternion.identity);
         }
+
+        SpawnSmokeParticles(position, impactSmokeColor, 4, 1.0f);
+    }
+
+    /// <summary>
+    /// เล่นเอฟเฟกต์แสงแฟลชปลายปืน
+    /// </summary>
+    public void PlayMuzzleFlash(Vector2 position, Vector2 direction)
+    {
+        if (cachedCircleSprite == null) cachedCircleSprite = CreateCircleSprite();
+        
+        GameObject flash = new GameObject("MuzzleFlash");
+        flash.transform.position = position + direction * 0.2f;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        flash.transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        var sr = flash.AddComponent<SpriteRenderer>();
+        sr.sprite = cachedCircleSprite;
+        sr.color = new Color(1f, 1f, 0.5f, 0.8f); // แสงเหลืองสว่าง
+        sr.sortingOrder = 95;
+
+        // รูปทรงวงรีพุ่งออกไป
+        flash.transform.localScale = new Vector3(1.5f, 0.5f, 1f);
+
+        // ทำลายตัวเองใน 0.05 วิ
+        Destroy(flash, 0.05f);
     }
 
     // =========================================================
@@ -284,6 +324,9 @@ public class HitEffect : MonoBehaviour
             // ปิดการชนกันเองของ Layer เดียวกัน (ถ้าเป็นไปได้ควรไปตั้งใน Project Settings > Physics 2D)
             // ชั่วคราว: ใส่ IgnoreCollision 
         }
+
+        // เสกควันเลือด
+        SpawnSmokeParticles(hitPoint, bloodSmokeColor, isCritical ? 5 : 2, 1.0f);
     }
 
     private void SpawnMeleeParticles(Vector2 hitPoint)
@@ -320,6 +363,46 @@ public class HitEffect : MonoBehaviour
             col.isTrigger = true;
 
             p.AddComponent<BloodParticle>();
+        }
+
+        // เสกควันเลือดก้อนใหญ่
+        SpawnSmokeParticles(hitPoint, bloodSmokeColor, 8, 1.5f);
+    }
+
+    private void SpawnSmokeParticles(Vector2 position, Color color, int count, float sizeMultiplier)
+    {
+        if (cachedCircleSprite == null) cachedCircleSprite = CreateCircleSprite();
+        Sprite smokeSprite = customSmokeSprite != null ? customSmokeSprite : cachedCircleSprite;
+
+        for (int i = 0; i < count; i++)
+        {
+            GameObject smoke = new GameObject("SmokeParticle");
+            smoke.transform.position = position + Random.insideUnitCircle * 0.3f;
+            
+            var sr = smoke.AddComponent<SpriteRenderer>();
+            sr.sprite = smokeSprite;
+            sr.color = color;
+            sr.sortingOrder = 90; // อยู่ใต้เลือดที่เป็นเม็ดๆ
+            
+            // ทำให้ควันดูบี้ๆ ไม่กลมดิ๊ก
+            float sizeX = Random.Range(smokeBaseSize * 0.7f, smokeBaseSize * 1.3f) * sizeMultiplier;
+            float sizeY = Random.Range(smokeBaseSize * 0.7f, smokeBaseSize * 1.3f) * sizeMultiplier;
+            smoke.transform.localScale = new Vector3(sizeX, sizeY, 1f);
+            
+            // สุ่มหมุน
+            smoke.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+
+            var sp = smoke.AddComponent<SmokeParticle>();
+            
+            // สุ่มระยะเวลาและความขยายตัวนิดหน่อยให้ดูเป็นธรรมชาติ
+            float duration = smokeFadeDuration * Random.Range(0.8f, 1.2f);
+            float expand = smokeExpandSpeed * Random.Range(0.8f, 1.2f);
+            
+            // ส่ง Velocity ให้สคริปต์ทำงานเอง (ลดแลคจาก Physics)
+            Vector2 initialVelocity = Random.insideUnitCircle * Random.Range(1f, 3f);
+            initialVelocity.y += 1f; // พุ่งขึ้นบนนิดนึง
+            
+            sp.Initialize(duration, expand, initialVelocity);
         }
     }
 
