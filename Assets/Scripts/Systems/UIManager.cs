@@ -38,9 +38,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text victoryScoreText;
 
     [Header("Settings")]
-    [SerializeField] private Color hpBarColor = new Color(0.2f, 0.8f, 0.2f);
-    [SerializeField] private Color hpBarLowColor = new Color(0.9f, 0.2f, 0.2f);
-    [SerializeField] private Color slowMoBarColor = new Color(0.3f, 0.5f, 1f);
+    [SerializeField] private Color hpBarColor = Color.white; // สีขาวทึบสไตล์คอมมิค
+    [SerializeField] private Color hpBarLowColor = new Color(0.9f, 0.1f, 0.1f); // สีแดงสดตัดกับขาวดำ
+    [SerializeField] private Color slowMoBarColor = new Color(0.8f, 0.8f, 0.8f); // สีเทาอ่อน
     [SerializeField] private bool autoCreateUI = true;
 
     private Canvas canvas;
@@ -117,6 +117,31 @@ public class UIManager : MonoBehaviour
         // Initialize values
         UpdateKillCount(0);
         UpdateScore(0);
+
+        // บังคับเปลี่ยนสี UI (ในกรณีที่ Component มีการเซฟค่าสีเก่าไว้ใน Inspector)
+        if (hpSlider != null)
+        {
+            var bg = hpSlider.transform.Find("Background")?.GetComponent<Image>();
+            if (bg != null) bg.color = Color.black;
+            
+            var label = hpSlider.transform.Find("Label")?.GetComponent<Text>();
+            if (label != null) label.color = Color.black;
+            
+            // อัปเดตสีหลอดเลือดปัจจุบัน
+            HandleHealthChanged(hpSlider.value);
+        }
+
+        if (slowMoSlider != null)
+        {
+            var bg = slowMoSlider.transform.Find("Background")?.GetComponent<Image>();
+            if (bg != null) bg.color = Color.black;
+            
+            var label = slowMoSlider.transform.Find("Label")?.GetComponent<Text>();
+            if (label != null) label.color = Color.black;
+            
+            var fill = slowMoSlider.fillRect?.GetComponent<Image>();
+            if (fill != null) fill.color = slowMoBarColor;
+        }
 
         // Hide panels
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
@@ -348,7 +373,7 @@ public class UIManager : MonoBehaviour
         GameObject bg = new GameObject("Background");
         bg.transform.SetParent(sliderObj.transform, false);
         Image bgImage = bg.AddComponent<Image>();
-        bgImage.color = new Color(0.15f, 0.15f, 0.15f, 0.8f);
+        bgImage.color = Color.black; // พื้นหลังดำสนิท
         RectTransform bgRect = bg.GetComponent<RectTransform>();
         bgRect.anchorMin = Vector2.zero;
         bgRect.anchorMax = Vector2.one;
@@ -388,7 +413,7 @@ public class UIManager : MonoBehaviour
         labelText.text = label;
         labelText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         labelText.fontSize = 10;
-        labelText.color = Color.white;
+        labelText.color = Color.black; // เปลี่ยนเป็นดำเพื่อให้อ่านง่ายบนพื้นขาว
         labelText.alignment = TextAnchor.MiddleLeft;
         RectTransform labelRect = labelObj.GetComponent<RectTransform>();
         labelRect.anchorMin = Vector2.zero;

@@ -72,6 +72,12 @@ public class ScreenEffectManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
+        // แปะ ComicTextSpawner ไว้ที่เดียวกัน จะได้ไม่ต้องลากใส่ Scene เอง
+        if (GetComponent<ComicTextSpawner>() == null)
+        {
+            gameObject.AddComponent<ComicTextSpawner>();
+        }
+
         CreateScreenCanvas();
     }
 
@@ -101,6 +107,7 @@ public class ScreenEffectManager : MonoBehaviour
         topBorder.raycastTarget = false;
         topBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
         if (borderTexture != null) topBorder.texture = borderTexture;
+        else topBorder.texture = CreateFilmStripTexture(true);
         RectTransform rtTop = topBorder.rectTransform;
         rtTop.anchorMin = new Vector2(0, 1f - borderHeightPercent);
         rtTop.anchorMax = new Vector2(1, 1);
@@ -113,6 +120,7 @@ public class ScreenEffectManager : MonoBehaviour
         bottomBorder.raycastTarget = false;
         bottomBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
         if (borderTexture != null) bottomBorder.texture = borderTexture;
+        else bottomBorder.texture = CreateFilmStripTexture(false);
         RectTransform rtBot = bottomBorder.rectTransform;
         rtBot.anchorMin = new Vector2(0, 0);
         rtBot.anchorMax = new Vector2(1, borderHeightPercent);
@@ -138,6 +146,42 @@ public class ScreenEffectManager : MonoBehaviour
     }
     
     private Image grayscaleImage;
+
+    /// <summary>สร้าง Texture รูม้วนฟิล์ม (Film Strip)</summary>
+    private Texture2D CreateFilmStripTexture(bool isTopBorder)
+    {
+        int width = 128;
+        int height = 32;
+        Texture2D tex = new Texture2D(width, height);
+        tex.wrapMode = TextureWrapMode.Repeat;
+        tex.filterMode = FilterMode.Point;
+        
+        Color[] pixels = new Color[width * height];
+        for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.white; // สีขาวทึบ (ใช้เป็น Mask ดำได้โดยเปลี่ยนสี RawImage)
+
+        // เจาะรูฟิล์ม
+        int holeWidth = 16;
+        int holeHeight = 16;
+        int spacing = 32;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // ตำแหน่งรูในแกน Y ขึ้นอยู่กับว่าเป็นขอบบนหรือล่าง (รูอยู่ชิดขอบจอ)
+                bool inHoleY = isTopBorder ? (y > height - holeHeight - 4 && y < height - 4) : (y > 4 && y < holeHeight + 4);
+                bool inHoleX = (x % spacing) < holeWidth;
+
+                if (inHoleX && inHoleY)
+                {
+                    pixels[y * width + x] = new Color(1f, 1f, 1f, 0f); // โปร่งใส ทะลุเห็นเกม
+                }
+            }
+        }
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return tex;
+    }
 
     /// <summary>สร้างภาพ Vignette (ตรงกลางใส ขอบทึบ) แบบ Procedural</summary>
     private Sprite CreateVignetteSprite()

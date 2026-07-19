@@ -177,6 +177,9 @@ public class PlayerParry : MonoBehaviour
 
         // ระเบิดขอบจอ (Adrenaline!)
         ScreenEffectManager.Instance?.TriggerAdrenaline();
+
+        // Comic Text (CLANG!)
+        ComicTextSpawner.Instance?.SpawnParryText(bullet.transform.position);
     }
 }
 

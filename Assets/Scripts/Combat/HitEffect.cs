@@ -338,6 +338,12 @@ public class HitEffect : MonoBehaviour
         // เสกควันเลือด
         int smokeCount = isCritical ? gunCriticalSmokeCount : gunSmokeCount;
         SpawnSmokeParticles(hitPoint, bloodSmokeColor, smokeCount, 1.0f);
+
+        // Flash & Comic Text สำหรับ Critical
+        if (isCritical)
+        {
+            ComicTextSpawner.Instance?.SpawnRandomHitText(hitPoint, true);
+        }
     }
 
     private void SpawnMeleeParticles(Vector2 hitPoint)
@@ -378,6 +384,9 @@ public class HitEffect : MonoBehaviour
 
         // เสกควันเลือดก้อนใหญ่ (ปรับจำนวนได้ใน Inspector)
         SpawnSmokeParticles(hitPoint, bloodSmokeColor, meleeSmokeCount, meleeSmokeSizeMultiplier);
+
+        // Flash & Comic Text สำหรับท่าโจมตีระยะประชิด
+        ComicTextSpawner.Instance?.SpawnRandomHitText(hitPoint, true);
     }
 
     private void SpawnSmokeParticles(Vector2 position, Color color, int count, float sizeMultiplier)
