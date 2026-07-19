@@ -106,17 +106,17 @@ TextureImporter:
       name: FD_0
       rect:
         serializedVersion: 2
-        x: 47
-        y: 221
-        width: 68
-        height: 22
+        x: 48
+        y: 222
+        width: 66
+        height: 20
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
       spriteID: 75debff002fc33120800000000000000
       internalID: 2392483563677936983
@@ -128,17 +128,21 @@ TextureImporter:
       name: FD_1
       rect:
         serializedVersion: 2
-        x: 47
-        y: 165
-        width: 68
-        height: 26
-      alignment: 0
+        x: 48
+        y: 170
+        width: 66
+        height: 20
+      alignment: 9
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape: []
-      tessellationDetail: -1
+      physicsShape:
+      - - {x: 33, y: 10}
+        - {x: -33, y: 10}
+        - {x: -33, y: -10}
+        - {x: 33, y: -10}
+      tessellationDetail: 0
       bones: []
       spriteID: d9020fdc2c58dd040800000000000000
       internalID: 4674039060005658781
