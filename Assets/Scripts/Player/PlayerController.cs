@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
     // ===================== SHADOW DASH =====================
     [Header("Shadow Dash (TP Dash)")]
     [Tooltip("ความเร็วตอนพุ่ง")]
-    [SerializeField] private float dashSpeed = 80f;
+    [SerializeField] private float dashSpeed = 50f;
     [Tooltip("ระยะเวลาที่พุ่ง (วินาที)")]
     [SerializeField] private float dashDuration = 0.05f;
     [Tooltip("ดีเลย์ก่อนพุ่งครั้งต่อไป (วินาที)")]
@@ -147,8 +147,8 @@ public class PlayerController : MonoBehaviour
         playerCollider = GetComponent<Collider2D>();
         initialGravityScale = rb.gravityScale;
 
-        // บังคับเปลี่ยนเป็น TP Dash (ในกรณีที่ค่าค้างจากเวอร์ชันเก่า)
-        if (dashSpeed < 50f) dashSpeed = 80f;
+        // บังคับเปลี่ยนเป็น TP Dash แบบเนิร์ฟระยะแล้ว
+        if (dashSpeed > 60f) dashSpeed = 50f;
         if (dashDuration > 0.1f) dashDuration = 0.05f;
 
         // ป้องกันทะลุกำแพงตอนพุ่งไวๆ
