@@ -70,17 +70,6 @@ public class PlayerController : MonoBehaviour
     [Tooltip("เวลาหน่วงหลังหลุดจากกำแพงที่ยังกดโดดต่อได้ (วินาที)")]
     [SerializeField] private float wallCoyoteTime = 0.2f;
 
-    // ===================== DASH =====================
-    [Header("Dash")]
-    [Tooltip("ความเร็ว Dash")]
-    [SerializeField] private float dashSpeed = 25f;
-
-    [Tooltip("ระยะเวลา Dash (วินาที)")]
-    [SerializeField] private float dashDuration = 0.15f;
-
-    [Tooltip("Cooldown ก่อนจะ Dash ได้อีก (วินาที)")]
-    [SerializeField] private float dashCooldown = 0.8f;
-
     // ===================== GROUND / WALL CHECK =====================
     [Header("Ground & Wall Detection")]
     [Tooltip("จุดตรวจพื้น (ลาก Empty GameObject มาวางที่เท้า)")]
@@ -107,22 +96,9 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded { get; private set; }
     public bool IsWallSliding { get; private set; }
-    public bool IsDashing { get; private set; }
     public bool IsFacingRight { get; private set; } = true;
     public float MoveInput { get; private set; }
     public Vector2 Velocity => rb.linearVelocity;
-
-    // Crouch state
-    public bool IsCrouching { get; private set; }
-    private Vector2 defaultColliderSize;
-    private Vector2 defaultColliderOffset;
-
-    [Header("Crouch / Roll Customization")]
-    [Tooltip("ขนาดของ Collider ตอนย่อ/กลิ้ง (ปรับในนี้ได้เลย)")]
-    [SerializeField] private Vector2 crouchColliderSize = new Vector2(0.5f, 0.5f);
-    
-    [Tooltip("จุดศูนย์กลางของ Collider ตอนย่อ/กลิ้ง")]
-    [SerializeField] private Vector2 crouchColliderOffset = new Vector2(0f, -0.25f);
 
     // ===================== INTERNAL =====================
     private Rigidbody2D rb;
@@ -131,7 +107,6 @@ public class PlayerController : MonoBehaviour
     // Input Actions
     private InputAction moveAction;
     private InputAction jumpAction;
-    private InputAction dashAction;
 
     // Jump state
     private float coyoteTimeCounter;
@@ -145,7 +120,6 @@ public class PlayerController : MonoBehaviour
     private int wallDirection; // 1 = ผนังอยู่ขวา, -1 = ผนังอยู่ซ้าย
     private float wallCoyoteCounter;
 
-    // Dash state
     private float dashTimer;
     private float dashCooldownTimer;
     private Vector2 dashDirection;
@@ -179,24 +153,7 @@ public class PlayerController : MonoBehaviour
         jumpAction.AddBinding("<Keyboard>/space");
         jumpAction.AddBinding("<Gamepad>/buttonSouth");
 
-        // Dash (Roll)
-        dashAction = new InputAction("Dash", InputActionType.Button);
-        dashAction.AddBinding("<Keyboard>/leftShift");
-        dashAction.AddBinding("<Gamepad>/leftShoulder");
-
-        if (playerCollider is BoxCollider2D box)
-        {
-            defaultColliderSize = box.size;
-            defaultColliderOffset = box.offset;
-        }
-        else if (playerCollider is CapsuleCollider2D cap)
-        {
-            defaultColliderSize = cap.size;
-            defaultColliderOffset = cap.offset;
-        }
-
-        // ลดความเร็ว Dash ลงเพื่อให้กลายเป็น Roll
-        if (dashSpeed > 15f) dashSpeed = 15f;
+        jumpAction.AddBinding("<Gamepad>/buttonSouth");
 
         // Auto-create ground/wall check points if not assigned
         if (groundCheck == null)
@@ -223,18 +180,15 @@ public class PlayerController : MonoBehaviour
     {
         moveAction.Enable();
         jumpAction.Enable();
-        dashAction.Enable();
 
         jumpAction.started += _ => OnJumpStarted();
         jumpAction.canceled += _ => OnJumpCanceled();
-        dashAction.performed += _ => OnDashPerformed();
     }
 
     private void OnDisable()
     {
         moveAction.Disable();
         jumpAction.Disable();
-        dashAction.Disable();
     }
 
     private void Update()
@@ -249,8 +203,6 @@ public class PlayerController : MonoBehaviour
         // Read input
         MoveInput = moveAction.ReadValue<float>();
 
-        HandleCrouch();
-
         // Checks
         CheckGround();
         CheckWall();
@@ -259,7 +211,6 @@ public class PlayerController : MonoBehaviour
         UpdateCoyoteTime();
         UpdateJumpBuffer();
         UpdateWallJumpLock();
-        UpdateDashTimer();
 
         // Try buffered jump
         TryBufferedJump();
@@ -276,16 +227,9 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (IsDashing)
-        {
-            HandleDashMovement();
-        }
-        else
-        {
-            HandleMovement();
-            HandleWallSlide();
-            ApplyBetterJumpGravity();
-        }
+        HandleMovement();
+        HandleWallSlide();
+        ApplyBetterJumpGravity();
     }
 
     // =========================================================
@@ -508,121 +452,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // =========================================================
-    // AUTO CROUCH & ROLL
-    // =========================================================
-
-    private void HandleCrouch()
-    {
-        if (IsDashing) // ย่อตัวอัตโนมัติเฉพาะตอนกลิ้ง
-        {
-            SetCrouch(true);
-        }
-        else if (IsCrouching) // ถ้ากลิ้งเสร็จแล้ว
-        {
-            // เช็คว่ายังติดเพดานรูอยู่ไหม
-            if (!CheckCeiling())
-            {
-                SetCrouch(false); // พ้นรูแล้ว ยืนขึ้นได้
-            }
-        }
-    }
-
-    private void SetCrouch(bool crouch)
-    {
-        if (IsCrouching == crouch) return;
-        IsCrouching = crouch;
-
-        if (playerCollider is BoxCollider2D box)
-        {
-            if (crouch)
-            {
-                // ใช้ค่าจาก Inspector เลย เพื่อให้คุณปรับได้เอง
-                box.size = crouchColliderSize;
-                box.offset = crouchColliderOffset;
-            }
-            else
-            {
-                box.size = defaultColliderSize;
-                box.offset = defaultColliderOffset;
-            }
-        }
-        else if (playerCollider is CapsuleCollider2D cap)
-        {
-            if (crouch)
-            {
-                cap.size = crouchColliderSize;
-                cap.offset = crouchColliderOffset;
-            }
-            else
-            {
-                cap.size = defaultColliderSize;
-                cap.offset = defaultColliderOffset;
-            }
-        }
-    }
-
-    private bool CheckCeiling()
-    {
-        Vector2 origin = (Vector2)transform.position + defaultColliderOffset;
-        origin.y += defaultColliderSize.y / 4f; // เริ่มเช็คจากกลางตัวตอนย่อ
-        float distance = (defaultColliderSize.y / 2f) + 0.1f;
-        
-        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.up, distance, LayerMask.GetMask("Ground"));
-        return hit.collider != null && !hit.collider.isTrigger;
-    }
-
-    // =========================================================
-    // DASH (ROLL)
-    // =========================================================
-
-    private void OnDashPerformed()
-    {
-        if (dashCooldownTimer > 0) return;
-        if (IsDashing) return;
-
-        // หา Dash Direction
-        float dashDir = MoveInput != 0 ? Mathf.Sign(MoveInput) : (IsFacingRight ? 1 : -1);
-        dashDirection = new Vector2(dashDir, 0);
-
-        IsDashing = true;
-        dashTimer = dashDuration;
-        dashCooldownTimer = dashCooldown;
-
-        // ล้าง velocity เดิม
-        rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0; // ปิด Gravity ระหว่าง Dash
-    }
-
-    private void HandleDashMovement()
-    {
-        rb.linearVelocity = dashDirection * dashSpeed;
-    }
-
-    private void UpdateDashTimer()
-    {
-        if (dashCooldownTimer > 0)
-            dashCooldownTimer -= Time.deltaTime;
-
-        if (IsDashing)
-        {
-            dashTimer -= Time.deltaTime;
-            if (dashTimer <= 0)
-            {
-                // ถ้ากลิ้งหมดเวลาแล้วแต่ยังอยู่ในรู และไม่ได้ชนกำแพงตัน
-                if (CheckCeiling() && !isTouchingWall)
-                {
-                    dashTimer = 0.05f; // บังคับกลิ้งต่อไปเรื่อยๆ จนกว่าจะพ้นรู!
-                }
-                else
-                {
-                    IsDashing = false;
-                    rb.gravityScale = initialGravityScale; // คืน Gravity เดิม
-                    rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.3f, 0); // ชะลอหลัง Dash
-                }
-            }
-        }
-    }
 
     // =========================================================
     // TIMERS

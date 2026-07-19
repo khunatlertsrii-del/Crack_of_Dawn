@@ -342,7 +342,7 @@ public class HitEffect : MonoBehaviour
         // Flash & Comic Text สำหรับ Critical
         if (isCritical)
         {
-            ComicTextSpawner.Instance?.SpawnRandomHitText(hitPoint, true);
+            // ถูกนำออกตามคำขอ
         }
     }
 
@@ -386,7 +386,7 @@ public class HitEffect : MonoBehaviour
         SpawnSmokeParticles(hitPoint, bloodSmokeColor, meleeSmokeCount, meleeSmokeSizeMultiplier);
 
         // Flash & Comic Text สำหรับท่าโจมตีระยะประชิด
-        ComicTextSpawner.Instance?.SpawnRandomHitText(hitPoint, true);
+        // ถูกนำออกตามคำขอ
     }
 
     private void SpawnSmokeParticles(Vector2 position, Color color, int count, float sizeMultiplier)

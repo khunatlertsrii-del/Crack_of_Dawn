@@ -55,6 +55,8 @@ public class ScreenEffectManager : MonoBehaviour
     public float screenBloodFadeDuration = 2f;
     [Tooltip("ความเร็วในการไหลย้อยลงมา")]
     public float screenBloodDripSpeed = 50f;
+    [Tooltip("ใส่รูปเลือดที่คุณต้องการที่นี่ (ถ้าไม่ใส่ ระบบจะสร้างรูป Procedural ให้เอง)")]
+    public Sprite[] customBloodSplats;
 
     private RawImage topBorder;
     private RawImage bottomBorder;
@@ -221,13 +223,15 @@ public class ScreenEffectManager : MonoBehaviour
 
     private void Update()
     {
-        // 1. อัปเดตขอบจอแดง & หน้าเทา
-        float targetGrayAlpha = 0f;
+        // 1. อัปเดตขอบจอแดง
+        float targetDamageAlpha = 0f;
         
-        // ถ้าเลือดน้อย ให้หน้าเทาตลอด
+        // ถ้าเลือดน้อย ให้ขอบจอแดงกระพริบตลอดเวลา
         if (enableLowHealthGray && currentHealthPercent <= lowHealthThreshold)
         {
-            targetGrayAlpha = grayscaleColor.a * 0.8f; // เทาน้อยลงนิดนึงตอนเลือดน้อยเฉยๆ จะได้พอมองเห็น
+            // กระพริบด้วย Sin wave (0 ถึง 1)
+            float pulse = (Mathf.Sin(Time.unscaledTime * 5f) + 1f) * 0.5f; 
+            targetDamageAlpha = damageColor.a * (0.3f + pulse * 0.4f); // กระพริบระหว่าง 30% - 70% ของ Alpha สูงสุด
         }
 
         if (currentDamageTimer > 0)
@@ -235,28 +239,25 @@ public class ScreenEffectManager : MonoBehaviour
             currentDamageTimer -= Time.deltaTime; // ใช้ deltaTime ปกติ เพราะไม่อยากให้จอแดงช้าลงตอน SlowMo
             float factor = (currentDamageTimer / damageEffectDuration);
             
-            // ขอบจอแดง
-            Color c = damageImage.color;
-            c.a = factor * damageColor.a;
-            damageImage.color = c;
-            
-            // หน้าเทาตอนโดนตี จะเอาอันที่มากกว่าระหว่าง เลือดน้อย กับ ตอนโดนตี
-            float impactGrayAlpha = factor * grayscaleColor.a;
-            targetGrayAlpha = Mathf.Max(targetGrayAlpha, impactGrayAlpha);
-        }
-        else
-        {
-            Color c = damageImage.color;
-            c.a = 0f;
-            damageImage.color = c;
+            // ตอนโดนตี จะเอาอันที่มากกว่าระหว่าง เลือดน้อยกระพริบ กับ ตอนเพิ่งโดนตี
+            float impactAlpha = factor * damageColor.a;
+            targetDamageAlpha = Mathf.Max(targetDamageAlpha, impactAlpha);
         }
         
-        // ค่อยๆ เปลี่ยนสีหน้าเทาให้สมูท
+        // อัปเดตสีขอบจอแดง
+        if (damageImage != null)
+        {
+            Color c = damageImage.color;
+            // Lerp เล็กน้อยให้สมูท
+            c.a = Mathf.Lerp(c.a, targetDamageAlpha, 15f * Time.unscaledDeltaTime);
+            damageImage.color = c;
+        }
+
+        // หน้าเทาเอาออกไปตามคำขอ แต่เผื่อไว้ให้มันค่อยๆ จางหายไปถ้าค้างอยู่
         if (grayscaleImage != null)
         {
             Color g = grayscaleImage.color;
-            g.a = Mathf.Lerp(g.a, targetGrayAlpha, 5f * Time.deltaTime);
-            g.r = grayscaleColor.r; g.g = grayscaleColor.g; g.b = grayscaleColor.b;
+            g.a = Mathf.Lerp(g.a, 0f, 5f * Time.deltaTime);
             grayscaleImage.color = g;
         }
 
@@ -365,9 +366,16 @@ public class ScreenEffectManager : MonoBehaviour
         Image img = bloodObj.AddComponent<Image>();
         img.raycastTarget = false;
         
-        // ใช้ Sprite วงกลม (ถ้ายังไม่มีก็สร้าง Procedural ให้เลย)
-        if (cachedCircleSprite == null) cachedCircleSprite = CreateCircleSprite();
-        img.sprite = cachedCircleSprite;
+        // ใช้ Sprite รอยหยดจาก Array (ถ้ามี) หรือใช้ Procedural (ถ้าไม่มี)
+        if (customBloodSplats != null && customBloodSplats.Length > 0)
+        {
+            img.sprite = customBloodSplats[Random.Range(0, customBloodSplats.Length)];
+        }
+        else
+        {
+            if (cachedCircleSprite == null) cachedCircleSprite = CreateSplatSprite();
+            img.sprite = cachedCircleSprite;
+        }
         
         // สุ่มสีไข่แดง (เหลือง/ส้ม)
         Color bloodColor = new Color(1f, Random.Range(0.6f, 0.9f), 0.1f, 1f);
@@ -424,25 +432,36 @@ public class ScreenEffectManager : MonoBehaviour
     }
 
     private Sprite cachedCircleSprite;
-    private Sprite CreateCircleSprite()
+    private Sprite CreateSplatSprite()
     {
-        Texture2D tex = new Texture2D(32, 32);
-        Color[] pixels = new Color[32 * 32];
-        Vector2 center = new Vector2(16, 16);
+        int size = 64;
+        Texture2D tex = new Texture2D(size, size);
+        Color[] pixels = new Color[size * size];
+        Vector2 center = new Vector2(size / 2f, size / 2f);
+        
+        float randomSeed = Random.Range(0f, 100f);
 
-        for (int y = 0; y < 32; y++)
+        for (int y = 0; y < size; y++)
         {
-            for (int x = 0; x < 32; x++)
+            for (int x = 0; x < size; x++)
             {
+                float angle = Mathf.Atan2(y - center.y, x - center.x);
+                // ใช้ PerlinNoise แบบวงกลม (Polar to Cartesian สำหรับ UV)
+                float noiseX = Mathf.Cos(angle) * 2f + randomSeed;
+                float noiseY = Mathf.Sin(angle) * 2f + randomSeed;
+                float noise = Mathf.PerlinNoise(noiseX, noiseY);
+                
+                // ระยะหวังผลให้มีรอยหยัก
+                float maxDist = (size * 0.3f) + (noise * size * 0.15f);
+                
                 float dist = Vector2.Distance(new Vector2(x, y), center);
-                // สร้างขอบเบลอๆ เล็กน้อยให้ดูเหมือนของเหลว
-                float alpha = 1f - Mathf.Clamp01((dist - 12f) / 4f);
-                pixels[y * 32 + x] = new Color(1, 1, 1, alpha);
+                // สร้างขอบเบลอๆ เล็กน้อย
+                float alpha = 1f - Mathf.Clamp01((dist - maxDist) / 4f);
+                pixels[y * size + x] = new Color(1, 1, 1, alpha);
             }
         }
-
         tex.SetPixels(pixels);
         tex.Apply();
-        return Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 100f);
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
     }
 }

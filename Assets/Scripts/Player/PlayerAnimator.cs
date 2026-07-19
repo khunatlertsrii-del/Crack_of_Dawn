@@ -99,7 +99,7 @@ public class PlayerAnimator : MonoBehaviour
         animator.SetBool(IsJumping, isJumping);
         animator.SetBool(IsFalling, isFalling);
         animator.SetBool(IsWallSliding, playerController.IsWallSliding);
-        animator.SetBool(IsDashing, playerController.IsDashing);
+        // animator.SetBool(IsDashing, playerController.IsDashing);
         animator.SetFloat(YVelocity, vel.y);
         animator.SetFloat(XSpeed, Mathf.Abs(vel.x));
     }
@@ -115,11 +115,7 @@ public class PlayerAnimator : MonoBehaviour
         Color targetColor = idleColor;
         Vector2 vel = playerController.Velocity;
 
-        if (playerController.IsDashing)
-        {
-            targetColor = dashColor;
-        }
-        else if (playerController.IsWallSliding)
+        if (playerController.IsWallSliding)
         {
             targetColor = wallSlideColor;
         }
@@ -167,12 +163,6 @@ public class PlayerAnimator : MonoBehaviour
                 targetScaleY = 1.1f;
                 targetScaleXMag = 0.92f;
             }
-        }
-        else if (playerController.IsDashing)
-        {
-            // Dash → ยืดแนวนอน
-            targetScaleY = 0.85f;
-            targetScaleXMag = 1.2f;
         }
 
         // Smooth lerp
