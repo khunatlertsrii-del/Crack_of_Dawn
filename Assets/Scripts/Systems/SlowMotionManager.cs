@@ -25,6 +25,9 @@ public class SlowMotionManager : MonoBehaviour
     [Tooltip("ความเร็วในการเปลี่ยน timeScale (Smooth transition)")]
     [SerializeField] private float transitionSpeed = 10f;
 
+    [Tooltip("ดีเลย์ระหว่างการกดเปิด/ปิดสโลว์ (ป้องกันการกดรัว)")]
+    [SerializeField] private float toggleCooldown = 0.5f;
+
     [Header("Meter / Energy")]
     [Tooltip("พลัง Slow-Mo สูงสุด")]
     [SerializeField] private float maxMeter = 100f;
@@ -57,6 +60,7 @@ public class SlowMotionManager : MonoBehaviour
     private InputAction slowMoAction;
     private float defaultFixedDeltaTime;
     private float targetTimeScale = 1f;
+    private float lastToggleTime = -100f;
 
     // =========================================================
     // UNITY LIFECYCLE
@@ -115,16 +119,18 @@ public class SlowMotionManager : MonoBehaviour
     {
         bool pressedThisFrame = slowMoAction.WasPressedThisFrame();
 
-        // สลับเปิด/ปิดเมื่อกดปุ่ม
-        if (pressedThisFrame)
+        // สลับเปิด/ปิดเมื่อกดปุ่ม (เช็คคูลดาวน์ด้วย)
+        if (pressedThisFrame && Time.unscaledTime - lastToggleTime >= toggleCooldown)
         {
             if (IsSlowMotionActive)
             {
                 DeactivateSlowMotion();
+                lastToggleTime = Time.unscaledTime;
             }
             else if (CurrentMeter > minimumMeterToActivate)
             {
                 ActivateSlowMotion();
+                lastToggleTime = Time.unscaledTime;
             }
         }
 

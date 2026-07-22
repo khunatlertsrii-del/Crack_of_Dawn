@@ -76,10 +76,11 @@ public class HitEffect : MonoBehaviour
     [SerializeField] public float bloodDecalDuration = 20f;
 
     [Header("Smoke Settings (Procedural)")]
+    [Header("Smoke Settings (Procedural)")]
     [Tooltip("ควันเลือด (สีแดง)")]
-    public Color bloodSmokeColor = new Color(0.8f, 0.1f, 0.1f, 0.6f);
+    public Color bloodSmokeColor = new Color(0.8f, 0.1f, 0.1f, 0.3f); // ลด Alpha ลงจาก 0.6 เหลือ 0.3 จะได้ไม่ทึบเกินไป
     [Tooltip("ควันฝุ่นกำแพง (สีเทา)")]
-    public Color impactSmokeColor = new Color(0.6f, 0.6f, 0.6f, 0.6f);
+    public Color impactSmokeColor = new Color(0.6f, 0.6f, 0.6f, 0.4f);
     [Tooltip("ระยะเวลาที่ควันจะจางหายไป")]
     public float smokeFadeDuration = 1.5f;
     [Tooltip("ความเร็วในการขยายตัวของควัน")]
@@ -100,6 +101,9 @@ public class HitEffect : MonoBehaviour
     public float meleeSmokeSizeMultiplier = 1.2f;
 
     private bool isHitstopActive = false;
+    private float lastMeleeTime = -100f; // เอาไว้เช็คดีเลย์กันกระตุก
+    private int hitsThisFrame = 0;
+    private int lastHitFrame = -1;
 
     private void Awake()
     {
@@ -152,18 +156,30 @@ public class HitEffect : MonoBehaviour
 
     /// <summary>
     /// เล่นเอฟเฟกต์ Melee Hit (ฟันระยะประชิด)
-    /// เลือดสาด 360 องศา ปริมาณเยอะสะใจ
+    /// ลดอาการแล็กเวลาฟันโดนหลายตัวพร้อมกัน (Multi-Hit Lag Fix)
     /// </summary>
     public void PlayMeleeHitEffect(Vector2 hitPoint)
     {
-        StartCoroutine(HitstopCoroutine(criticalHitstopDuration * 2f)); // Hitstop นานกว่าปกติเพื่อความหนักแน่น
-
-        if (CameraFollow.Instance != null)
+        if (Time.frameCount != lastHitFrame)
         {
-            CameraFollow.Instance.ShakeCamera(criticalShakeIntensity * 1.5f, criticalShakeDuration);
+            hitsThisFrame = 0;
+            lastHitFrame = Time.frameCount;
+        }
+        hitsThisFrame++;
+
+        bool isPrimaryHit = hitsThisFrame <= 1; // ตัวแรกที่โดนฟันในเฟรมนี้ จะได้เอฟเฟกต์เต็มที่
+
+        if (isPrimaryHit)
+        {
+            StartCoroutine(HitstopCoroutine(criticalHitstopDuration * 1.5f)); // Hitstop
+            if (CameraFollow.Instance != null)
+            {
+                CameraFollow.Instance.ShakeCamera(criticalShakeIntensity * 1.5f, criticalShakeDuration);
+            }
         }
 
-        SpawnMeleeParticles(hitPoint);
+        // เสกอนุภาคเลือดและควัน (ตัวที่ 2 ขึ้นไปจะโดนเนิร์ฟจำนวนลงเพื่อลดแล็ก)
+        SpawnMeleeParticles(hitPoint, isPrimaryHit);
     }
 
     /// <summary>
@@ -346,9 +362,10 @@ public class HitEffect : MonoBehaviour
         }
     }
 
-    private void SpawnMeleeParticles(Vector2 hitPoint)
+    private void SpawnMeleeParticles(Vector2 hitPoint, bool isPrimaryHit)
     {
-        int particleCount = meleeBloodCount;
+        // ถ้าฟันโดนหลายตัวพร้อมกัน ตัวที่ 2+ จะลดจำนวนเลือดสาดเหลือแค่ 3 หยด เพื่อแก้เกมแล็ก
+        int particleCount = isPrimaryHit ? meleeBloodCount : 3; 
         Color particleColor = new Color(1f, 0.7f, 0.1f); // สีไข่แดง
 
         if (cachedCircleSprite == null) cachedCircleSprite = CreateCircleSprite();
@@ -382,8 +399,12 @@ public class HitEffect : MonoBehaviour
             p.AddComponent<BloodParticle>();
         }
 
-        // เสกควันเลือดก้อนใหญ่ (ปรับจำนวนได้ใน Inspector)
-        SpawnSmokeParticles(hitPoint, bloodSmokeColor, meleeSmokeCount, meleeSmokeSizeMultiplier);
+        // เสกควันเลือด (ลดลงถ้ายากเกินไปหรือฟันหลายตัวพร้อมกัน)
+        int smokeToSpawn = isPrimaryHit ? meleeSmokeCount : 0; // ฟันหลายตัวพร้อมกัน ไม่ต้องเสกควันเพิ่ม
+        if (smokeToSpawn > 0)
+        {
+            SpawnSmokeParticles(hitPoint, bloodSmokeColor, smokeToSpawn, meleeSmokeSizeMultiplier);
+        }
 
         // Flash & Comic Text สำหรับท่าโจมตีระยะประชิด
         // ถูกนำออกตามคำขอ

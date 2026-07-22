@@ -85,6 +85,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
                 CurrentHealth += regenRate * Time.deltaTime;
                 CurrentHealth = Mathf.Min(CurrentHealth, maxHealth);
                 OnHealthChanged?.Invoke(HealthPercent);
+                ScreenEffectManager.Instance?.UpdateHealthPercent(HealthPercent);
             }
         }
     }
