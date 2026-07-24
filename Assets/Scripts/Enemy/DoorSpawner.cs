@@ -18,6 +18,9 @@ public class DoorSpawner : MonoBehaviour
     [Tooltip("Prefab ของศัตรู (ถ้าไม่ใส่ จะพยายามหาจาก Resources หรือใช้ Default)")]
     [SerializeField] private GameObject enemyPrefab;
 
+    [Tooltip("ถ้าติ๊กถูก ประตูจะไม่เปิดเองตอนเดินชน ต้องรอให้ระบบอื่น (เช่น ArenaManager) สั่งเปิด")]
+    public bool requireManualTrigger = false;
+
     [Header("Door Visuals")]
     [Tooltip("ขนาดของประตู")]
     [SerializeField] private Vector2 doorSize = new Vector2(1f, 2f);
@@ -37,6 +40,7 @@ public class DoorSpawner : MonoBehaviour
     private bool isOpened = false;
     private SpriteRenderer doorSprite;
     private Transform spawnPoint;
+    public bool IsSpawningComplete { get; private set; } = false;
 
     private void Awake()
     {
@@ -88,8 +92,20 @@ public class DoorSpawner : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (isOpened) return;
+        if (requireManualTrigger) return; // ถ้าให้ Arena คุม จะไม่เปิดเองเวลาเดินชน
 
         if (collision.CompareTag("Player"))
+        {
+            OpenDoor();
+        }
+    }
+
+    /// <summary>
+    /// ให้ ArenaManager สั่งเปิดประตูจากภายนอก
+    /// </summary>
+    public void TriggerSpawner()
+    {
+        if (!isOpened)
         {
             OpenDoor();
         }
@@ -122,6 +138,8 @@ public class DoorSpawner : MonoBehaviour
             SpawnSingleEnemy();
             yield return new WaitForSeconds(spawnDelay);
         }
+
+        IsSpawningComplete = true; // สปอนเสร็จครบทุกตัวแล้ว
     }
 
     private void SpawnSingleEnemy()
