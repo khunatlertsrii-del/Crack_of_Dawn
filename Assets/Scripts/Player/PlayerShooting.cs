@@ -45,7 +45,10 @@ public class PlayerShooting : MonoBehaviour
     [SerializeField] private float recoilForce = 1.5f;
 
     [Header("Muzzle Flash")]
-    [Tooltip("Sprite ไฟจากปากกระบอก (ถ้ามี)")]
+    [Tooltip("ใส่รูป Sprite แสงแฟลชปืนของคุณตรงนี้ได้เลย! (ถ้ามี)")]
+    public Sprite customMuzzleFlash;
+
+    [Tooltip("Sprite ไฟจากปากกระบอก (ให้โค้ดจัดการอัตโนมัติ)")]
     [SerializeField] private SpriteRenderer muzzleFlashSprite;
 
     [Tooltip("ระยะเวลาแสดง Muzzle Flash (วินาที)")]
@@ -131,6 +134,17 @@ public class PlayerShooting : MonoBehaviour
             gunSprite.color = new Color(0.3f, 0.3f, 0.3f); // สีเทาเข้ม (ปืน)
             gunSprite.sortingOrder = 5;
         }
+
+        // Auto-create muzzle flash sprite renderer if missing
+        if (muzzleFlashSprite == null && muzzlePoint != null)
+        {
+            GameObject flashObj = new GameObject("MuzzleFlashVisual");
+            flashObj.transform.SetParent(muzzlePoint);
+            flashObj.transform.localPosition = Vector3.zero;
+            muzzleFlashSprite = flashObj.AddComponent<SpriteRenderer>();
+            muzzleFlashSprite.sortingOrder = 6;
+            muzzleFlashSprite.enabled = false;
+        }
     }
 
     private void OnEnable()
@@ -154,7 +168,16 @@ public class PlayerShooting : MonoBehaviour
         }
 
         // ถ้ากำลังรำดาบอยู่ ห้ามยิงปืน! (ป้องกันความขัดแย้งของอนิเมชั่นและเกมเพลย์)
-        if (playerParry != null && playerParry.IsParrying) return;
+        if (playerParry != null && playerParry.IsParrying)
+        {
+            if (gunPivot != null) gunPivot.gameObject.SetActive(false);
+            return;
+        }
+        else
+        {
+            if (gunPivot != null && !gunPivot.gameObject.activeSelf) 
+                gunPivot.gameObject.SetActive(true);
+        }
 
         AimAtMouse();
         HandleShooting();
@@ -357,6 +380,13 @@ public class PlayerShooting : MonoBehaviour
         // เก็บของเก่าไว้เผื่อมีการลากใส่ใน Inspector
         if (muzzleFlashSprite != null)
         {
+            // ถ้าผู้เล่นลากรูปมาใส่ ให้ใช้รูปนั้นแทน
+            if (customMuzzleFlash != null)
+            {
+                muzzleFlashSprite.sprite = customMuzzleFlash;
+                muzzleFlashSprite.color = Color.white;
+            }
+
             muzzleFlashSprite.enabled = true;
             muzzleFlashTimer = muzzleFlashDuration;
 
