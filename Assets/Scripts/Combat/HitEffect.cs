@@ -160,14 +160,15 @@ public class HitEffect : MonoBehaviour
     /// </summary>
     public void PlayMeleeHitEffect(Vector2 hitPoint)
     {
-        if (Time.frameCount != lastHitFrame)
-        {
-            hitsThisFrame = 0;
-            lastHitFrame = Time.frameCount;
-        }
-        hitsThisFrame++;
+        bool isPrimaryHit = false;
 
-        bool isPrimaryHit = hitsThisFrame <= 1; // ตัวแรกที่โดนฟันในเฟรมนี้ จะได้เอฟเฟกต์เต็มที่
+        // แก้อาการแล็ก: ถ้าฟันโดนรัวๆ หรือฟันหลายตัวพร้อมกัน (ภายใน 0.1 วินาที)
+        // จะให้เกิด Hitstop+เลือดสาดเต็มที่ แค่ "ครั้งแรก" เท่านั้น!
+        if (Time.unscaledTime - lastMeleeTime > 0.1f)
+        {
+            isPrimaryHit = true;
+            lastMeleeTime = Time.unscaledTime;
+        }
 
         if (isPrimaryHit)
         {
@@ -178,7 +179,7 @@ public class HitEffect : MonoBehaviour
             }
         }
 
-        // เสกอนุภาคเลือดและควัน (ตัวที่ 2 ขึ้นไปจะโดนเนิร์ฟจำนวนลงเพื่อลดแล็ก)
+        // เสกอนุภาคเลือดและควัน (ตัวที่ 2+ หรือโดนฟันรัวๆ จะเหลือเลือดแค่ 3 เม็ดเพื่อลดแล็ก!)
         SpawnMeleeParticles(hitPoint, isPrimaryHit);
     }
 
