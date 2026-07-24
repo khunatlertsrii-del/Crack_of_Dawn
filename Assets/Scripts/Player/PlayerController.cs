@@ -71,11 +71,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float wallCoyoteTime = 0.2f;
 
     // ===================== SHADOW DASH =====================
-    [Header("Shadow Dash (TP Dash)")]
+    [Header("Shadow Dash (Hornet Style)")]
     [Tooltip("ความเร็วตอนพุ่ง")]
-    [SerializeField] private float dashSpeed = 50f;
+    [SerializeField] private float dashSpeed = 25f;
     [Tooltip("ระยะเวลาที่พุ่ง (วินาที)")]
-    [SerializeField] private float dashDuration = 0.05f;
+    [SerializeField] private float dashDuration = 0.2f;
     [Tooltip("ดีเลย์ก่อนพุ่งครั้งต่อไป (วินาที)")]
     [SerializeField] private float dashCooldown = 1f;
     
@@ -147,9 +147,9 @@ public class PlayerController : MonoBehaviour
         playerCollider = GetComponent<Collider2D>();
         initialGravityScale = rb.gravityScale;
 
-        // บังคับเปลี่ยนเป็น TP Dash แบบเนิร์ฟระยะแล้ว
-        if (dashSpeed > 60f) dashSpeed = 50f;
-        if (dashDuration > 0.1f) dashDuration = 0.05f;
+        // เปลี่ยนจาก TP Dash กลับมาเป็น Dash ปกติ
+        if (dashSpeed >= 50f) dashSpeed = 25f;
+        if (dashDuration <= 0.05f) dashDuration = 0.2f;
 
         // ป้องกันทะลุกำแพงตอนพุ่งไวๆ
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
