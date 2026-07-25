@@ -28,6 +28,8 @@ public class ScreenEffectManager : MonoBehaviour
     public bool enableSlowMoFilter = true;
     [Tooltip("สีของฟิลเตอร์ตอน Slow (แนะนำให้ใช้สีเหลือง/ส้มอ่อนๆ หรือสีฟ้าซีดๆ)")]
     public Color slowMoColor = new Color(1f, 0.9f, 0.5f, 0.15f); // สีเหลืองจางๆ แบบ My Friend Pedro
+    [Tooltip("ความหนาของ Vignette ตอนสโลว์และจอแดง (ยิ่งค่าน้อย ขอบยิ่งหนา ปกติคือ 3)")]
+    public float vignettePower = 3f;
     [Tooltip("ความเร็วในการค่อยๆ เปลี่ยนสีฟิลเตอร์")]
     public float filterTransitionSpeed = 5f;
 
@@ -127,8 +129,8 @@ public class ScreenEffectManager : MonoBehaviour
                 float dist = Vector2.Distance(new Vector2(x, y), center);
                 // ขอบจอจะค่าใกล้ 1 ตรงกลางใกล้ 0
                 float factor = Mathf.Clamp01(dist / maxDist);
-                // ยกกำลังให้ตรงกลางกว้างๆ แล้วขอบแดงจัดๆ
-                factor = Mathf.Pow(factor, 3f);
+                // ยกกำลังให้ตรงกลางกว้างๆ แล้วขอบแดง/มืดจัดๆ
+                factor = Mathf.Pow(factor, vignettePower);
 
                 pixels[y * size + x] = new Color(1f, 1f, 1f, factor); // ใช้สีขาวไล่ Alpha แล้วให้ Image.color เปลี่ยนสีเอา
             }

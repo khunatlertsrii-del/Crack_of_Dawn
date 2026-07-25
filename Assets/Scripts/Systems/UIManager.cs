@@ -150,40 +150,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-
-        // Dynamic HUD หลบขอบจอ Cinematic
-        if (SlowMotionManager.Instance != null)
-        {
-            // เซฟค่าเริ่มต้นถ้าเพิ่งเคยเจอ Slider
-            if (hpSlider != null && hpRect == null)
-            {
-                hpRect = hpSlider.GetComponent<RectTransform>();
-                if (hpRect != null) hpOriginalPos = hpRect.anchoredPosition;
-            }
-            if (slowMoSlider != null && slowMoRect == null)
-            {
-                slowMoRect = slowMoSlider.GetComponent<RectTransform>();
-                if (slowMoRect != null) slowMoOriginalPos = slowMoRect.anchoredPosition;
-            }
-
-            // ขยับ HP Slider
-            if (hpRect != null)
-            {
-                float direction = (hpRect.anchorMin.y >= 0.5f) ? -1f : 1f;
-                float targetY = SlowMotionManager.Instance.IsSlowMotionActive ? hpOriginalPos.y + (150f * direction) : hpOriginalPos.y;
-                Vector2 targetPos = new Vector2(hpOriginalPos.x, targetY);
-                hpRect.anchoredPosition = Vector2.Lerp(hpRect.anchoredPosition, targetPos, 10f * Time.unscaledDeltaTime);
-            }
-
-            // ขยับ SlowMo Slider
-            if (slowMoRect != null)
-            {
-                float direction = (slowMoRect.anchorMin.y >= 0.5f) ? -1f : 1f;
-                float targetY = SlowMotionManager.Instance.IsSlowMotionActive ? slowMoOriginalPos.y + (150f * direction) : slowMoOriginalPos.y;
-                Vector2 targetPos = new Vector2(slowMoOriginalPos.x, targetY);
-                slowMoRect.anchoredPosition = Vector2.Lerp(slowMoRect.anchoredPosition, targetPos, 10f * Time.unscaledDeltaTime);
-            }
-        }
+        // Removed dynamic HUD movement
     }
 
     private void OnDisable()

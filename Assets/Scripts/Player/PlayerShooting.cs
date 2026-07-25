@@ -182,15 +182,6 @@ public class PlayerShooting : MonoBehaviour
         AimAtMouse();
         HandleShooting();
         UpdateMuzzleFlash();
-
-        // Dynamic HUD หลบขอบจอ
-        if (ammoRect != null && SlowMotionManager.Instance != null)
-        {
-            float direction = (ammoRect.anchorMin.y >= 0.5f) ? -1f : 1f;
-            float targetY = SlowMotionManager.Instance.IsSlowMotionActive ? ammoOriginalPos.y + (150f * direction) : ammoOriginalPos.y;
-            Vector2 targetPos = new Vector2(ammoOriginalPos.x, targetY);
-            ammoRect.anchoredPosition = Vector2.Lerp(ammoRect.anchoredPosition, targetPos, 10f * Time.unscaledDeltaTime);
-        }
         UpdateAmmoUI();
     }
 
