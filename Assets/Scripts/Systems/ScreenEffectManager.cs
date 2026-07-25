@@ -31,22 +31,7 @@ public class ScreenEffectManager : MonoBehaviour
     [Tooltip("ความเร็วในการค่อยๆ เปลี่ยนสีฟิลเตอร์")]
     public float filterTransitionSpeed = 5f;
 
-    [Header("Cinematic Borders")]
-    [Tooltip("เปิดระบบขอบจอบนล่างวิ่งเป็นฟิล์ม")]
-    [SerializeField] private bool enableCinematicBorders = true;
-    [Tooltip("ลาก Texture ลายขอบมาใส่ตรงนี้ (อย่าลืมตั้ง Wrap Mode เป็น Repeat)")]
-    public Texture borderTexture; 
-    [Tooltip("เปลี่ยนขอบจอตามเมาส์ (Dynamic)")]
-    [SerializeField] private bool dynamicBorders = true;
-    [SerializeField] private Color borderColor = new Color(0, 0, 0, 0.8f);
-    [Tooltip("ความกว้างของขอบจอ (0.1 = 10% ของจอ)")]
-    public float borderHeightPercent = 0.15f;
-    [Tooltip("ความเร็วตอนปกติ")]
-    public float normalScrollSpeed = 0.5f;
-    [Tooltip("ความเร็วตอนปะทะ (Adrenaline!)")]
-    public float adrenalineScrollSpeed = 3f;
-    [Tooltip("ความเร็วในการกลับคืนสู่สปีดปกติ")]
-    public float adrenalineDecaySpeed = 2f;
+
 
     [Header("Screen Blood Settings (เลือดเปื้อนจอ)")]
     [Tooltip("ขนาดคราบเลือดบนจอ (Min/Max)")]
@@ -60,16 +45,7 @@ public class ScreenEffectManager : MonoBehaviour
     [Tooltip("ใส่รูปเลือดที่คุณต้องการที่นี่ (ถ้าไม่ใส่ ระบบจะสร้างรูป Procedural ให้เอง)")]
     public Sprite[] customBloodSplats;
 
-    private RawImage topBorder;
-    private RawImage bottomBorder;
-    private RawImage leftBorder;
-    private RawImage rightBorder;
-    
-    private float currentScrollSpeed = 0f;
-    private float scrollPositionTop = 0f;
-    private float scrollPositionBottom = 0f;
-    private float scrollPositionLeft = 0f;
-    private float scrollPositionRight = 0f;
+
 
     private Image damageImage;
     private Image slowMoImage;
@@ -107,72 +83,10 @@ public class ScreenEffectManager : MonoBehaviour
         slowMoImage = slowObj.AddComponent<Image>();
         slowMoImage.raycastTarget = false;
         slowMoImage.color = new Color(slowMoColor.r, slowMoColor.g, slowMoColor.b, 0f);
+        slowMoImage.sprite = CreateVignetteSprite(); // เพิ่ม Vignette ตอนสโลว์แบบ My Friend Pedro
         SetFullScreen(slowMoImage.rectTransform);
 
-        // 3. สร้าง Cinematic Borders (อยู่บนสุดของ Slow-Mo แต่ใต้ Damage)
-        GameObject topObj = new GameObject("TopBorder");
-        topObj.transform.SetParent(canvasObj.transform, false);
-        topBorder = topObj.AddComponent<RawImage>();
-        topBorder.raycastTarget = false;
-        topBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
-        if (borderTexture != null) topBorder.texture = borderTexture;
-        else topBorder.texture = CreateFilmStripTexture(true);
-        RectTransform rtTop = topBorder.rectTransform;
-        rtTop.anchorMin = new Vector2(0, 1f - borderHeightPercent);
-        rtTop.anchorMax = new Vector2(1, 1);
-        rtTop.offsetMin = Vector2.zero;
-        rtTop.offsetMax = Vector2.zero;
 
-        GameObject botObj = new GameObject("BottomBorder");
-        botObj.transform.SetParent(canvasObj.transform, false);
-        bottomBorder = botObj.AddComponent<RawImage>();
-        bottomBorder.raycastTarget = false;
-        bottomBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
-        if (borderTexture != null) bottomBorder.texture = borderTexture;
-        else bottomBorder.texture = CreateFilmStripTexture(false);
-        RectTransform rtBot = bottomBorder.rectTransform;
-        rtBot.anchorMin = new Vector2(0, 0);
-        rtBot.anchorMax = new Vector2(1, borderHeightPercent);
-        rtBot.offsetMin = Vector2.zero;
-        rtBot.offsetMax = Vector2.zero;
-
-        // --- Left & Right Borders (Rotate 90 degrees to use the same horizontal texture correctly) ---
-        GameObject leftObj = new GameObject("LeftBorder");
-        leftObj.transform.SetParent(canvasObj.transform, false);
-        leftBorder = leftObj.AddComponent<RawImage>();
-        leftBorder.raycastTarget = false;
-        leftBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
-        if (borderTexture != null) leftBorder.texture = borderTexture;
-        else leftBorder.texture = CreateFilmStripTexture(true); // ใช้แบบแนวนอนปกติ เพราะเราจะหมุนมัน
-        RectTransform rtLeft = leftBorder.rectTransform;
-        
-        // หมุน -90 องศา (ขวาชี้ขึ้นบน, ล่างชี้ไปขวา)
-        rtLeft.localEulerAngles = new Vector3(0, 0, -90);
-        // Anchor ซ้ายกลาง
-        rtLeft.anchorMin = new Vector2(0, 0.5f);
-        rtLeft.anchorMax = new Vector2(0, 0.5f);
-        rtLeft.pivot = new Vector2(0.5f, 0f); // แก้ Pivot เป็น 0 เพื่อให้อยู่ในจอพอดี
-        // ตั้งขนาดให้ กว้าง = ความสูงจอ, สูง = ความหนาของขอบ
-        rtLeft.sizeDelta = new Vector2(Screen.height, Screen.width * borderHeightPercent);
-        rtLeft.anchoredPosition = Vector2.zero;
-
-        GameObject rightObj = new GameObject("RightBorder");
-        rightObj.transform.SetParent(canvasObj.transform, false);
-        rightBorder = rightObj.AddComponent<RawImage>();
-        rightBorder.raycastTarget = false;
-        rightBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
-        if (borderTexture != null) rightBorder.texture = borderTexture;
-        else rightBorder.texture = CreateFilmStripTexture(false);
-        RectTransform rtRight = rightBorder.rectTransform;
-
-        // หมุน 90 องศา (ขวาชี้ลงล่าง, ล่างชี้ซ้าย)
-        rtRight.localEulerAngles = new Vector3(0, 0, 90);
-        // Anchor ขวากลาง
-        rtRight.anchorMin = new Vector2(1, 0.5f);
-        rtRight.anchorMax = new Vector2(1, 0.5f);
-        rtRight.pivot = new Vector2(0.5f, 0f); // แก้ Pivot เป็น 0 เพื่อให้อยู่ในจอพอดี
-        rtRight.sizeDelta = new Vector2(Screen.height, Screen.width * borderHeightPercent);
-        rtRight.anchoredPosition = Vector2.zero;
 
         // 4. สร้าง Image สำหรับ Grayscale Overlay (หน้าเทา) (อยู่ใต้ Vignette)
         GameObject grayObj = new GameObject("GrayscaleOverlay");
@@ -194,39 +108,7 @@ public class ScreenEffectManager : MonoBehaviour
     
     private Image grayscaleImage;
 
-    /// <summary>สร้าง Texture รูม้วนฟิล์ม (Film Strip)</summary>
-    private Texture2D CreateFilmStripTexture(bool isTopBorder)
-    {
-        int width = 128;
-        int height = 32;
-        Texture2D tex = new Texture2D(width, height);
-        tex.wrapMode = TextureWrapMode.Repeat;
-        tex.filterMode = FilterMode.Point;
-        
-        Color[] pixels = new Color[width * height];
-        for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.white;
 
-        int holeWidth = 16;
-        int holeHeight = 16;
-        int spacing = 32;
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                bool inHoleY = isTopBorder ? (y > height - holeHeight - 4 && y < height - 4) : (y > 4 && y < holeHeight + 4);
-                bool inHoleX = (x % spacing) < holeWidth;
-
-                if (inHoleX && inHoleY)
-                {
-                    pixels[y * width + x] = new Color(1f, 1f, 1f, 0f); // โปร่งใส
-                }
-            }
-        }
-        tex.SetPixels(pixels);
-        tex.Apply();
-        return tex;
-    }
 
     /// <summary>สร้างภาพ Vignette (ตรงกลางใส ขอบทึบ) แบบ Procedural</summary>
     private Sprite CreateVignetteSprite()
@@ -316,105 +198,7 @@ public class ScreenEffectManager : MonoBehaviour
             slowMoImage.color = c;
         }
 
-        // 3. อัปเดต Cinematic Borders (ขอบจอวิ่ง)
-        if (enableCinematicBorders && topBorder != null && bottomBorder != null)
-        {
-            if (borderTexture != null)
-            {
-                topBorder.texture = borderTexture;
-                bottomBorder.texture = borderTexture;
-                leftBorder.texture = borderTexture;
-                rightBorder.texture = borderTexture;
-            }
 
-            currentScrollSpeed = Mathf.Lerp(currentScrollSpeed, normalScrollSpeed, adrenalineDecaySpeed * Time.unscaledDeltaTime);
-
-            scrollPositionTop += currentScrollSpeed * Time.unscaledDeltaTime;
-            scrollPositionBottom -= currentScrollSpeed * Time.unscaledDeltaTime;
-            scrollPositionLeft += currentScrollSpeed * Time.unscaledDeltaTime; // เลื่อนตามแนวที่หมุนแล้ว
-            scrollPositionRight -= currentScrollSpeed * Time.unscaledDeltaTime;
-
-            // คำนวณอัตราส่วนจอภาพเพื่อไม่ให้ Texture ยืดเกินไป
-            float screenAspect = (float)Screen.width / Screen.height;
-            float repeatX = 1f;
-            float repeatY = 1f;
-
-            if (borderTexture == null)
-            {
-                // ถ้าเป็นลาย Procedural ปกติที่ขนาด 128x32
-                repeatX = Screen.width / 128f;
-                repeatY = Screen.height / 128f;
-            }
-            else
-            {
-                // ถ้าใช้ Texture แบกำหนดเอง ให้คำนวณการ Tile ตาม Aspect Ratio เพื่อไม่ให้ภาพยืดอ้วน
-                float texAspect = (float)borderTexture.width / borderTexture.height;
-                
-                // สำหรับขอบบน/ล่าง
-                float pixelHeight = Screen.height * borderHeightPercent;
-                float pixelWidth = pixelHeight * texAspect;
-                repeatX = Screen.width / pixelWidth;
-
-                // สำหรับขอบซ้าย/ขวา (หมุน 90 องศา)
-                float vertPixelHeight = Screen.width * borderHeightPercent;
-                float vertPixelWidth = vertPixelHeight * texAspect;
-                repeatY = Screen.height / vertPixelWidth;
-            }
-
-            topBorder.uvRect = new Rect(scrollPositionTop, 0, repeatX, 1);
-            bottomBorder.uvRect = new Rect(scrollPositionBottom, 0, repeatX, 1);
-            // Left/Right หมุนแล้ว 90 องศา ความกว้างคือแกน Y ของจอ, ความสูงคือแกน X ของจอ (ขอบหนา)
-            leftBorder.uvRect = new Rect(scrollPositionLeft, 0, repeatY, 1);
-            rightBorder.uvRect = new Rect(scrollPositionRight, 0, repeatY, 1);
-
-            float baseTargetAlpha = SlowMotionManager.Instance != null && SlowMotionManager.Instance.IsSlowMotionActive ? borderColor.a : 0f;
-            float topBotAlpha = baseTargetAlpha;
-            float leftRightAlpha = baseTargetAlpha;
-
-            if (dynamicBorders && baseTargetAlpha > 0)
-            {
-                Vector2 mousePos = Input.mousePosition;
-                Vector2 screenCenter = new Vector2(Screen.width / 2f, Screen.height / 2f);
-                Vector2 dir = (mousePos - screenCenter).normalized;
-                
-                // ถ้าเมาส์ชี้ขึ้น/ลง (แกน Y มากกว่า X)
-                if (Mathf.Abs(dir.y) > Mathf.Abs(dir.x))
-                {
-                    topBotAlpha = 0f;
-                    leftRightAlpha = baseTargetAlpha;
-                }
-                else // ถ้าเมาส์ชี้ซ้าย/ขวา
-                {
-                    topBotAlpha = baseTargetAlpha;
-                    leftRightAlpha = 0f;
-                }
-            }
-            else if (!dynamicBorders)
-            {
-                // ถ้าไม่เปิด Dynamic ก็มีแค่บน-ล่าง
-                leftRightAlpha = 0f;
-            }
-
-            Color cTop = topBorder.color;
-            Color cBot = bottomBorder.color;
-            Color cLeft = leftBorder.color;
-            Color cRight = rightBorder.color;
-            
-            cTop.a = Mathf.Lerp(cTop.a, topBotAlpha, filterTransitionSpeed * Time.unscaledDeltaTime);
-            cBot.a = Mathf.Lerp(cBot.a, topBotAlpha, filterTransitionSpeed * Time.unscaledDeltaTime);
-            cLeft.a = Mathf.Lerp(cLeft.a, leftRightAlpha, filterTransitionSpeed * Time.unscaledDeltaTime);
-            cRight.a = Mathf.Lerp(cRight.a, leftRightAlpha, filterTransitionSpeed * Time.unscaledDeltaTime);
-            
-            cTop.r = borderColor.r; cTop.g = borderColor.g; cTop.b = borderColor.b;
-            cBot.r = borderColor.r; cBot.g = borderColor.g; cBot.b = borderColor.b;
-            cLeft.r = borderColor.r; cLeft.g = borderColor.g; cLeft.b = borderColor.b;
-            cRight.r = borderColor.r; cRight.g = borderColor.g; cRight.b = borderColor.b;
-
-            topBorder.color = cTop;
-            bottomBorder.color = cBot;
-            leftBorder.color = cLeft;
-            rightBorder.color = cRight;
-        }
     }
 
     /// <summary>
@@ -430,10 +214,7 @@ public class ScreenEffectManager : MonoBehaviour
     /// </summary>
     public void TriggerAdrenaline()
     {
-        if (enableCinematicBorders)
-        {
-            currentScrollSpeed = adrenalineScrollSpeed;
-        }
+        // ยกเลิกระบบขอบจอไปแล้ว ปล่อยว่างไว้เผื่อถูกเรียกใช้จากโค้ดอื่น
     }
 
     /// <summary>
