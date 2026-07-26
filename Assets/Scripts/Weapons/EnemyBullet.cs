@@ -129,6 +129,21 @@ public class EnemyBullet : MonoBehaviour
             return;
         }
 
+        // ชน IDamageable อื่นๆ (ที่ไม่ใช่ศัตรู) เช่น ถังระเบิด
+        if (!other.CompareTag("Enemy") && other.GetComponent<FriedEggEnemy>() == null)
+        {
+            IDamageable damageable = other.GetComponent<IDamageable>();
+            if (damageable == null) damageable = other.GetComponentInParent<IDamageable>();
+
+            if (damageable != null && damageable.IsAlive)
+            {
+                hasHit = true;
+                damageable.TakeDamage(damage, transform.position, false, rb.linearVelocity.normalized);
+                Destroy(gameObject);
+                return;
+            }
+        }
+
         // ชนพื้น/ผนัง? (ชนอะไรก็ตามที่แข็ง เป็น solid ไม่ใช่ trigger และไม่ใช่ศัตรู/ผู้เล่น)
         if (!other.isTrigger && !other.CompareTag("Enemy") && !other.CompareTag("Player"))
         {
@@ -143,6 +158,13 @@ public class EnemyBullet : MonoBehaviour
         if (hasHit) return;
         if (!collision.gameObject.CompareTag("Enemy"))
         {
+            IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
+            if (damageable == null) damageable = collision.gameObject.GetComponentInParent<IDamageable>();
+            if (damageable != null && damageable.IsAlive)
+            {
+                damageable.TakeDamage(damage, transform.position, false, rb.linearVelocity.normalized);
+            }
+
             hasHit = true;
             Destroy(gameObject);
         }

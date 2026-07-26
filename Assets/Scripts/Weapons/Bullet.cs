@@ -138,6 +138,14 @@ public class Bullet : MonoBehaviour
     {
         if (hasHit) return;
 
+        IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
+        if (damageable == null) damageable = collision.gameObject.GetComponentInParent<IDamageable>();
+
+        if (damageable != null && damageable.IsAlive)
+        {
+            damageable.TakeDamage(damage, transform.position, false, direction);
+        }
+
         // ชนอะไรก็ตามที่เป็น non-trigger → ทำลาย
         hasHit = true;
         SpawnImpactEffect();
