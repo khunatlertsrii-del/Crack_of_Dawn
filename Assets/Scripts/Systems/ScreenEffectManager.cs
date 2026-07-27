@@ -33,6 +33,24 @@ public class ScreenEffectManager : MonoBehaviour
     [Tooltip("ความเร็วในการค่อยๆ เปลี่ยนสีฟิลเตอร์")]
     public float filterTransitionSpeed = 5f;
 
+    [Header("Cinematic Borders 2.0 (ขอบฟิล์มภาพยนตร์บางโปร่งแสง)")]
+    [Tooltip("เปิด/ปิดระบบขอบฟิล์มบาง")]
+    public bool enableCinematicBorders = true;
+    [Tooltip("ความสูงของขอบจอ (พิกเซล) แนะนำ 55 เพื่อไม่ให้บังทางด้านบน/ล่าง")]
+    public float borderHeight = 55f;
+    [Tooltip("สีและความโปร่งใสของขอบฟิล์ม (Alpha แนะนำ 0.65 จะได้มองเห็นศัตรูทะลุได้)")]
+    public Color borderColor = new Color(0f, 0f, 0f, 0.65f);
+    [Tooltip("ความเร็วปกติในการเลื่อนฟิล์มตอนเปิดสโลว์")]
+    public float normalBorderSpeed = 0.35f;
+    [Tooltip("ความเร็วที่พุ่งสุดขีดตอนแพรี่หรือฟันดาบโดน (Adrenaline Boost)")]
+    public float adrenalineBorderSpeed = 2.5f;
+
+    private RawImage topBorder;
+    private RawImage bottomBorder;
+    private float currentBorderSpeed = 0f;
+    private float adrenalineTimer = 0f;
+    private Rect borderUvRect = new Rect(0, 0, 20, 1);
+
 
 
     [Header("Screen Blood Settings (เลือดเปื้อนจอ)")]
@@ -106,6 +124,69 @@ public class ScreenEffectManager : MonoBehaviour
         damageImage.color = new Color(damageColor.r, damageColor.g, damageColor.b, 0f);
         damageImage.sprite = CreateVignetteSprite(); // สร้างภาพขอบแดงไล่สี
         SetFullScreen(damageImage.rectTransform);
+
+        CreateCinematicBorders(canvasObj);
+    }
+
+    private void CreateCinematicBorders(GameObject canvasObj)
+    {
+        Texture2D filmTex = CreateFilmStripTexture(64, 32);
+
+        // Top Border (บางเฉียบติดขอบบน)
+        GameObject topObj = new GameObject("TopCinematicBorder");
+        topObj.transform.SetParent(canvasObj.transform, false);
+        topBorder = topObj.AddComponent<RawImage>();
+        topBorder.raycastTarget = false;
+        topBorder.texture = filmTex;
+        topBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
+        RectTransform rtTop = topBorder.rectTransform;
+        rtTop.anchorMin = new Vector2(0, 1);
+        rtTop.anchorMax = new Vector2(1, 1);
+        rtTop.pivot = new Vector2(0.5f, 1);
+        rtTop.sizeDelta = new Vector2(0, borderHeight);
+        rtTop.anchoredPosition = Vector2.zero;
+
+        // Bottom Border (บางเฉียบติดขอบล่าง)
+        GameObject botObj = new GameObject("BottomCinematicBorder");
+        botObj.transform.SetParent(canvasObj.transform, false);
+        bottomBorder = botObj.AddComponent<RawImage>();
+        bottomBorder.raycastTarget = false;
+        bottomBorder.texture = filmTex;
+        bottomBorder.color = new Color(borderColor.r, borderColor.g, borderColor.b, 0f);
+        RectTransform rtBot = bottomBorder.rectTransform;
+        rtBot.anchorMin = new Vector2(0, 0);
+        rtBot.anchorMax = new Vector2(1, 0);
+        rtBot.pivot = new Vector2(0.5f, 0);
+        rtBot.sizeDelta = new Vector2(0, borderHeight);
+        rtBot.anchoredPosition = Vector2.zero;
+    }
+
+    private Texture2D CreateFilmStripTexture(int width, int height)
+    {
+        Texture2D tex = new Texture2D(width, height);
+        tex.wrapMode = TextureWrapMode.Repeat;
+        tex.filterMode = FilterMode.Point;
+        Color[] pixels = new Color[width * height];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                pixels[y * width + x] = Color.white;
+
+                // รูฟิล์มสีทองสว่างโปร่งใส
+                if (y >= height * 0.35f && y <= height * 0.65f)
+                {
+                    if ((x % 16) >= 4 && (x % 16) <= 12)
+                    {
+                        pixels[y * width + x] = new Color(0.8f, 0.7f, 0.2f, 0.4f);
+                    }
+                }
+            }
+        }
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return tex;
     }
     
     private Image grayscaleImage;
@@ -200,7 +281,39 @@ public class ScreenEffectManager : MonoBehaviour
             slowMoImage.color = c;
         }
 
+        // 3. อัปเดต Cinematic Borders 2.0 (ขอบฟิล์มภาพยนตร์บางโปร่งแสง)
+        if (enableCinematicBorders && topBorder != null && bottomBorder != null && SlowMotionManager.Instance != null)
+        {
+            bool isSlowMo = SlowMotionManager.Instance.IsSlowMotionActive;
+            float targetBorderAlpha = isSlowMo ? borderColor.a : 0f;
 
+            Color curColor = topBorder.color;
+            curColor.a = Mathf.Lerp(curColor.a, targetBorderAlpha, 15f * Time.unscaledDeltaTime);
+            curColor.r = borderColor.r; curColor.g = borderColor.g; curColor.b = borderColor.b;
+            topBorder.color = curColor;
+            bottomBorder.color = curColor;
+
+            // คำนวณความเร็ววิ่งของฟิล์ม (Adrenaline Speed Boost!)
+            if (adrenalineTimer > 0)
+            {
+                adrenalineTimer -= Time.unscaledDeltaTime;
+                currentBorderSpeed = Mathf.Lerp(currentBorderSpeed, adrenalineBorderSpeed, 15f * Time.unscaledDeltaTime);
+            }
+            else
+            {
+                currentBorderSpeed = Mathf.Lerp(currentBorderSpeed, normalBorderSpeed, 5f * Time.unscaledDeltaTime);
+            }
+
+            if (curColor.a > 0.01f)
+            {
+                borderUvRect.x += currentBorderSpeed * Time.unscaledDeltaTime;
+                borderUvRect.width = Screen.width / 40f;
+                borderUvRect.height = 1f;
+
+                topBorder.uvRect = borderUvRect;
+                bottomBorder.uvRect = borderUvRect;
+            }
+        }
     }
 
     /// <summary>
@@ -216,7 +329,8 @@ public class ScreenEffectManager : MonoBehaviour
     /// </summary>
     public void TriggerAdrenaline()
     {
-        // ยกเลิกระบบขอบจอไปแล้ว ปล่อยว่างไว้เผื่อถูกเรียกใช้จากโค้ดอื่น
+        adrenalineTimer = 0.5f; // เร่งความเร็วฟิล์มสุดขีดครึ่งวินาที
+        currentBorderSpeed = adrenalineBorderSpeed;
     }
 
     /// <summary>

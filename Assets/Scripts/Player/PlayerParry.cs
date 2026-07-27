@@ -131,7 +131,11 @@ public class PlayerParry : MonoBehaviour
 
                             // เลือดสาด 360 องศา และแปะหน้าจอ!
                             if (HitEffect.Instance != null) HitEffect.Instance.PlayMeleeHitEffect(hit.transform.position);
-                            if (ScreenEffectManager.Instance != null) ScreenEffectManager.Instance.PlayScreenBloodSplatter(Random.Range(1, 4));
+                            if (ScreenEffectManager.Instance != null) 
+                            {
+                                ScreenEffectManager.Instance.PlayScreenBloodSplatter(Random.Range(1, 4));
+                                ScreenEffectManager.Instance.TriggerAdrenaline();
+                            }
                         }
                     }
                 }
