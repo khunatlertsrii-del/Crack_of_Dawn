@@ -38,12 +38,14 @@ public class ScreenEffectManager : MonoBehaviour
     public bool enableCinematicBorders = true;
     [Tooltip("ความสูงของขอบจอ (พิกเซล) แนะนำ 55 เพื่อไม่ให้บังทางด้านบน/ล่าง")]
     public float borderHeight = 55f;
-    [Tooltip("สีและความโปร่งใสของขอบฟิล์ม (Alpha แนะนำ 0.65 จะได้มองเห็นศัตรูทะลุได้)")]
-    public Color borderColor = new Color(0f, 0f, 0f, 0.65f);
+    [Tooltip("สีและความโปร่งใสของขอบฟิล์ม (Alpha ปรับความเข้มได้ตามชอบ ค่าเริ่มต้น 0.95 คือเข้มชัด)")]
+    public Color borderColor = new Color(0f, 0f, 0f, 0.95f);
+    [Tooltip("ใส่รูป Texture ขอบฟิล์มของคุณเองที่นี่ (ถ้าไม่ใส่ ระบบจะสร้างลายฟิล์มทองให้เอง)")]
+    public Texture customBorderTexture;
     [Tooltip("ความเร็วปกติในการเลื่อนฟิล์มตอนเปิดสโลว์")]
-    public float normalBorderSpeed = 0.35f;
+    public float normalBorderSpeed = 0.5f;
     [Tooltip("ความเร็วที่พุ่งสุดขีดตอนแพรี่หรือฟันดาบโดน (Adrenaline Boost)")]
-    public float adrenalineBorderSpeed = 2.5f;
+    public float adrenalineBorderSpeed = 15f;
 
     private RawImage topBorder;
     private RawImage bottomBorder;
@@ -130,7 +132,8 @@ public class ScreenEffectManager : MonoBehaviour
 
     private void CreateCinematicBorders(GameObject canvasObj)
     {
-        Texture2D filmTex = CreateFilmStripTexture(64, 32);
+        Texture filmTex = customBorderTexture != null ? customBorderTexture : CreateFilmStripTexture(64, 32);
+        filmTex.wrapMode = TextureWrapMode.Repeat;
 
         // Top Border (บางเฉียบติดขอบบน)
         GameObject topObj = new GameObject("TopCinematicBorder");
@@ -174,12 +177,12 @@ public class ScreenEffectManager : MonoBehaviour
             {
                 pixels[y * width + x] = Color.white;
 
-                // รูฟิล์มสีทองสว่างโปร่งใส
+                // รูฟิล์มสีทองสว่างชัดเจน
                 if (y >= height * 0.35f && y <= height * 0.65f)
                 {
                     if ((x % 16) >= 4 && (x % 16) <= 12)
                     {
-                        pixels[y * width + x] = new Color(0.8f, 0.7f, 0.2f, 0.4f);
+                        pixels[y * width + x] = new Color(1f, 0.85f, 0.1f, 1f); // สีทองสว่าง 100%
                     }
                 }
             }
@@ -297,7 +300,7 @@ public class ScreenEffectManager : MonoBehaviour
             if (adrenalineTimer > 0)
             {
                 adrenalineTimer -= Time.unscaledDeltaTime;
-                currentBorderSpeed = Mathf.Lerp(currentBorderSpeed, adrenalineBorderSpeed, 15f * Time.unscaledDeltaTime);
+                currentBorderSpeed = Mathf.Lerp(currentBorderSpeed, adrenalineBorderSpeed, 20f * Time.unscaledDeltaTime);
             }
             else
             {
@@ -329,7 +332,7 @@ public class ScreenEffectManager : MonoBehaviour
     /// </summary>
     public void TriggerAdrenaline()
     {
-        adrenalineTimer = 0.5f; // เร่งความเร็วฟิล์มสุดขีดครึ่งวินาที
+        adrenalineTimer = 0.6f; // เร่งความเร็วฟิล์มสุดขีด 0.6 วินาที
         currentBorderSpeed = adrenalineBorderSpeed;
     }
 

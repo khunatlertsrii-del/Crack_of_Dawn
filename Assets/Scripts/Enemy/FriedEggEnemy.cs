@@ -462,6 +462,7 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         {
             SlowMotionManager.Instance.AddMeterFromHit();
         }
+        ScreenEffectManager.Instance?.TriggerAdrenaline();
 
         currentHealth -= damage;
 
