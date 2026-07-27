@@ -98,38 +98,37 @@ public class EnemyBullet : MonoBehaviour
             return;
         }
 
-        // ชน Player? (เฉพาะตอนยังไม่โดนปัด)
-        if (!isDeflected && other.CompareTag("Player"))
-        {
-            // เช็คด่วน! ผู้เล่นกำลังเปิดโหมด Parry อยู่หรือไม่?
-            // ป้องกันปัญหากระสุนพุ่งเร็วทะลุวงแหวน หรือศัตรูยิงเผาขน
-            PlayerParry parry = other.GetComponent<PlayerParry>();
-            if (parry == null) parry = other.GetComponentInParent<PlayerParry>();
-            if (parry == null) parry = other.GetComponentInChildren<PlayerParry>();
+        // 1. เช็คก่อนเลย! ชน Player หรือชิ้นส่วนลูกๆ ของ Player หรือไม่? (ไม่ว่าจะตั้ง Tag ว่าอะไร)
+        PlayerParry parry = other.GetComponent<PlayerParry>();
+        if (parry == null) parry = other.GetComponentInParent<PlayerParry>();
+        if (parry == null) parry = other.GetComponentInChildren<PlayerParry>();
 
-            if (parry != null && parry.IsParrying)
+        if (parry != null)
+        {
+            // ถ้ากำลังเปิดโหมด Parry อยู่ -> ปัดกระสุนทิ้งทันที! ห้ามทำดาเมจเด็ดขาด!
+            if (parry.IsParrying)
             {
-                // ปัดทิ้งทันที! รอดตาย!
                 parry.DeflectBullet(this);
                 return;
             }
 
-            hasHit = true;
-
-            // หา IDamageable (PlayerHealth)
-            IDamageable damageable = other.GetComponent<IDamageable>();
-            if (damageable == null) damageable = other.GetComponentInParent<IDamageable>();
-
-            if (damageable != null && damageable.IsAlive)
+            // ถ้าไม่ได้เปิด Parry และกระสุนยังไม่โดนปัด -> ทำดาเมจใส่ผู้เล่น
+            if (!isDeflected)
             {
-                damageable.TakeDamage(damage, transform.position, false, rb.linearVelocity.normalized);
-            }
+                hasHit = true;
+                IDamageable playerDamageable = other.GetComponent<IDamageable>();
+                if (playerDamageable == null) playerDamageable = other.GetComponentInParent<IDamageable>();
 
-            Destroy(gameObject);
+                if (playerDamageable != null && playerDamageable.IsAlive)
+                {
+                    playerDamageable.TakeDamage(damage, transform.position, false, rb.linearVelocity.normalized);
+                }
+                Destroy(gameObject);
+            }
             return;
         }
 
-        // ชน IDamageable อื่นๆ (ที่ไม่ใช่ศัตรู) เช่น ถังระเบิด
+        // 2. ชน IDamageable อื่นๆ (ที่ไม่ใช่ศัตรู และไม่ใช่ผู้เล่น) เช่น ถังระเบิด
         if (!other.CompareTag("Enemy") && other.GetComponent<FriedEggEnemy>() == null)
         {
             IDamageable damageable = other.GetComponent<IDamageable>();
@@ -156,6 +155,18 @@ public class EnemyBullet : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (hasHit) return;
+
+        // เช็คก่อนเลยว่าชน Player ที่กำลัง Parry อยู่หรือไม่?
+        PlayerParry parry = collision.gameObject.GetComponent<PlayerParry>();
+        if (parry == null) parry = collision.gameObject.GetComponentInParent<PlayerParry>();
+        if (parry == null) parry = collision.gameObject.GetComponentInChildren<PlayerParry>();
+
+        if (parry != null && parry.IsParrying)
+        {
+            parry.DeflectBullet(this);
+            return;
+        }
+
         if (!collision.gameObject.CompareTag("Enemy"))
         {
             IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();

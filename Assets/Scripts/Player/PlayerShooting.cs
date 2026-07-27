@@ -214,11 +214,13 @@ public class PlayerShooting : MonoBehaviour
         }
 
         gunPivot.rotation = Quaternion.Euler(0, 0, angle);
-        
-        // หมุนหัวด้วย (ถ้ามี)
+
+        // หมุนหัวเบาๆ (ก้ม-เงย ไม่เกิน 25 องศา จะได้ไม่คอหักและไม่กลับหัว!)
         if (headPivot != null)
         {
-            headPivot.rotation = Quaternion.Euler(0, 0, angle);
+            float headAngle = Mathf.Atan2(direction.y, Mathf.Abs(direction.x)) * Mathf.Rad2Deg;
+            headAngle = Mathf.Clamp(headAngle, -25f, 25f);
+            headPivot.localRotation = Quaternion.Euler(0, 0, headAngle);
         }
 
         // Flip Gun Sprite (ไม่ให้ปืนกลับหัวตอนเล็งขึ้น/ลง)
@@ -228,12 +230,6 @@ public class PlayerShooting : MonoBehaviour
         if (gunSprite != null)
         {
             gunSprite.flipY = shouldFlipY;
-        }
-
-        // Flip Head Sprite (ไม่ให้หัวกลับด้าน)
-        if (headSprite != null)
-        {
-            headSprite.flipY = shouldFlipY;
         }
     }
 

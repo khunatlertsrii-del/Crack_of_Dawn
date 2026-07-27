@@ -11,6 +11,9 @@ TextureImporter:
   - first:
       213: 4455661318402929323
     second: ALL_Omelet_2
+  - first:
+      213: -7643784872507386986
+    second: ALL_Omelet_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -118,15 +121,8 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape:
-      - - {x: 8, y: 4}
-        - {x: 6, y: 6}
-        - {x: -3, y: 6}
-        - {x: -8, y: 5}
-        - {x: -8, y: -4}
-        - {x: -6, y: -6}
-        - {x: 8, y: -6}
-      tessellationDetail: 0
+      physicsShape: []
+      tessellationDetail: -1
       bones: []
       spriteID: c9da63297a50c79c0800000000000000
       internalID: -3928258557703180900
@@ -139,24 +135,16 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 31
-        y: 234
+        y: 237
         width: 27
-        height: 35
+        height: 24
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape:
-      - - {x: 12.5, y: -7.5}
-        - {x: 12.5, y: 10.5}
-        - {x: 6.5, y: 16.5}
-        - {x: -10.5, y: 16.5}
-        - {x: -12.5, y: 5.5}
-        - {x: -12.5, y: -12.5}
-        - {x: -10.5, y: -13.5}
-        - {x: 6.5, y: -13.5}
-      tessellationDetail: 0
+      physicsShape: []
+      tessellationDetail: -1
       bones: []
       spriteID: 8899a163d53720020800000000000000
       internalID: 2306532803343980936
@@ -168,30 +156,42 @@ TextureImporter:
       name: ALL_Omelet_2
       rect:
         serializedVersion: 2
-        x: 38
-        y: 218
-        width: 21
-        height: 8
+        x: 63
+        y: 237
+        width: 27
+        height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
-      physicsShape:
-      - - {x: 11, y: -13}
-        - {x: 10, y: 13}
-        - {x: 6, y: 15}
-        - {x: -1, y: 15}
-        - {x: -8, y: 14}
-        - {x: -11, y: 1}
-        - {x: -11, y: -13}
-        - {x: -10, y: -15}
-        - {x: 11, y: -13}
-        - {x: 8, y: -15}
-      tessellationDetail: 0
+      physicsShape: []
+      tessellationDetail: -1
       bones: []
       spriteID: ba2fadaac50b5dd30800000000000000
       internalID: 4455661318402929323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ALL_Omelet_3
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 215
+        width: 30
+        height: 13
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69351be2822dbe590800000000000000
+      internalID: -7643784872507386986
       vertices: []
       indices: 
       edges: []
@@ -200,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 41242e67ae64c8749a95321063c27123
+    spriteID: d7afee483e6d7574ea7520bf9edf88bd
     internalID: 0
     vertices: []
     indices: 
@@ -213,6 +213,7 @@ TextureImporter:
       ALL_Omelet_0: -3928258557703180900
       ALL_Omelet_1: 2306532803343980936
       ALL_Omelet_2: 4455661318402929323
+      ALL_Omelet_3: -7643784872507386986
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
