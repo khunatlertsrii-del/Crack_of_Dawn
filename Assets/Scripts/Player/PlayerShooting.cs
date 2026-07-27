@@ -79,6 +79,9 @@ public class PlayerShooting : MonoBehaviour
     [SerializeField] private TextMeshProUGUI ammoText;
 
     // Dynamic HUD
+    [Header("Ammo UI Dodge Settings")]
+    [Tooltip("ระยะที่ UI กระสุนเลื่อนขึ้นหลบขอบจอ (แนะนำ 65 คือเลื่อนขึ้นบน)")]
+    public float ammoUIDodgeOffsetY = 65f;
     private RectTransform ammoRect;
     private Vector2 ammoOriginalPos;
 
@@ -182,6 +185,17 @@ public class PlayerShooting : MonoBehaviour
         AimAtMouse();
         HandleShooting();
         UpdateMuzzleFlash();
+
+        // Dynamic HUD หลบขอบจอตอนเปิด Slow-Mo หรือ Cinematic Borders
+        if (ammoRect != null && SlowMotionManager.Instance != null)
+        {
+            bool isSlowMo = SlowMotionManager.Instance.IsSlowMotionActive;
+            float targetY = isSlowMo ? (ammoOriginalPos.y + ammoUIDodgeOffsetY) : ammoOriginalPos.y;
+            Vector2 pos = ammoRect.anchoredPosition;
+            pos.y = Mathf.Lerp(pos.y, targetY, 15f * Time.unscaledDeltaTime);
+            ammoRect.anchoredPosition = pos;
+        }
+
         UpdateAmmoUI();
     }
 
@@ -189,19 +203,22 @@ public class PlayerShooting : MonoBehaviour
     // AIM — หมุนปืนตามเมาส์
     // =========================================================
 
+    private Vector2 GetMouseWorldPos()
+    {
+        if (mainCam == null) mainCam = Camera.main;
+        if (mainCam == null) return Vector2.zero;
+
+        Vector2 mouseScreenPos = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
+        Vector3 mouseWorldPos = mainCam.ScreenToWorldPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, Mathf.Abs(mainCam.transform.position.z)));
+        return mouseWorldPos;
+    }
+
     private void AimAtMouse()
     {
         if (mainCam == null) mainCam = Camera.main;
         if (mainCam == null || gunPivot == null) return;
 
-        // แปลง Mouse Position → World Position
-        Vector2 mouseScreenPos = Mouse.current != null
-            ? Mouse.current.position.ReadValue()
-            : Vector2.zero;
-
-        Vector3 mouseWorldPos = mainCam.ScreenToWorldPoint(
-            new Vector3(mouseScreenPos.x, mouseScreenPos.y, Mathf.Abs(mainCam.transform.position.z))
-        );
+        Vector3 mouseWorldPos = GetMouseWorldPos();
 
         // คำนวณมุมจาก gunPivot ไป Mouse
         Vector2 direction = (mouseWorldPos - gunPivot.position).normalized;
@@ -291,7 +308,13 @@ public class PlayerShooting : MonoBehaviour
         // === Spawn Bullet ===
         if (bulletPrefab != null)
         {
-            Vector2 direction = (muzzlePoint.position - gunPivot.position).normalized;
+            Vector2 mouseWorldPos = GetMouseWorldPos();
+            Vector2 direction = (mouseWorldPos - (Vector2)muzzlePoint.position).normalized;
+            if (Vector2.Distance(mouseWorldPos, muzzlePoint.position) < 0.2f)
+            {
+                direction = (muzzlePoint.position - gunPivot.position).normalized;
+            }
+
             GameObject bullet = Instantiate(bulletPrefab, muzzlePoint.position, Quaternion.identity);
 
             Bullet bulletScript = bullet.GetComponent<Bullet>();
@@ -320,7 +343,12 @@ public class PlayerShooting : MonoBehaviour
     /// <summary>สร้างกระสุน Default ถ้ายังไม่ได้ assign Bullet Prefab</summary>
     private void SpawnDefaultBullet()
     {
-        Vector2 direction = (muzzlePoint.position - gunPivot.position).normalized;
+        Vector2 mouseWorldPos = GetMouseWorldPos();
+        Vector2 direction = (mouseWorldPos - (Vector2)muzzlePoint.position).normalized;
+        if (Vector2.Distance(mouseWorldPos, muzzlePoint.position) < 0.2f)
+        {
+            direction = (muzzlePoint.position - gunPivot.position).normalized;
+        }
 
         GameObject bullet = new GameObject("Bullet");
         bullet.transform.position = muzzlePoint.position;

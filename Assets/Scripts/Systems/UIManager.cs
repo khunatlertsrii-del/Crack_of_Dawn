@@ -43,6 +43,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Color slowMoBarColor = new Color(0.8f, 0.8f, 0.8f); // สีเทาอ่อน
     [SerializeField] private bool autoCreateUI = true;
 
+    [Header("Dynamic HUD Settings (หลบขอบจอตอนเปิดสโลว์)")]
+    [Tooltip("ระยะที่ UI หลอดเลือดและสโลว์เลื่อนหลบขอบจอ (ค่าลบ = เลื่อนลงข้างล่าง แนะนำ -65)")]
+    public float hudDodgeOffsetY = -65f;
+
     private Canvas canvas;
 
     // =========================================================
@@ -143,6 +147,17 @@ public class UIManager : MonoBehaviour
             if (fill != null) fill.color = slowMoBarColor;
         }
 
+        if (hpSlider != null)
+        {
+            hpRect = hpSlider.GetComponent<RectTransform>();
+            if (hpRect != null) hpOriginalPos = hpRect.anchoredPosition;
+        }
+        if (slowMoSlider != null)
+        {
+            slowMoRect = slowMoSlider.GetComponent<RectTransform>();
+            if (slowMoRect != null) slowMoOriginalPos = slowMoRect.anchoredPosition;
+        }
+
         // Hide panels
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (victoryPanel != null) victoryPanel.SetActive(false);
@@ -150,7 +165,21 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        // Removed dynamic HUD movement
+        // Dynamic HUD หลบขอบจอตอนเปิด Slow-Mo หรือ Cinematic Borders
+        if (SlowMotionManager.Instance != null && hpRect != null && slowMoRect != null)
+        {
+            bool isSlowMo = SlowMotionManager.Instance.IsSlowMotionActive;
+            float hpTargetY = isSlowMo ? (hpOriginalPos.y + hudDodgeOffsetY) : hpOriginalPos.y;
+            float slowTargetY = isSlowMo ? (slowMoOriginalPos.y + hudDodgeOffsetY) : slowMoOriginalPos.y;
+
+            Vector2 hpPos = hpRect.anchoredPosition;
+            hpPos.y = Mathf.Lerp(hpPos.y, hpTargetY, 15f * Time.unscaledDeltaTime);
+            hpRect.anchoredPosition = hpPos;
+
+            Vector2 slowPos = slowMoRect.anchoredPosition;
+            slowPos.y = Mathf.Lerp(slowPos.y, slowTargetY, 15f * Time.unscaledDeltaTime);
+            slowMoRect.anchoredPosition = slowPos;
+        }
     }
 
     private void OnDisable()

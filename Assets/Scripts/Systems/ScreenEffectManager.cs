@@ -46,12 +46,15 @@ public class ScreenEffectManager : MonoBehaviour
     public float normalBorderSpeed = 0.5f;
     [Tooltip("ความเร็วที่พุ่งสุดขีดตอนแพรี่หรือฟันดาบโดน (Adrenaline Boost)")]
     public float adrenalineBorderSpeed = 15f;
+    [Tooltip("จำนวนครั้งที่ลายฟิล์มซ้ำบนหน้าจอ (ยิ่งค่าน้อย ยิ่งไม่ถี่ ปกติคือ 6)")]
+    public float borderRepeatCount = 6f;
 
     private RawImage topBorder;
     private RawImage bottomBorder;
     private float currentBorderSpeed = 0f;
     private float adrenalineTimer = 0f;
-    private Rect borderUvRect = new Rect(0, 0, 20, 1);
+    private Rect topUvRect = new Rect(0, 0, 20, 1);
+    private Rect bottomUvRect = new Rect(0, 0, 20, 1);
 
 
 
@@ -309,12 +312,17 @@ public class ScreenEffectManager : MonoBehaviour
 
             if (curColor.a > 0.01f)
             {
-                borderUvRect.x += currentBorderSpeed * Time.unscaledDeltaTime;
-                borderUvRect.width = Screen.width / 40f;
-                borderUvRect.height = 1f;
+                // ขอบบนกับขอบล่างวิ่งสวนทางกันสุดเท่ (Opposite direction!)
+                topUvRect.x += currentBorderSpeed * Time.unscaledDeltaTime;
+                topUvRect.width = borderRepeatCount;
+                topUvRect.height = 1f;
 
-                topBorder.uvRect = borderUvRect;
-                bottomBorder.uvRect = borderUvRect;
+                bottomUvRect.x -= currentBorderSpeed * Time.unscaledDeltaTime;
+                bottomUvRect.width = borderRepeatCount;
+                bottomUvRect.height = 1f;
+
+                topBorder.uvRect = topUvRect;
+                bottomBorder.uvRect = bottomUvRect;
             }
         }
     }
