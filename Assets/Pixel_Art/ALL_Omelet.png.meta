@@ -135,9 +135,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 31
-        y: 237
-        width: 27
-        height: 24
+        y: 238
+        width: 23
+        height: 25
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,10 +178,10 @@ TextureImporter:
       name: ALL_Omelet_3
       rect:
         serializedVersion: 2
-        x: 35
-        y: 215
-        width: 30
-        height: 13
+        x: 36
+        y: 217
+        width: 32
+        height: 8
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -200,7 +200,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: d7afee483e6d7574ea7520bf9edf88bd
+    spriteID: 107e3ee02b6e1734b9e9ca046ff5241e
     internalID: 0
     vertices: []
     indices: 
