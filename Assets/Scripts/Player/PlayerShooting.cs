@@ -80,8 +80,8 @@ public class PlayerShooting : MonoBehaviour
 
     // Dynamic HUD
     [Header("Ammo UI Dodge Settings")]
-    [Tooltip("ระยะที่ UI กระสุนเลื่อนขึ้นหลบขอบจอ (แนะนำ 65 คือเลื่อนขึ้นบน)")]
-    public float ammoUIDodgeOffsetY = 65f;
+    [Tooltip("ระยะที่ UI กระสุน/รีโหลดเลื่อนขึ้นหลบขอบจอ (แนะนำ 85 คือเลื่อนขึ้นบน)")]
+    public float ammoUIDodgeOffsetY = 85f;
     private RectTransform ammoRect;
     private Vector2 ammoOriginalPos;
 
@@ -106,12 +106,6 @@ public class PlayerShooting : MonoBehaviour
         reloadAction.AddBinding("<Gamepad>/buttonWest");
 
         CurrentAmmo = ammoCapacity;
-
-        if (ammoText != null)
-        {
-            ammoRect = ammoText.GetComponent<RectTransform>();
-            if (ammoRect != null) ammoOriginalPos = ammoRect.anchoredPosition;
-        }
 
         // Auto-create gun pivot if not assigned
         if (gunPivot == null)
@@ -147,6 +141,28 @@ public class PlayerShooting : MonoBehaviour
             muzzleFlashSprite = flashObj.AddComponent<SpriteRenderer>();
             muzzleFlashSprite.sortingOrder = 6;
             muzzleFlashSprite.enabled = false;
+        }
+    }
+
+    private RectTransform GetAmmoDodgeRect()
+    {
+        if (ammoText == null) return null;
+        RectTransform rt = ammoText.GetComponent<RectTransform>();
+        // ถ้า Text อยู่ใต้ Panel/Container ให้ขยับตัว Panel/Container แทน
+        if (rt != null && rt.parent != null && rt.parent.GetComponent<Canvas>() == null)
+        {
+            RectTransform parentRect = rt.parent.GetComponent<RectTransform>();
+            if (parentRect != null) return parentRect;
+        }
+        return rt;
+    }
+
+    private void Start()
+    {
+        ammoRect = GetAmmoDodgeRect();
+        if (ammoRect != null)
+        {
+            ammoOriginalPos = ammoRect.anchoredPosition;
         }
     }
 
@@ -187,6 +203,12 @@ public class PlayerShooting : MonoBehaviour
         UpdateMuzzleFlash();
 
         // Dynamic HUD หลบขอบจอตอนเปิด Slow-Mo หรือ Cinematic Borders
+        if (ammoRect == null && ammoText != null)
+        {
+            ammoRect = GetAmmoDodgeRect();
+            if (ammoRect != null) ammoOriginalPos = ammoRect.anchoredPosition;
+        }
+
         if (ammoRect != null && SlowMotionManager.Instance != null)
         {
             bool isSlowMo = SlowMotionManager.Instance.IsSlowMotionActive;
