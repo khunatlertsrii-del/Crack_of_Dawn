@@ -98,6 +98,17 @@ public class Bullet : MonoBehaviour
     {
         if (hasHit) return;
 
+        // ป้องกันไม่ให้กระสุนผู้เล่นยิงโดนตัวเอง (ไม่ว่าจะใช้ Box Collider หรือ Circle Collider)
+        if (other.CompareTag("Player") || 
+            other.gameObject.layer == LayerMask.NameToLayer("Player") ||
+            other.GetComponent<PlayerController>() != null || 
+            other.GetComponentInParent<PlayerController>() != null ||
+            other.GetComponent<PlayerHealth>() != null ||
+            other.GetComponentInParent<PlayerHealth>() != null)
+        {
+            return;
+        }
+
         // === ชนศัตรูไข่ดาว? ===
         FriedEggEnemy enemy = other.GetComponent<FriedEggEnemy>();
         if (enemy == null) enemy = other.GetComponentInParent<FriedEggEnemy>();
@@ -137,6 +148,17 @@ public class Bullet : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (hasHit) return;
+
+        // ป้องกันไม่ให้กระสุนผู้เล่นยิงโดนตัวเอง
+        if (collision.gameObject.CompareTag("Player") || 
+            collision.gameObject.layer == LayerMask.NameToLayer("Player") ||
+            collision.gameObject.GetComponent<PlayerController>() != null || 
+            collision.gameObject.GetComponentInParent<PlayerController>() != null ||
+            collision.gameObject.GetComponent<PlayerHealth>() != null ||
+            collision.gameObject.GetComponentInParent<PlayerHealth>() != null)
+        {
+            return;
+        }
 
         IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
         if (damageable == null) damageable = collision.gameObject.GetComponentInParent<IDamageable>();
