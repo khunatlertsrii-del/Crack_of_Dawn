@@ -112,7 +112,7 @@ public class PlayerShooting : MonoBehaviour
         {
             GameObject pivot = new GameObject("GunPivot");
             pivot.transform.SetParent(transform);
-            pivot.transform.localPosition = new Vector3(0.2f, 0f, 0f);
+            pivot.transform.localPosition = new Vector3(0.1f, 0.5f, 0f); // อยู่ระดับหัวไหล่กลางลำตัวพอดี
             gunPivot = pivot.transform;
 
             // Create muzzle point
