@@ -262,13 +262,10 @@ public class PlayerShooting : MonoBehaviour
             headPivot.localRotation = Quaternion.Euler(0, 0, headAngle);
         }
 
-        // Flip Gun Sprite (ไม่ให้ปืนกลับหัวตอนเล็งขึ้น/ลง)
-        bool shouldFlipY = (angle > 90 || angle < -90) && transform.localScale.x > 0
-                || (angle <= 90 && angle >= -90) && transform.localScale.x < 0;
-
+        // ปืนไม่กลับหัวแน่นอนเพราะ parent.localScale.x = -1 ควบคู่กับ angle+180 ทำให้แกน Y ของปืนชี้ขึ้นบนเสมอ!
         if (gunSprite != null)
         {
-            gunSprite.flipY = shouldFlipY;
+            gunSprite.flipY = false;
         }
     }
 

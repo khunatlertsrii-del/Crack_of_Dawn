@@ -14,6 +14,12 @@ TextureImporter:
   - first:
       213: -7643784872507386986
     second: ALL_Omelet_3
+  - first:
+      213: 445928970537901918
+    second: ALL_Omelet_4
+  - first:
+      213: -5814772720182497575
+    second: ALL_Omelet_5
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -136,8 +142,8 @@ TextureImporter:
         serializedVersion: 2
         x: 31
         y: 238
-        width: 23
-        height: 25
+        width: 26
+        height: 23
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -158,7 +164,7 @@ TextureImporter:
         serializedVersion: 2
         x: 63
         y: 237
-        width: 27
+        width: 32
         height: 32
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -178,10 +184,10 @@ TextureImporter:
       name: ALL_Omelet_3
       rect:
         serializedVersion: 2
-        x: 36
-        y: 217
-        width: 32
-        height: 8
+        x: 100
+        y: 237
+        width: 23
+        height: 24
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -196,11 +202,55 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: ALL_Omelet_4
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 237
+        width: 27
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5f97fb3902403600800000000000000
+      internalID: 445928970537901918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ALL_Omelet_5
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 216
+        width: 21
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9dee3ebd407cd4fa0800000000000000
+      internalID: -5814772720182497575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 107e3ee02b6e1734b9e9ca046ff5241e
+    spriteID: 5520d18e22db7b64193718c2f6e05d4a
     internalID: 0
     vertices: []
     indices: 
@@ -214,6 +264,8 @@ TextureImporter:
       ALL_Omelet_1: 2306532803343980936
       ALL_Omelet_2: 4455661318402929323
       ALL_Omelet_3: -7643784872507386986
+      ALL_Omelet_4: 445928970537901918
+      ALL_Omelet_5: -5814772720182497575
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
