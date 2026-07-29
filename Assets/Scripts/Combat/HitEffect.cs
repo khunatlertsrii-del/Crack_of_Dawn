@@ -184,6 +184,15 @@ public class HitEffect : MonoBehaviour
     }
 
     /// <summary>
+    /// เล่นเอฟเฟกต์ซากไข่ดาวและเลือดกระจายทั่วแมพสำหรับ "ถังระเบิด" (Explosive Barrel Gore)
+    /// กระจาย 360 องศาด้วยความแรงและจำนวนที่กำหนดเองได้
+    /// </summary>
+    public void PlayExplosionGoreEffect(Vector2 hitPoint, int bloodCount, float explosionForce, float sizeMultiplier)
+    {
+        SpawnExplosionGoreParticles(hitPoint, bloodCount, explosionForce, sizeMultiplier);
+    }
+
+    /// <summary>
     /// เล่นเอฟเฟกต์ปัดกระสุน (Parry) สุดอลังการ!
     /// </summary>
     public void PlayParryEffect(Vector2 position)
@@ -409,6 +418,46 @@ public class HitEffect : MonoBehaviour
 
         // Flash & Comic Text สำหรับท่าโจมตีระยะประชิด
         // ถูกนำออกตามคำขอ
+    }
+
+    private void SpawnExplosionGoreParticles(Vector2 hitPoint, int bloodCount, float explosionForce, float sizeMultiplier)
+    {
+        if (cachedCircleSprite == null) cachedCircleSprite = CreateCircleSprite();
+
+        for (int i = 0; i < bloodCount; i++)
+        {
+            GameObject p = new GameObject($"ExplosionBlood_{i}");
+            p.transform.position = hitPoint + Random.insideUnitCircle * 0.4f;
+
+            var sr = p.AddComponent<SpriteRenderer>();
+            sr.sprite = cachedCircleSprite;
+
+            // สุ่มสลับสีซากไข่แดง (ส้มเหลือง) และซากไข่ขาว (ขาวสว่าง)
+            sr.color = (Random.value > 0.4f)
+                ? new Color(1f, 0.65f, 0.05f) // สีไข่แดงสด (Yolk)
+                : new Color(1f, 0.95f, 0.85f); // สีไข่ขาว (White)
+
+            sr.sortingOrder = 100;
+            p.transform.localScale = Vector3.one * Random.Range(bloodSizeRange.x, bloodSizeRange.y) * sizeMultiplier;
+
+            var rb = p.AddComponent<Rigidbody2D>();
+            rb.gravityScale = Random.Range(bloodGravityScale.x, bloodGravityScale.y);
+
+            // กระจายรอบทิศ 360 องศา พุ่งแรงสุดๆ ทั่วแมพ!
+            Vector2 sprayDir = Random.insideUnitCircle.normalized;
+            float force = Random.Range(explosionForce * 0.6f, explosionForce * 1.4f);
+            rb.AddForce(sprayDir * force, ForceMode2D.Impulse);
+            rb.angularVelocity = Random.Range(-720f, 720f);
+
+            var col = p.AddComponent<CircleCollider2D>();
+            col.radius = 0.5f;
+            col.isTrigger = true;
+
+            p.AddComponent<BloodParticle>();
+        }
+
+        // เสกควันระเบิดสีส้มแดง
+        SpawnSmokeParticles(hitPoint, new Color(1f, 0.4f, 0.1f, 0.8f), Mathf.Clamp(bloodCount / 3, 5, 20), sizeMultiplier * 1.3f);
     }
 
     private void SpawnSmokeParticles(Vector2 position, Color color, int count, float sizeMultiplier)

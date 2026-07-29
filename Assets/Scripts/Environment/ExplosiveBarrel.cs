@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ExplosiveBarrel : MonoBehaviour, IDamageable
 {
@@ -16,6 +17,14 @@ public class ExplosiveBarrel : MonoBehaviour, IDamageable
     [Header("Effects")]
     [Tooltip("สีของเอฟเฟกต์ระเบิด (แฟลชสว่าง)")]
     public Color explosionColor = new Color(1f, 0.5f, 0f, 0.8f);
+
+    [Header("Explosion Gore & Blood Settings")]
+    [Tooltip("จำนวนซากไข่ดาว/เลือดที่จะกระจายทั่วฉากตอนระเบิดโดนศัตรู (ยิ่งเยอะยิ่งสาดสะใจ!)")]
+    public int explosionBloodCount = 50;
+    [Tooltip("ความแรงในการสาดซากไข่ไปทั่วแมพ")]
+    public float explosionBloodForce = 20f;
+    [Tooltip("ขนาดของคราบเลือด/ซากไข่ (1.0 = ปกติ, 1.8 = ชิ้นใหญ่ 1.8 เท่า)")]
+    public float explosionBloodSizeMultiplier = 1.8f;
 
     public bool IsAlive => true; // สมมติว่ายังไม่ระเบิด
 
@@ -41,6 +50,7 @@ public class ExplosiveBarrel : MonoBehaviour, IDamageable
         SpawnExplosionEffect();
 
         // 3. ทำดาเมจเป็นวงกว้าง
+        HashSet<FriedEggEnemy> hitEnemies = new HashSet<FriedEggEnemy>();
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
         foreach (Collider2D hit in hits)
         {
@@ -50,11 +60,24 @@ public class ExplosiveBarrel : MonoBehaviour, IDamageable
             if (damageable != null && damageable != (IDamageable)this)
             {
                 // เช็คว่าเป็นศัตรูหรือผู้เล่น
-                if (hit.GetComponent<FriedEggEnemy>() != null || hit.GetComponentInParent<FriedEggEnemy>() != null)
+                FriedEggEnemy enemy = hit.GetComponent<FriedEggEnemy>();
+                if (enemy == null) enemy = hit.GetComponentInParent<FriedEggEnemy>();
+
+                if (enemy != null)
                 {
                     // โดนศัตรู
                     Vector2 dir = (hit.transform.position - transform.position).normalized;
                     damageable.TakeDamage(enemyDamage, hit.ClosestPoint(transform.position), true, dir);
+
+                    // สาดซากไข่ดาวและเลือดกระจายทั่วแมพสำหรับถังระเบิด!
+                    if (!hitEnemies.Contains(enemy))
+                    {
+                        hitEnemies.Add(enemy);
+                        if (HitEffect.Instance != null)
+                        {
+                            HitEffect.Instance.PlayExplosionGoreEffect(enemy.transform.position, explosionBloodCount, explosionBloodForce, explosionBloodSizeMultiplier);
+                        }
+                    }
                 }
                 else if (hit.GetComponent<PlayerHealth>() != null || hit.GetComponentInParent<PlayerHealth>() != null)
                 {
