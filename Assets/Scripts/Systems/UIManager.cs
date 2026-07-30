@@ -169,8 +169,11 @@ public class UIManager : MonoBehaviour
         if (SlowMotionManager.Instance != null && hpRect != null && slowMoRect != null)
         {
             bool isSlowMo = SlowMotionManager.Instance.IsSlowMotionActive;
-            float hpTargetY = isSlowMo ? (hpOriginalPos.y + hudDodgeOffsetY) : hpOriginalPos.y;
-            float slowTargetY = isSlowMo ? (slowMoOriginalPos.y + hudDodgeOffsetY) : slowMoOriginalPos.y;
+            float hpDodgeDir = (hpRect.anchorMin.y < 0.5f || hpOriginalPos.y > 0) ? Mathf.Abs(hudDodgeOffsetY) : -Mathf.Abs(hudDodgeOffsetY);
+            float slowDodgeDir = (slowMoRect.anchorMin.y < 0.5f || slowMoOriginalPos.y > 0) ? Mathf.Abs(hudDodgeOffsetY) : -Mathf.Abs(hudDodgeOffsetY);
+
+            float hpTargetY = isSlowMo ? (hpOriginalPos.y + hpDodgeDir) : hpOriginalPos.y;
+            float slowTargetY = isSlowMo ? (slowMoOriginalPos.y + slowDodgeDir) : slowMoOriginalPos.y;
 
             Vector2 hpPos = hpRect.anchoredPosition;
             hpPos.y = Mathf.Lerp(hpPos.y, hpTargetY, 15f * Time.unscaledDeltaTime);

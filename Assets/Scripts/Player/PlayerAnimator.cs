@@ -3,6 +3,7 @@
 // Omelet Rush © 2026
 // ============================================================
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// ตัวกลางส่งค่าจาก PlayerController → Animator
@@ -44,12 +45,16 @@ public class PlayerAnimator : MonoBehaviour
 
     // Animator parameter hashes (ประหยัด Performance)
     private static readonly int IsRunning = Animator.StringToHash("isRunning");
+    private static readonly int IsWalkingBackwards = Animator.StringToHash("isWalkingBackwards");
     private static readonly int IsJumping = Animator.StringToHash("isJumping");
     private static readonly int IsFalling = Animator.StringToHash("isFalling");
     private static readonly int IsWallSliding = Animator.StringToHash("isWallSliding");
     private static readonly int IsDashing = Animator.StringToHash("isDashing");
     private static readonly int YVelocity = Animator.StringToHash("yVelocity");
     private static readonly int XSpeed = Animator.StringToHash("xSpeed");
+
+    private HashSet<int> paramHashes = new HashSet<int>();
+    private RuntimeAnimatorController cachedController;
 
     // =========================================================
     // UNITY LIFECYCLE
@@ -88,20 +93,57 @@ public class PlayerAnimator : MonoBehaviour
     // ANIMATOR
     // =========================================================
 
+    private void CheckAndCacheParameters()
+    {
+        if (animator != null && animator.runtimeAnimatorController != cachedController)
+        {
+            cachedController = animator.runtimeAnimatorController;
+            paramHashes.Clear();
+            if (cachedController != null)
+            {
+                foreach (AnimatorControllerParameter param in animator.parameters)
+                {
+                    paramHashes.Add(param.nameHash);
+                }
+            }
+        }
+    }
+
+    private void SetBoolSafe(int hash, bool val)
+    {
+        if (paramHashes.Contains(hash)) animator.SetBool(hash, val);
+    }
+
+    private void SetFloatSafe(int hash, float val)
+    {
+        if (paramHashes.Contains(hash)) animator.SetFloat(hash, val);
+    }
+
     private void UpdateAnimator()
     {
+        CheckAndCacheParameters();
+
         Vector2 vel = playerController.Velocity;
-        bool isRunning = Mathf.Abs(playerController.MoveInput) > 0.1f && playerController.IsGrounded;
+        bool isMoving = Mathf.Abs(playerController.MoveInput) > 0.1f && playerController.IsGrounded;
         bool isJumping = !playerController.IsGrounded && vel.y > 0.1f;
         bool isFalling = !playerController.IsGrounded && vel.y < -0.1f;
 
-        animator.SetBool(IsRunning, isRunning);
-        animator.SetBool(IsJumping, isJumping);
-        animator.SetBool(IsFalling, isFalling);
-        animator.SetBool(IsWallSliding, playerController.IsWallSliding);
-        // animator.SetBool(IsDashing, playerController.IsDashing);
-        animator.SetFloat(YVelocity, vel.y);
-        animator.SetFloat(XSpeed, Mathf.Abs(vel.x));
+        // เช็คว่ากำลังเดินถอยหลังหรือไม่ (กดปุ่มตรงข้ามกับทิศที่หันหน้าอยู่)
+        bool isWalkingBackwards = isMoving && (
+            (playerController.IsFacingRight && playerController.MoveInput < -0.1f) ||
+            (!playerController.IsFacingRight && playerController.MoveInput > 0.1f)
+        );
+        // ให้ isRunning เป็นจริงเฉพาะเวลาเดินไปข้างหน้าเท่านั้น ไม่ชนกับ isWalkingBackwards
+        bool isRunning = isMoving && !isWalkingBackwards;
+
+        SetBoolSafe(IsRunning, isRunning);
+        SetBoolSafe(IsWalkingBackwards, isWalkingBackwards);
+        SetBoolSafe(IsJumping, isJumping);
+        SetBoolSafe(IsFalling, isFalling);
+        SetBoolSafe(IsWallSliding, playerController.IsWallSliding);
+        // SetBoolSafe(IsDashing, playerController.IsDashing);
+        SetFloatSafe(YVelocity, vel.y);
+        SetFloatSafe(XSpeed, Mathf.Abs(vel.x));
     }
 
     // =========================================================

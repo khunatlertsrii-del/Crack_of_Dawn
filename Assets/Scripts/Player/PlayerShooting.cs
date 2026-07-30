@@ -148,11 +148,15 @@ public class PlayerShooting : MonoBehaviour
     {
         if (ammoText == null) return null;
         RectTransform rt = ammoText.GetComponent<RectTransform>();
-        // ถ้า Text อยู่ใต้ Panel/Container ให้ขยับตัว Panel/Container แทน
+        // ถ้า Text อยู่ใต้ Panel เฉพาะของ Ammo/Reload ให้ขยับกล่องนั้น (แต่ห้ามไปขยับ Container หลักของหน้าจอ!)
         if (rt != null && rt.parent != null && rt.parent.GetComponent<Canvas>() == null)
         {
-            RectTransform parentRect = rt.parent.GetComponent<RectTransform>();
-            if (parentRect != null) return parentRect;
+            string pName = rt.parent.name.ToLower();
+            if (pName.Contains("ammo") || pName.Contains("reload") || pName.Contains("bullet") || pName.Contains("gun"))
+            {
+                RectTransform parentRect = rt.parent.GetComponent<RectTransform>();
+                if (parentRect != null) return parentRect;
+            }
         }
         return rt;
     }
@@ -212,7 +216,9 @@ public class PlayerShooting : MonoBehaviour
         if (ammoRect != null && SlowMotionManager.Instance != null)
         {
             bool isSlowMo = SlowMotionManager.Instance.IsSlowMotionActive;
-            float targetY = isSlowMo ? (ammoOriginalPos.y + ammoUIDodgeOffsetY) : ammoOriginalPos.y;
+            // เช็คว่าอยู่ด้านล่างหรือบนของจอ เพื่อให้ขยับเข้าหาตรงกลางจอเสมอ ไม่ตกขอบจอ
+            float dodgeDir = (ammoRect.anchorMin.y < 0.5f || ammoOriginalPos.y > 0) ? Mathf.Abs(ammoUIDodgeOffsetY) : -Mathf.Abs(ammoUIDodgeOffsetY);
+            float targetY = isSlowMo ? (ammoOriginalPos.y + dodgeDir) : ammoOriginalPos.y;
             Vector2 pos = ammoRect.anchoredPosition;
             pos.y = Mathf.Lerp(pos.y, targetY, 15f * Time.unscaledDeltaTime);
             ammoRect.anchoredPosition = pos;
