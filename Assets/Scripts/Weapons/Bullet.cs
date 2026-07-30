@@ -134,14 +134,14 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        // === ชนพื้น/ผนัง? ===
-        if (!other.isTrigger && 
-            (other.gameObject.layer == LayerMask.NameToLayer("Default") || other.CompareTag("Ground")))
+        // === ชนพื้น/ผนัง/สิ่งกีดขวางทุกชนิด ===
+        if (!other.isTrigger)
         {
-            // ถ้าชน Collider ที่ไม่ใช่ Trigger (เช่น พื้น, ผนัง)
+            // ชน Collider ใดๆ ก็ตามที่ไม่ใช่ Trigger (เช่น พื้น, ผนัง, สิ่งกีดขวางทุก Layer/Tag)
             hasHit = true;
             HitEffect.Instance?.PlayImpactEffect(transform.position);
             DestroyBullet();
+            return;
         }
     }
 
