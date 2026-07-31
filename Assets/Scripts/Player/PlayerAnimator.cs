@@ -48,6 +48,7 @@ public class PlayerAnimator : MonoBehaviour
     private static readonly int IsWalkingBackwards = Animator.StringToHash("isWalkingBackwards");
     private static readonly int IsJumping = Animator.StringToHash("isJumping");
     private static readonly int IsFalling = Animator.StringToHash("isFalling");
+    private static readonly int IsGrounded = Animator.StringToHash("isGrounded");
     private static readonly int IsWallSliding = Animator.StringToHash("isWallSliding");
     private static readonly int IsDashing = Animator.StringToHash("isDashing");
     private static readonly int YVelocity = Animator.StringToHash("yVelocity");
@@ -140,6 +141,7 @@ public class PlayerAnimator : MonoBehaviour
         SetBoolSafe(IsWalkingBackwards, isWalkingBackwards);
         SetBoolSafe(IsJumping, isJumping);
         SetBoolSafe(IsFalling, isFalling);
+        SetBoolSafe(IsGrounded, playerController.IsGrounded);
         SetBoolSafe(IsWallSliding, playerController.IsWallSliding);
         // SetBoolSafe(IsDashing, playerController.IsDashing);
         SetFloatSafe(YVelocity, vel.y);
