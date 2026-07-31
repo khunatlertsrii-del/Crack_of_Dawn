@@ -41,9 +41,6 @@ public class PlayerController : MonoBehaviour
     [Tooltip("ตัวคูณ Gravity ตอนตก (ตกเร็วขึ้น = Game Feel ดี)")]
     [SerializeField] private float fallMultiplier = 3f;
 
-    [Tooltip("ตัวคูณ Gravity ตอนปล่อยปุ่ม Jump (กระโดดเตี้ยลง)")]
-    [SerializeField] private float lowJumpMultiplier = 5f;
-
     [Tooltip("ระยะเวลา Coyote Time (วินาที)")]
     [SerializeField] private float coyoteTime = 0.12f;
 
@@ -300,6 +297,7 @@ public class PlayerController : MonoBehaviour
         if (IsGrounded && !wasGrounded)
         {
             extraJumpsRemaining = extraJumps;
+            JumpDustEffect.PlayLandingDust(transform.position);
         }
     }
 
@@ -433,6 +431,7 @@ public class PlayerController : MonoBehaviour
     private void PerformJump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        JumpDustEffect.PlayJumpDust(transform.position);
     }
 
     private void PerformWallJump()
@@ -466,11 +465,6 @@ public class PlayerController : MonoBehaviour
         {
             // กำลังตก → เพิ่มแรงโน้มถ่วง
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.fixedDeltaTime;
-        }
-        else if (rb.linearVelocity.y > 0 && !isJumpHeld)
-        {
-            // กำลังขึ้น + ปล่อยปุ่ม Jump → ตัดแรงกระโดด (กระโดดเตี้ย)
-            rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
         }
     }
 
