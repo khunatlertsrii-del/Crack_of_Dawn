@@ -297,7 +297,6 @@ public class PlayerController : MonoBehaviour
         if (IsGrounded && !wasGrounded)
         {
             extraJumpsRemaining = extraJumps;
-            JumpDustEffect.PlayLandingDust(transform.position);
         }
     }
 
@@ -431,7 +430,6 @@ public class PlayerController : MonoBehaviour
     private void PerformJump()
     {
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        JumpDustEffect.PlayJumpDust(transform.position);
     }
 
     private void PerformWallJump()
