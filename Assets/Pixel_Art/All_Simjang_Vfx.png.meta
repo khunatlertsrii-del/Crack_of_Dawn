@@ -1,0 +1,475 @@
+fileFormatVersion: 2
+guid: fb7d51a7f77ad754a866a291f91b5797
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6805209941022431796
+    second: All_Simjang_Vfx_0
+  - first:
+      213: -3026158644372699356
+    second: All_Simjang_Vfx_1
+  - first:
+      213: 4003985744750889999
+    second: All_Simjang_Vfx_2
+  - first:
+      213: 2193396914916310390
+    second: All_Simjang_Vfx_3
+  - first:
+      213: -1019362494824065071
+    second: All_Simjang_Vfx_4
+  - first:
+      213: 9168111181302247949
+    second: All_Simjang_Vfx_5
+  - first:
+      213: 1074439320009605690
+    second: All_Simjang_Vfx_6
+  - first:
+      213: -300020660255273459
+    second: All_Simjang_Vfx_7
+  - first:
+      213: 3266824958553212883
+    second: All_Simjang_Vfx_8
+  - first:
+      213: -942642528542138764
+    second: All_Simjang_Vfx_9
+  - first:
+      213: -1079469671519038192
+    second: All_Simjang_Vfx_10
+  - first:
+      213: -485820174745786853
+    second: All_Simjang_Vfx_11
+  - first:
+      213: 3308487965250426091
+    second: All_Simjang_Vfx_12
+  - first:
+      213: -14465603435978219
+    second: All_Simjang_Vfx_13
+  - first:
+      213: 6262613259960258391
+    second: All_Simjang_Vfx_14
+  - first:
+      213: 5538909778799971409
+    second: All_Simjang_Vfx_15
+  - first:
+      213: 2867779529115779556
+    second: All_Simjang_Vfx_16
+  - first:
+      213: -6576128972097001681
+    second: All_Simjang_Vfx_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_0
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 178
+        width: 27
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43a5994c266f07e50800000000000000
+      internalID: 6805209941022431796
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_1
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 166
+        width: 36
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42700380fbce006d0800000000000000
+      internalID: -3026158644372699356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_3
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 161
+        width: 29
+        height: 47
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67d360d7fd2807e10800000000000000
+      internalID: 2193396914916310390
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_6
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 155
+        width: 25
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3282e17edc29ee00800000000000000
+      internalID: 1074439320009605690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_7
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 155
+        width: 52
+        height: 47
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0ec4309ccc16dbf0800000000000000
+      internalID: -300020660255273459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_8
+      rect:
+        serializedVersion: 2
+        x: 55
+        y: 100
+        width: 54
+        height: 61
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d7c1fdcdf7165d20800000000000000
+      internalID: 3266824958553212883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_10
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 111
+        width: 50
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 015dc439d04f401f0800000000000000
+      internalID: -1079469671519038192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_11
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 107
+        width: 44
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b162f8300250249f0800000000000000
+      internalID: -485820174745786853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_12
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 90
+        width: 49
+        height: 57
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be41868764c1aed20800000000000000
+      internalID: 3308487965250426091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_13
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 96
+        width: 54
+        height: 53
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 512acbd3c9b9ccff0800000000000000
+      internalID: -14465603435978219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_14
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 51
+        width: 46
+        height: 46
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75f0595449549e650800000000000000
+      internalID: 6262613259960258391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_15
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 40
+        width: 71
+        height: 52
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15c4f40f8192edc40800000000000000
+      internalID: 5538909778799971409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang_Vfx_16
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 33
+        width: 55
+        height: 53
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e1451f99466cc720800000000000000
+      internalID: 2867779529115779556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 435125e0c01432241be392dd329efed8
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      All_Simjang_Vfx_0: 6805209941022431796
+      All_Simjang_Vfx_1: -3026158644372699356
+      All_Simjang_Vfx_10: -1079469671519038192
+      All_Simjang_Vfx_11: -485820174745786853
+      All_Simjang_Vfx_12: 3308487965250426091
+      All_Simjang_Vfx_13: -14465603435978219
+      All_Simjang_Vfx_14: 6262613259960258391
+      All_Simjang_Vfx_15: 5538909778799971409
+      All_Simjang_Vfx_16: 2867779529115779556
+      All_Simjang_Vfx_17: -6576128972097001681
+      All_Simjang_Vfx_2: 4003985744750889999
+      All_Simjang_Vfx_3: 2193396914916310390
+      All_Simjang_Vfx_4: -1019362494824065071
+      All_Simjang_Vfx_5: 9168111181302247949
+      All_Simjang_Vfx_6: 1074439320009605690
+      All_Simjang_Vfx_7: -300020660255273459
+      All_Simjang_Vfx_8: 3266824958553212883
+      All_Simjang_Vfx_9: -942642528542138764
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
