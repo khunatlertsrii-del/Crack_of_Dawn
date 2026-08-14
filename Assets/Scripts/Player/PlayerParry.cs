@@ -24,6 +24,12 @@ public class PlayerParry : MonoBehaviour
     [Tooltip("Slider สำหรับหลอดปัดกระสุน")]
     public Slider parrySlider;
 
+    [Header("Animation & Visuals")]
+    [Tooltip("ชิ้นส่วนที่จะถูกซ่อนตอน Parry (เช่น หัว, แขน, ปืน)")]
+    public GameObject[] objectsToHide;
+    [Tooltip("Animator สำหรับเล่นท่าฟัน")]
+    public Animator animator;
+
     private float currentParryMeter;
     private bool isParrying;
     public bool IsParrying => isParrying;
@@ -142,6 +148,10 @@ public class PlayerParry : MonoBehaviour
             }
 
             currentParryMeter -= drainRate * Time.deltaTime;
+            
+            // ซ่อนชิ้นส่วนตอน Parry และเล่นอนิเมชั่น
+            foreach(var obj in objectsToHide) if(obj != null) obj.SetActive(false);
+            if (animator != null) animator.SetBool("isParrying", true);
         }
         else
         {
@@ -151,6 +161,10 @@ public class PlayerParry : MonoBehaviour
             
             // ฟื้นฟู
             currentParryMeter += regenRate * Time.deltaTime;
+            
+            // เปิดชิ้นส่วนกลับมาตอนเลิก Parry และหยุดเล่นอนิเมชั่น
+            foreach(var obj in objectsToHide) if(obj != null) obj.SetActive(true);
+            if (animator != null) animator.SetBool("isParrying", false);
         }
 
         currentParryMeter = Mathf.Clamp(currentParryMeter, 0, maxParryMeter);

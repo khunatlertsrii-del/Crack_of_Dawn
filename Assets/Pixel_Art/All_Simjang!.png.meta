@@ -114,7 +114,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 15
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -166,12 +166,12 @@ TextureImporter:
       name: All_Simjang!_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 237
-        width: 28
-        height: 31
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 221
+        y: 52
+        width: 46
+        height: 45
+      alignment: 9
+      pivot: {x: 0.5136914, y: 0.52160764}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -185,125 +185,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: All_Simjang!_1
-      rect:
-        serializedVersion: 2
-        x: 9
-        y: 223
-        width: 18
-        height: 14
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 349e5bf425042dd80800000000000000
-      internalID: -8227442846983657149
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: All_Simjang!_2
-      rect:
-        serializedVersion: 2
-        x: 47
-        y: 237
-        width: 33
-        height: 30
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 385e039989b18a0c0800000000000000
-      internalID: -4564367880120900221
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: All_Simjang!_3
-      rect:
-        serializedVersion: 2
-        x: 81
-        y: 237
-        width: 34
-        height: 30
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b8f0d9cc48a1c74d0800000000000000
-      internalID: -3135602082885857397
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: All_Simjang!_4
-      rect:
-        serializedVersion: 2
-        x: 123
-        y: 231
-        width: 28
-        height: 37
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7f691a950cd29fd90800000000000000
-      internalID: -7063564236393179401
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: All_Simjang!_5
-      rect:
-        serializedVersion: 2
-        x: 163
-        y: 237
-        width: 31
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: accbaf2177609be40800000000000000
-      internalID: 5672572314139147466
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: All_Simjang!_6
       rect:
         serializedVersion: 2
-        x: 198
-        y: 237
-        width: 32
-        height: 28
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 222
+        y: 167
+        width: 37
+        height: 37
+      alignment: 9
+      pivot: {x: 0.7048967, y: 0.4599622}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -320,12 +210,12 @@ TextureImporter:
       name: All_Simjang!_7
       rect:
         serializedVersion: 2
-        x: 14
-        y: 168
-        width: 35
-        height: 34
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 30
+        y: 156
+        width: 49
+        height: 49
+      alignment: 9
+      pivot: {x: 0.47094727, y: 0.51742864}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -339,37 +229,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: All_Simjang!_8
-      rect:
-        serializedVersion: 2
-        x: 52
-        y: 166
-        width: 39
-        height: 31
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d39c0a41592457cd0800000000000000
-      internalID: -2561067605026617027
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: All_Simjang!_9
       rect:
         serializedVersion: 2
         x: 55
-        y: 100
+        y: 93
         width: 54
-        height: 60
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        height: 54
+      alignment: 9
+      pivot: {x: 0.6853095, y: 0.41614336}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -386,12 +254,12 @@ TextureImporter:
       name: All_Simjang!_10
       rect:
         serializedVersion: 2
-        x: 96
-        y: 161
-        width: 43
-        height: 46
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 83
+        y: 157
+        width: 44
+        height: 48
+      alignment: 9
+      pivot: {x: 0.65264755, y: 0.55257064}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -408,12 +276,12 @@ TextureImporter:
       name: All_Simjang!_12
       rect:
         serializedVersion: 2
-        x: 145
-        y: 157
-        width: 46
-        height: 48
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 131
+        y: 161
+        width: 48
+        height: 47
+      alignment: 9
+      pivot: {x: 0.61692303, y: 0.46757084}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -430,12 +298,12 @@ TextureImporter:
       name: All_Simjang!_13
       rect:
         serializedVersion: 2
-        x: 193
-        y: 154
-        width: 47
-        height: 48
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 180
+        y: 165
+        width: 40
+        height: 32
+      alignment: 9
+      pivot: {x: 0.6133579, y: 0.5620656}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -452,12 +320,12 @@ TextureImporter:
       name: All_Simjang!_15
       rect:
         serializedVersion: 2
-        x: 4
-        y: 111
-        width: 50
-        height: 44
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 1
+        y: 97
+        width: 53
+        height: 52
+      alignment: 9
+      pivot: {x: 0.4665938, y: 0.45570228}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -476,10 +344,10 @@ TextureImporter:
         serializedVersion: 2
         x: 111
         y: 107
-        width: 44
+        width: 47
         height: 44
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 9
+      pivot: {x: 0.5981108, y: 0.41131955}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -497,11 +365,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 161
-        y: 90
-        width: 49
-        height: 57
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        y: 101
+        width: 53
+        height: 59
+      alignment: 9
+      pivot: {x: 0.37104568, y: 0.48733857}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -519,11 +387,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 216
-        y: 96
-        width: 54
-        height: 53
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        y: 112
+        width: 49
+        height: 45
+      alignment: 9
+      pivot: {x: 0.517765, y: 0.41617465}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -537,37 +405,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: All_Simjang!_19
-      rect:
-        serializedVersion: 2
-        x: 3
-        y: 51
-        width: 46
-        height: 46
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 54094136d52251a80800000000000000
-      internalID: -8496847337474977723
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: All_Simjang!_20
       rect:
         serializedVersion: 2
-        x: 57
-        y: 40
-        width: 71
-        height: 52
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 84
+        y: 34
+        width: 52
+        height: 45
+      alignment: 9
+      pivot: {x: 0.55587107, y: 0.4815284}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -584,12 +430,12 @@ TextureImporter:
       name: All_Simjang!_21
       rect:
         serializedVersion: 2
-        x: 133
-        y: 33
-        width: 54
-        height: 47
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 143
+        y: 40
+        width: 69
+        height: 51
+      alignment: 9
+      pivot: {x: 0.51221365, y: 0.5164674}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
