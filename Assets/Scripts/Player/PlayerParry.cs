@@ -13,6 +13,8 @@ public class PlayerParry : MonoBehaviour
     public float regenRate = 30f;
     [Tooltip("รัศมีการปัดกระสุนและทำดาเมจ")]
     public float parryRadius = 1.0f;
+    [Tooltip("เปอร์เซ็นต์ขั้นต่ำที่ต้องชาร์จใหม่หลังหลอดหมด (เช่น 0.2 = 20%)")]
+    public float overheatRecoveryThreshold = 0.2f;
 
     [Header("Damage Zone Settings")]
     [Tooltip("ดาเมจที่ทำได้ต่อครั้ง (เบาๆ แต่ฟันรัว)")]
@@ -34,6 +36,7 @@ public class PlayerParry : MonoBehaviour
 
     private float currentParryMeter;
     private bool isParrying;
+    private bool isOverheated; // เช็คว่าหลอดพัง (ฮีท) อยู่หรือไม่
     public bool IsParrying => isParrying;
     private CircleCollider2D parryCollider;
     private InputAction parryAction;
@@ -75,7 +78,13 @@ public class PlayerParry : MonoBehaviour
 
     private void Update()
     {
-        if (parryAction.IsPressed() && currentParryMeter > 0)
+        // ยกเลิก Overheat เมื่อหลอดชาร์จกลับมาถึง 20% ของหลอดเต็ม (หรือตามที่ตั้งค่าไว้)
+        if (isOverheated && currentParryMeter >= maxParryMeter * overheatRecoveryThreshold)
+        {
+            isOverheated = false;
+        }
+
+        if (parryAction.IsPressed() && currentParryMeter > 0 && !isOverheated)
         {
             isParrying = true;
             parryCollider.enabled = true;
@@ -129,6 +138,12 @@ public class PlayerParry : MonoBehaviour
             // ซ่อนชิ้นส่วนตอน Parry และเล่นอนิเมชั่น
             foreach(var obj in objectsToHide) if(obj != null) obj.SetActive(false);
             if (animator != null) animator.SetBool("isParrying", true);
+
+            // ถ้าหลอดหมด ให้เข้าสู่โหมด Overheat (ใช้งานไม่ได้จนกว่าจะฟื้นฟูถึงจุดที่กำหนด)
+            if (currentParryMeter <= 0)
+            {
+                isOverheated = true;
+            }
         }
         else
         {
