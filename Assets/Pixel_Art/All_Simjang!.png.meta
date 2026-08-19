@@ -114,7 +114,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 22
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -452,12 +452,12 @@ TextureImporter:
       name: All_Simjang!_1
       rect:
         serializedVersion: 2
-        x: 6
-        y: 233
-        width: 29
-        height: 33
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 41
+        y: 237
+        width: 30
+        height: 27
+      alignment: 9
+      pivot: {x: 0.4207273, y: 0.49004802}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -466,6 +466,94 @@ TextureImporter:
       bones: []
       spriteID: 8a776622755ecf7418300bfdc8331dc0
       internalID: -8227442846983657149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang!_2
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 238
+        width: 29
+        height: 30
+      alignment: 9
+      pivot: {x: 0.548785, y: 0.35977527}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 152bc1b53fe6aff469b6fc34126a4282
+      internalID: -4564367880120900221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang!_3
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 232
+        width: 26
+        height: 35
+      alignment: 9
+      pivot: {x: 0.7522348, y: 0.30391324}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b07602311a9b2c3478c16805d6a8c9d3
+      internalID: -3135602082885857397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang!_4
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 238
+        width: 32
+        height: 28
+      alignment: 9
+      pivot: {x: 0.54836845, y: 0.38980865}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 080204d63bd402e4fa662b27ee5a0014
+      internalID: -7063564236393179401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: All_Simjang!_5
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 238
+        width: 31
+        height: 28
+      alignment: 9
+      pivot: {x: 0.74521023, y: 0.39668983}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 042f9723ebe87b5479d3a0983307d427
+      internalID: 5672572314139147466
       vertices: []
       indices: 
       edges: []
