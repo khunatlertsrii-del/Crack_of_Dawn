@@ -31,8 +31,8 @@ public class PlayerParry : MonoBehaviour
     public GameObject[] objectsToHide;
     [Tooltip("Animator สำหรับเล่นท่าฟัน")]
     public Animator animator;
-    [Tooltip("GameObject เอฟเฟกต์ฟันดาบ 360 องศา (Parry_VFX)")]
-    public GameObject parryVisualEffect;
+    [Tooltip("GameObject เอฟเฟกต์ฟันดาบ 360 องศา (ใส่ได้หลายอัน)")]
+    public GameObject[] parryVisualEffects;
 
     private float currentParryMeter;
     private bool isParrying;
@@ -57,11 +57,13 @@ public class PlayerParry : MonoBehaviour
         parryCollider.isTrigger = true;
         parryCollider.enabled = false;
 
-        // ปิด VFX ไว้ตั้งแต่เริ่มเกม
-        if (parryVisualEffect != null)
+        // ปิด VFX ทุกอันไว้ตั้งแต่เริ่มเกม
+        if (parryVisualEffects != null)
         {
-            parryVisualEffect.SetActive(false);
-            parryVisualTransform = parryVisualEffect.transform;
+            foreach (var vfx in parryVisualEffects)
+            {
+                if (vfx != null) vfx.SetActive(false);
+            }
         }
 
         // ใส่ Script ไว้จับ OnTrigger
@@ -88,9 +90,12 @@ public class PlayerParry : MonoBehaviour
         {
             isParrying = true;
             parryCollider.enabled = true;
-            if (parryVisualEffect != null)
+            if (parryVisualEffects != null)
             {
-                parryVisualEffect.SetActive(true);
+                foreach (var vfx in parryVisualEffects)
+                {
+                    if (vfx != null) vfx.SetActive(true);
+                }
             }
 
             // กวาดหาทั้งศัตรู (ทำดาเมจ) และกระสุน (ปัดทิ้ง) ในวงแหวน
@@ -149,7 +154,13 @@ public class PlayerParry : MonoBehaviour
         {
             isParrying = false;
             parryCollider.enabled = false;
-            if (parryVisualEffect != null) parryVisualEffect.SetActive(false);
+            if (parryVisualEffects != null)
+            {
+                foreach (var vfx in parryVisualEffects)
+                {
+                    if (vfx != null) vfx.SetActive(false);
+                }
+            }
             
             // ฟื้นฟู
             currentParryMeter += regenRate * Time.deltaTime;
