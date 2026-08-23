@@ -77,6 +77,8 @@ public class PlayerShooting : MonoBehaviour
     [Header("UI")]
     [Tooltip("ลาก Text (TextMeshPro) จาก Canvas มาใส่ตรงนี้เพื่อแสดงกระสุน (ถ้าไม่ใส่จะไม่มี UI กระสุน)")]
     [SerializeField] private TextMeshProUGUI ammoText;
+    [Tooltip("ใส่ Image แถบรีโหลดที่ปรับ Image Type เป็น Filled (Fill Method: Horizontal)")]
+    [SerializeField] private Image reloadProgressBar;
 
     // Dynamic HUD
     [Header("Ammo UI Dodge Settings")]
@@ -316,14 +318,22 @@ public class PlayerShooting : MonoBehaviour
     private System.Collections.IEnumerator ReloadRoutine()
     {
         isReloading = true;
-        Debug.Log("[PlayerShooting] Reloading...");
         
-        // ถ้าต้องการเพิ่มเสียง Reload ให้ใส่ตรงนี้
-        yield return new WaitForSeconds(reloadTime);
+        float timer = 0f;
+        while (timer < reloadTime)
+        {
+            timer += Time.deltaTime;
+            if (reloadProgressBar != null)
+            {
+                reloadProgressBar.fillAmount = timer / reloadTime;
+            }
+            yield return null; // รอจนกว่าจะถึงเฟรมถัดไป
+        }
+        
+        if (reloadProgressBar != null) reloadProgressBar.fillAmount = 0f; // ซ่อนหลอดเมื่อรีโหลดเสร็จ
         
         CurrentAmmo = ammoCapacity;
         isReloading = false;
-        Debug.Log("[PlayerShooting] Reload Complete!");
     }
 
     private void Fire()
@@ -473,16 +483,7 @@ public class PlayerShooting : MonoBehaviour
     {
         if (ammoText != null)
         {
-            if (isReloading)
-            {
-                ammoText.text = "RELOADING...";
-                ammoText.color = Color.white;
-            }
-            else
-            {
-                ammoText.text = $"AMMO: {CurrentAmmo} / {ammoCapacity}";
-                ammoText.color = Color.white;
-            }
+            ammoText.text = $"{CurrentAmmo} / {ammoCapacity}"; // โชว์แค่เลขกระสุน เช่น 12 / 12
         }
     }
 }

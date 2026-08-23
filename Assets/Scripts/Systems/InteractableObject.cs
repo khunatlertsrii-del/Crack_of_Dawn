@@ -39,6 +39,9 @@ public class InteractableObject : MonoBehaviour
         {
             if (DialogueManager.Instance != null && !DialogueManager.Instance.dialogueBoxPanel.activeSelf)
             {
+                // เช็คคูลดาวน์ 0.5 วินาทีหลังจากเพิ่งปิดกล่องข้อความไป เพื่อกันกดเบิ้ล
+                if (Time.unscaledTime - DialogueManager.Instance.lastDialogueEndTime < 0.5f) return;
+
                 // ส่งข้อความไปให้ DialogueManager เปิดกล่อง
                 DialogueManager.Instance.StartDialogue(dialogues);
             }

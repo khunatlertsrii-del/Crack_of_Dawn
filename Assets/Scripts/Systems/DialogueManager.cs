@@ -19,6 +19,9 @@ public class DialogueManager : MonoBehaviour
     private Queue<string> sentences;
     private bool isTyping = false;
     private string currentSentence = "";
+    
+    // ตัวแปรกันกดเบิ้ลรัวๆ
+    public float lastDialogueEndTime = -100f;
 
     // ปุมสำหรับกด Next (ใช้ปุ่ม E หรือ Spacebar หรือเมาส์คลิกซ้ายก็ได้)
     private InputAction nextAction;
@@ -116,5 +119,6 @@ public class DialogueManager : MonoBehaviour
     {
         dialogueBoxPanel.SetActive(false);
         Time.timeScale = 1f; // ให้เวลาเดินต่อ
+        lastDialogueEndTime = Time.unscaledTime; // เก็บเวลาตอนคุยจบ
     }
 }
