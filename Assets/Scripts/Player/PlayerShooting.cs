@@ -483,7 +483,8 @@ public class PlayerShooting : MonoBehaviour
     {
         if (ammoText != null)
         {
-            ammoText.text = $"{CurrentAmmo} / {ammoCapacity}"; // โชว์แค่เลขกระสุน เช่น 12 / 12
+            // เติมเลข 0 ข้างหน้าถ้าเป็นเลขหลักเดียว (เช่น 05 / 12) เพื่อป้องกันตัวหนังสือดิ้น
+            ammoText.text = $"{CurrentAmmo.ToString("00")} / {ammoCapacity.ToString("00")}"; 
         }
     }
 }
