@@ -230,28 +230,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: FD_5
-      rect:
-        serializedVersion: 2
-        x: 333
-        y: 369
-        width: 41
-        height: 32
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2fe9f3fa304357fa0800000000000000
-      internalID: -5803675354367287566
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: FD_6
       rect:
         serializedVersion: 2
@@ -445,6 +423,28 @@ TextureImporter:
       bones: []
       spriteID: fb9476f61cd218410800000000000000
       internalID: 1477512461575211455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: FD_1
+      rect:
+        serializedVersion: 2
+        x: 333
+        y: 370
+        width: 41
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c8ff60f5ab0d94b44be6610c73118c67
+      internalID: 4674039060005658781
       vertices: []
       indices: 
       edges: []
