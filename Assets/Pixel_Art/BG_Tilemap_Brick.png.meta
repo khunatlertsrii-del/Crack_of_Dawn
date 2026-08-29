@@ -8,6 +8,39 @@ TextureImporter:
   - first:
       213: -554817009518782385
     second: BG_Tilemap_Brick_1
+  - first:
+      213: 4444298898640273070
+    second: BG_Tilemap_Brick_2
+  - first:
+      213: -7609217934196451093
+    second: BG_Tilemap_Brick_3
+  - first:
+      213: 7457784720568046423
+    second: BG_Tilemap_Brick_4
+  - first:
+      213: -71628066106223559
+    second: BG_Tilemap_Brick_5
+  - first:
+      213: 5084815049607257196
+    second: BG_Tilemap_Brick_6
+  - first:
+      213: 3980195829723485102
+    second: BG_Tilemap_Brick_7
+  - first:
+      213: 3847254865454498159
+    second: BG_Tilemap_Brick_8
+  - first:
+      213: -5622927984364153461
+    second: BG_Tilemap_Brick_9
+  - first:
+      213: 8837827107105992454
+    second: BG_Tilemap_Brick_10
+  - first:
+      213: 1191206068441008293
+    second: BG_Tilemap_Brick_11
+  - first:
+      213: -8473944387239292590
+    second: BG_Tilemap_Brick_12
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -54,7 +87,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -106,10 +139,10 @@ TextureImporter:
       name: BG_Tilemap_Brick_0
       rect:
         serializedVersion: 2
-        x: 96
-        y: 190
-        width: 32
-        height: 32
+        x: 31
+        y: 187
+        width: 34
+        height: 20
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,10 +161,10 @@ TextureImporter:
       name: BG_Tilemap_Brick_1
       rect:
         serializedVersion: 2
-        x: 64
-        y: 158
-        width: 32
-        height: 32
+        x: 95
+        y: 189
+        width: 34
+        height: 34
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -150,20 +183,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_2
       rect:
         serializedVersion: 2
-        x: 96
-        y: 158
-        width: 32
-        height: 32
+        x: 143
+        y: 189
+        width: 34
+        height: 34
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 9013d60d759fc0f4eb898542e0ec5d40
-      internalID: -2135670598
+      spriteID: eaefc192d425dad30800000000000000
+      internalID: 4444298898640273070
       vertices: []
       indices: 
       edges: []
@@ -172,20 +205,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_3
       rect:
         serializedVersion: 2
-        x: 128
-        y: 158
-        width: 32
-        height: 32
+        x: 191
+        y: 157
+        width: 68
+        height: 34
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: ce372c01789084e48a1dba3a8cf43c59
-      internalID: 343436899
+      spriteID: be850bdaa90a66690800000000000000
+      internalID: -7609217934196451093
       vertices: []
       indices: 
       edges: []
@@ -194,20 +227,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_4
       rect:
         serializedVersion: 2
-        x: 64
-        y: 126
+        x: 96
+        y: 158
         width: 32
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: f1cf59fa37204ac4fba95bfd8ef623c5
-      internalID: -663905093
+      spriteID: 7535bc8b0bf5f7760800000000000000
+      internalID: 7457784720568046423
       vertices: []
       indices: 
       edges: []
@@ -216,20 +249,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_5
       rect:
         serializedVersion: 2
-        x: 96
-        y: 126
-        width: 32
-        height: 32
+        x: 31
+        y: 125
+        width: 34
+        height: 18
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 0e29968274550674f9e7fcf90c5c35e4
-      internalID: -1528598956
+      spriteID: 9345ac347a6810ff0800000000000000
+      internalID: -71628066106223559
       vertices: []
       indices: 
       edges: []
@@ -238,20 +271,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_6
       rect:
         serializedVersion: 2
-        x: 128
+        x: 96
         y: 126
         width: 32
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 8055fc821a3eec1468d842b5ca0bb162
-      internalID: 1209036731
+      spriteID: c6c966cd854e09640800000000000000
+      internalID: 5084815049607257196
       vertices: []
       indices: 
       edges: []
@@ -260,20 +293,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_7
       rect:
         serializedVersion: 2
-        x: 64
-        y: 94
+        x: 144
+        y: 126
         width: 32
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 54cbab7888eeda248838b8b2438cb5a2
-      internalID: -1252650387
+      spriteID: ea3d827e40f7c3730800000000000000
+      internalID: 3980195829723485102
       vertices: []
       indices: 
       edges: []
@@ -285,17 +318,17 @@ TextureImporter:
         x: 96
         y: 94
         width: 32
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 83cbb68900ee77e44a6df5e7a8283bae
-      internalID: 763303974
+      spriteID: f610fcf9ae1346530800000000000000
+      internalID: 3847254865454498159
       vertices: []
       indices: 
       edges: []
@@ -304,20 +337,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_9
       rect:
         serializedVersion: 2
-        x: 128
+        x: 144
         y: 94
         width: 32
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: fbc41acd4a0cc4c4892130b6a7a35174
-      internalID: -1511437331
+      spriteID: b851f5e2ac857f1b0800000000000000
+      internalID: -5622927984364153461
       vertices: []
       indices: 
       edges: []
@@ -326,20 +359,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_10
       rect:
         serializedVersion: 2
-        x: 64
+        x: 96
         y: 62
         width: 32
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 0c251681bea9bf544af78410c4174234
-      internalID: -2014345149
+      spriteID: 60fee59dde446aa70800000000000000
+      internalID: 8837827107105992454
       vertices: []
       indices: 
       edges: []
@@ -348,20 +381,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_11
       rect:
         serializedVersion: 2
-        x: 96
+        x: 144
         y: 62
         width: 32
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 6039a4d6c6f6d4941968a29c22679541
-      internalID: 739781005
+      spriteID: 5a847b3ab93088010800000000000000
+      internalID: 1191206068441008293
       vertices: []
       indices: 
       edges: []
@@ -370,20 +403,20 @@ TextureImporter:
       name: BG_Tilemap_Brick_12
       rect:
         serializedVersion: 2
-        x: 128
+        x: 192
         y: 62
         width: 32
-        height: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: bd27aadeb3f221043b9a0c87949af80a
-      internalID: 1211054706
+      spriteID: 251df280a70866a80800000000000000
+      internalID: -8473944387239292590
       vertices: []
       indices: 
       edges: []
@@ -392,7 +425,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 0bdb4d9b2febffc4aa54597025d4da79
+    spriteID: d1b720b012b6afe4ab251a40ca673e38
     internalID: 0
     vertices: []
     indices: 
@@ -400,23 +433,21 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries:
-      - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":32.0,"y":32.0},"gridSpriteOffset":{"x":0.0,"y":16.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+      entries: []
     nameFileIdTable:
       BG_Tilemap_Brick_0: 7847942806151547452
       BG_Tilemap_Brick_1: -554817009518782385
-      BG_Tilemap_Brick_10: -2014345149
-      BG_Tilemap_Brick_11: 739781005
-      BG_Tilemap_Brick_12: 1211054706
-      BG_Tilemap_Brick_2: -2135670598
-      BG_Tilemap_Brick_3: 343436899
-      BG_Tilemap_Brick_4: -663905093
-      BG_Tilemap_Brick_5: -1528598956
-      BG_Tilemap_Brick_6: 1209036731
-      BG_Tilemap_Brick_7: -1252650387
-      BG_Tilemap_Brick_8: 763303974
-      BG_Tilemap_Brick_9: -1511437331
+      BG_Tilemap_Brick_10: 8837827107105992454
+      BG_Tilemap_Brick_11: 1191206068441008293
+      BG_Tilemap_Brick_12: -8473944387239292590
+      BG_Tilemap_Brick_2: 4444298898640273070
+      BG_Tilemap_Brick_3: -7609217934196451093
+      BG_Tilemap_Brick_4: 7457784720568046423
+      BG_Tilemap_Brick_5: -71628066106223559
+      BG_Tilemap_Brick_6: 5084815049607257196
+      BG_Tilemap_Brick_7: 3980195829723485102
+      BG_Tilemap_Brick_8: 3847254865454498159
+      BG_Tilemap_Brick_9: -5622927984364153461
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
