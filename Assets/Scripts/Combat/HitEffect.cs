@@ -218,6 +218,16 @@ public class HitEffect : MonoBehaviour
         {
             Instantiate(parryParticlePrefab, position, Quaternion.identity);
         }
+
+        // เสกแสง Light 2D วาบขึ้นมาแว้บเดียว!
+        GameObject parryFlash = new GameObject("ParryFlash");
+        parryFlash.transform.position = position;
+        var light2D = parryFlash.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+        light2D.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
+        light2D.color = new Color(1f, 1f, 1f); // สีขาวจ้า
+        light2D.intensity = 3f;
+        light2D.pointLightOuterRadius = 6f;
+        Destroy(parryFlash, 0.1f);
     }
 
     /// <summary>
@@ -252,6 +262,13 @@ public class HitEffect : MonoBehaviour
 
         // รูปทรงวงรีพุ่งออกไป
         flash.transform.localScale = new Vector3(1.5f, 0.5f, 1f);
+
+        // เพิ่มแสง Light 2D ให้เรืองแสงจริงในฉาก!
+        var light2D = flash.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+        light2D.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
+        light2D.color = new Color(1f, 0.8f, 0.2f); // สีเหลืองทอง
+        light2D.intensity = 2f;
+        light2D.pointLightOuterRadius = 4f;
 
         // ทำลายตัวเองใน 0.05 วิ
         Destroy(flash, 0.05f);

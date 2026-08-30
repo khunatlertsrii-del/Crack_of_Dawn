@@ -44,7 +44,9 @@ public class PlayerShooting : MonoBehaviour
     [Tooltip("แรง Recoil (ดันตัวถอยหลัง)")]
     [SerializeField] private float recoilForce = 1.5f;
 
-    [Header("Muzzle Flash")]
+    [Tooltip("ระยะมือกระตุกถอยหลังตอนยิง (Visual Recoil)")]
+    [SerializeField] private float visualRecoilDistance = 0.3f;
+    private float currentVisualRecoil = 0f;
     [Tooltip("ใส่รูป Sprite แสงแฟลชปืนของคุณตรงนี้ได้เลย! (ถ้ามี)")]
     public Sprite customMuzzleFlash;
 
@@ -226,6 +228,13 @@ public class PlayerShooting : MonoBehaviour
             ammoRect.anchoredPosition = pos;
         }
 
+        // --- Visual Recoil (มือกระตุก) ---
+        if (gunSprite != null)
+        {
+            currentVisualRecoil = Mathf.Lerp(currentVisualRecoil, 0f, 15f * Time.deltaTime);
+            gunSprite.transform.localPosition = new Vector3(-currentVisualRecoil, 0, 0); // ถอยหลังแกน X
+        }
+
         UpdateAmmoUI();
     }
 
@@ -367,7 +376,10 @@ public class PlayerShooting : MonoBehaviour
         // === Muzzle Flash ===
         ShowMuzzleFlash();
 
-        // === Recoil ===
+        // === Visual Recoil (ปืนกระตุกถอยหลัง) ===
+        currentVisualRecoil = visualRecoilDistance;
+
+        // === Physics Recoil (ดันตัวผู้เล่น) ===
         if (rb != null)
         {
             Vector2 recoilDir = -(muzzlePoint.position - gunPivot.position).normalized;
