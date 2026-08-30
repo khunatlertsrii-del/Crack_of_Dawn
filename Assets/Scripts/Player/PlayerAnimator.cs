@@ -143,7 +143,7 @@ public class PlayerAnimator : MonoBehaviour
         SetBoolSafe(IsFalling, isFalling);
         SetBoolSafe(IsGrounded, playerController.IsGrounded);
         SetBoolSafe(IsWallSliding, playerController.IsWallSliding);
-        // SetBoolSafe(IsDashing, playerController.IsDashing);
+        SetBoolSafe(IsDashing, playerController.IsShadowDashing);
         SetFloatSafe(YVelocity, vel.y);
         SetFloatSafe(XSpeed, Mathf.Abs(vel.x));
     }

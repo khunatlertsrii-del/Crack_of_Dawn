@@ -604,7 +604,15 @@ public class PlayerController : MonoBehaviour
     {
         if (wallJumpLockTimer > 0) return;
 
-        // หันหน้าตามเมาส์
+        // ถ้ากำลังสไลด์ ให้หันหน้าไปตามทิศทางที่สไลด์ (ซ้าย/ขวา) แทนการหันตามเมาส์
+        if (IsShadowDashing)
+        {
+            if (dashDirection.x > 0 && !IsFacingRight) Flip();
+            else if (dashDirection.x < 0 && IsFacingRight) Flip();
+            return;
+        }
+
+        // หันหน้าตามเมาส์ (สภาวะปกติ)
         if (Camera.main == null || UnityEngine.InputSystem.Mouse.current == null) return;
 
         Vector2 mouseScreenPos = UnityEngine.InputSystem.Mouse.current.position.ReadValue();

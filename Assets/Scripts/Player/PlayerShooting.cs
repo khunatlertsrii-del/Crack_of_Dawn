@@ -242,7 +242,24 @@ public class PlayerShooting : MonoBehaviour
             
             // คำนวณทิศทางถอยหลังในแกน Local ของ Player
             Vector3 recoilDirLocal = -gunPivot.parent.InverseTransformDirection(gunPivot.right);
-            gunPivot.localPosition = originalGunPivotLocalPos + (recoilDirLocal * currentVisualRecoil);
+            
+            // ถ้ากำลังสไลด์ ให้เลื่อนปืนลงต่ำลงมาหน่อยให้ตรงกับตัวที่แบนลง และซ่อนหัวที่แยกชิ้นไว้ (เพราะวาดรวมในอนิเมชั่นแล้ว)
+            Vector3 targetPivotPos = originalGunPivotLocalPos;
+            bool isSliding = playerController != null && playerController.IsShadowDashing;
+            
+            if (isSliding)
+            {
+                targetPivotPos.y -= 0.35f; // เลื่อนแกนแขนลงมาข้างล่าง
+                if (headSprite != null) headSprite.enabled = false;
+                else if (headPivot != null) headPivot.gameObject.SetActive(false);
+            }
+            else
+            {
+                if (headSprite != null) headSprite.enabled = true;
+                else if (headPivot != null && !headPivot.gameObject.activeSelf) headPivot.gameObject.SetActive(true);
+            }
+
+            gunPivot.localPosition = targetPivotPos + (recoilDirLocal * currentVisualRecoil);
         }
 
         UpdateAmmoUI();
