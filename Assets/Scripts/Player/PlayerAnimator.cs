@@ -136,14 +136,32 @@ public class PlayerAnimator : MonoBehaviour
         );
         // ให้ isRunning เป็นจริงเฉพาะเวลาเดินไปข้างหน้าเท่านั้น ไม่ชนกับ isWalkingBackwards
         bool isRunning = isMoving && !isWalkingBackwards;
+        bool isDashing = playerController.IsShadowDashing;
+        bool isGrounded = playerController.IsGrounded;
+        bool isWallSliding = playerController.IsWallSliding;
+
+        // =========================================================
+        // PARRY OVERRIDE (บังคับปิดท่าอื่นทั้งหมดเวลา Parry)
+        // =========================================================
+        PlayerParry parrySystem = playerController.GetComponent<PlayerParry>();
+        if (parrySystem != null && parrySystem.IsParrying)
+        {
+            isRunning = false;
+            isWalkingBackwards = false;
+            isJumping = false;
+            isFalling = false;
+            isWallSliding = false;
+            isDashing = false;
+            // (ไม่บังคับ isGrounded เป็น false เผื่อ Animator บางตัวต้องใช้เช็คการลงพื้น แต่ท่าทางจะถูกระงับ)
+        }
 
         SetBoolSafe(IsRunning, isRunning);
         SetBoolSafe(IsWalkingBackwards, isWalkingBackwards);
         SetBoolSafe(IsJumping, isJumping);
         SetBoolSafe(IsFalling, isFalling);
-        SetBoolSafe(IsGrounded, playerController.IsGrounded);
-        SetBoolSafe(IsWallSliding, playerController.IsWallSliding);
-        SetBoolSafe(IsDashing, playerController.IsShadowDashing);
+        SetBoolSafe(IsGrounded, isGrounded);
+        SetBoolSafe(IsWallSliding, isWallSliding);
+        SetBoolSafe(IsDashing, isDashing);
         SetFloatSafe(YVelocity, vel.y);
         SetFloatSafe(XSpeed, Mathf.Abs(vel.x));
     }

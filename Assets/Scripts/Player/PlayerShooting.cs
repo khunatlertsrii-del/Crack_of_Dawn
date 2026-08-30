@@ -63,6 +63,9 @@ public class PlayerShooting : MonoBehaviour
     [Tooltip("SpriteRenderer ของหัว (สำหรับ Flip ไม่ให้หัวกลับด้าน)")]
     [SerializeField] private SpriteRenderer headSprite;
 
+    [Tooltip("ระยะลดระดับความสูงของปืนลงมาตอนสไลด์ (ค่าติดลบคือเลื่อนลง)")]
+    [SerializeField] private float slideGunOffsetY = -0.35f;
+
     // ===================== Internal =====================
     private InputAction shootAction;
     private InputAction reloadAction;
@@ -249,7 +252,7 @@ public class PlayerShooting : MonoBehaviour
             
             if (isSliding)
             {
-                targetPivotPos.y -= 0.35f; // เลื่อนแกนแขนลงมาข้างล่าง
+                targetPivotPos.y += slideGunOffsetY; // เลื่อนแกนแขนลงมาข้างล่างตามค่าที่ตั้งใน Inspector
                 if (headSprite != null) headSprite.enabled = false;
                 else if (headPivot != null) headPivot.gameObject.SetActive(false);
             }
