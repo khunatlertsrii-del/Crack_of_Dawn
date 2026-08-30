@@ -131,7 +131,6 @@ public class PlayerController : MonoBehaviour
     private float dashTimer;
     private float dashCooldownTimer;
     private Vector2 dashDirection;
-    private float oilSpawnTimer;
 
     private float initialGravityScale;
 
@@ -148,6 +147,23 @@ public class PlayerController : MonoBehaviour
         // เปลี่ยนจาก TP Dash กลับมาเป็น Dash ปกติ
         if (dashSpeed >= 50f) dashSpeed = 25f;
         if (dashDuration <= 0.05f) dashDuration = 0.2f;
+
+        // --- Setup TrailRenderer สำหรับ Sizzling Slide ---
+        GameObject oilTrailObj = new GameObject("OilSmearTrail");
+        oilTrailObj.transform.SetParent(transform);
+        oilTrailObj.transform.localPosition = new Vector3(0, -0.6f, 0); // ตำแหน่งเท้า
+        
+        oilTrailRenderer = oilTrailObj.AddComponent<TrailRenderer>();
+        oilTrailRenderer.time = 1.0f; // รอยน้ำมันค่อยๆ จางหายใน 1 วิ
+        oilTrailRenderer.startWidth = 0.4f;
+        oilTrailRenderer.endWidth = 0.1f;
+        
+        // สร้าง Material ด่วนๆ เพื่อให้มันแสดงผลเป็นสีได้แบบไม่ต้องวาดรูป
+        oilTrailRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        oilTrailRenderer.startColor = new Color(1f, 0.8f, 0.1f, 0.6f); // สีเหลืองทอง
+        oilTrailRenderer.endColor = new Color(1f, 0.8f, 0.1f, 0f); // จางหายไป
+        oilTrailRenderer.emitting = false;
+        oilTrailRenderer.sortingOrder = -1; // ให้อยู่ล่างสุด
 
         // ป้องกันทะลุกำแพงตอนพุ่งไวๆ
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -241,20 +257,23 @@ public class PlayerController : MonoBehaviour
         {
             dashTimer -= Time.deltaTime;
             
-            // Spawn คราบน้ำมันตอนสไลด์ติดพื้น
-            if (IsGrounded)
+            // เปิด Trail ให้ลากยาวเฉพาะตอนเท้าแตะพื้น
+            if (oilTrailRenderer != null)
             {
-                oilSpawnTimer -= Time.deltaTime;
-                if (oilSpawnTimer <= 0)
-                {
-                    oilSpawnTimer = 0.04f; // เสกทุกๆ 0.04 วิ
-                    SpawnOilTrail();
-                }
+                oilTrailRenderer.emitting = IsGrounded;
             }
 
             if (dashTimer <= 0)
             {
                 EndDash();
+            }
+        }
+        else
+        {
+            // ปิด Trail เมื่อไม่ได้ Dash
+            if (oilTrailRenderer != null)
+            {
+                oilTrailRenderer.emitting = false;
             }
         }
 
@@ -539,85 +558,7 @@ public class PlayerController : MonoBehaviour
         if (health != null) health.SetManualInvincible(false);
     }
 
-    [Tooltip("รูปภาพคราบน้ำมัน (ถ้าไม่ใส่ โค้ดจะสร้างรูปหยดน้ำมันวงรีให้เอง)")]
-    public Sprite customOilSprite;
-    private static Sprite cachedOilSprite;
-
-    private void SpawnOilTrail()
-    {
-        GameObject oil = new GameObject("OilTrail");
-        
-        // ยิง Raycast ลงพื้นเพื่อหาตำแหน่งที่ "ติดพื้นเป๊ะๆ"
-        Vector2 spawnPos = transform.position;
-        if (groundCheck != null) spawnPos = groundCheck.position;
-        
-        RaycastHit2D hit = Physics2D.Raycast(spawnPos, Vector2.down, 1f, groundLayer);
-        if (hit.collider != null)
-        {
-            spawnPos = hit.point; // เอาจุดที่กระทบพื้นเป๊ะๆ
-        }
-        else
-        {
-            spawnPos.y -= 0.1f; // เผื่อไว้ถ้ายิงไม่โดน ให้ดรอปลงมานิดนึง
-        }
-        
-        oil.transform.position = spawnPos;
-
-        // สุ่มหมุนนิดเดียว และทำให้แบนๆ กว้างๆ
-        oil.transform.rotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-5f, 5f));
-        oil.transform.localScale = new Vector3(UnityEngine.Random.Range(1.2f, 2.0f), UnityEngine.Random.Range(0.2f, 0.4f), 1f);
-
-        var sr = oil.AddComponent<SpriteRenderer>();
-        
-        // ใช้รูประบบที่ผู้เล่นใส่มาให้ ถ้าไม่มีค่อยสร้างเอง
-        if (customOilSprite != null)
-        {
-            sr.sprite = customOilSprite;
-        }
-        else
-        {
-            if (cachedOilSprite == null)
-            {
-                Texture2D tex = new Texture2D(16, 16);
-                Color[] pixels = new Color[256];
-                for (int y = 0; y < 16; y++)
-                {
-                    for (int x = 0; x < 16; x++)
-                    {
-                        // วาดวงกลม (เช็คระยะจากจุดศูนย์กลาง)
-                        float dist = Vector2.Distance(new Vector2(x, y), new Vector2(7.5f, 7.5f));
-                        pixels[y * 16 + x] = (dist <= 7.5f) ? Color.white : Color.clear;
-                    }
-                }
-                tex.SetPixels(pixels);
-                tex.Apply();
-                tex.filterMode = FilterMode.Point;
-                cachedOilSprite = Sprite.Create(tex, new Rect(0, 0, 16, 16), new Vector2(0.5f, 0.5f), 16);
-            }
-            sr.sprite = cachedOilSprite;
-        }
-        
-        sr.color = new Color(1f, 0.8f, 0.1f, 0.6f); // สีเหลืองทอง
-        sr.sortingOrder = -1; // ให้อยู่หลังตัวละครและหน้าฉาก
-
-        Destroy(oil, 1.5f);
-        StartCoroutine(FadeOutOil(sr));
-    }
-
-    private System.Collections.IEnumerator FadeOutOil(SpriteRenderer sr)
-    {
-        float timer = 0f;
-        float duration = 1.5f;
-        Color startColor = sr.color;
-        while (timer < duration)
-        {
-            timer += Time.deltaTime;
-            if (sr == null) yield break;
-            sr.color = new Color(startColor.r, startColor.g, startColor.b, Mathf.Lerp(startColor.a, 0f, timer / duration));
-            yield return null;
-        }
-    }
-
+    private TrailRenderer oilTrailRenderer;
     // =========================================================
     // TIMERS
     // =========================================================
