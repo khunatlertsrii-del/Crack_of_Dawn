@@ -67,13 +67,13 @@ public class PlayerController : MonoBehaviour
     [Tooltip("เวลาหน่วงหลังหลุดจากกำแพงที่ยังกดโดดต่อได้ (วินาที)")]
     [SerializeField] private float wallCoyoteTime = 0.2f;
 
-    // ===================== SHADOW DASH =====================
-    [Header("Shadow Dash (Hornet Style)")]
-    [Tooltip("ความเร็วตอนพุ่ง")]
+    // ===================== SIZZLING SLIDE (Oil Dash) =====================
+    [Header("Sizzling Slide (Oil Dash)")]
+    [Tooltip("ความเร็วตอนพุ่งสไลด์")]
     [SerializeField] private float dashSpeed = 25f;
-    [Tooltip("ระยะเวลาที่พุ่ง (วินาที)")]
+    [Tooltip("ระยะเวลาที่สไลด์ (วินาที)")]
     [SerializeField] private float dashDuration = 0.2f;
-    [Tooltip("ดีเลย์ก่อนพุ่งครั้งต่อไป (วินาที)")]
+    [Tooltip("ดีเลย์ก่อนสไลด์ครั้งต่อไป (วินาที)")]
     [SerializeField] private float dashCooldown = 1f;
     
     // ===================== GROUND / WALL CHECK =====================
@@ -131,6 +131,7 @@ public class PlayerController : MonoBehaviour
     private float dashTimer;
     private float dashCooldownTimer;
     private Vector2 dashDirection;
+    private float oilSpawnTimer;
 
     private float initialGravityScale;
 
@@ -239,6 +240,18 @@ public class PlayerController : MonoBehaviour
         if (IsShadowDashing)
         {
             dashTimer -= Time.deltaTime;
+            
+            // Spawn คราบน้ำมันตอนสไลด์ติดพื้น
+            if (IsGrounded)
+            {
+                oilSpawnTimer -= Time.deltaTime;
+                if (oilSpawnTimer <= 0)
+                {
+                    oilSpawnTimer = 0.04f; // เสกทุกๆ 0.04 วิ
+                    SpawnOilTrail();
+                }
+            }
+
             if (dashTimer <= 0)
             {
                 EndDash();
@@ -524,6 +537,85 @@ public class PlayerController : MonoBehaviour
         // ปิด I-Frame
         var health = GetComponent<PlayerHealth>();
         if (health != null) health.SetManualInvincible(false);
+    }
+
+    [Tooltip("รูปภาพคราบน้ำมัน (ถ้าไม่ใส่ โค้ดจะสร้างรูปหยดน้ำมันวงรีให้เอง)")]
+    public Sprite customOilSprite;
+    private static Sprite cachedOilSprite;
+
+    private void SpawnOilTrail()
+    {
+        GameObject oil = new GameObject("OilTrail");
+        
+        // ยิง Raycast ลงพื้นเพื่อหาตำแหน่งที่ "ติดพื้นเป๊ะๆ"
+        Vector2 spawnPos = transform.position;
+        if (groundCheck != null) spawnPos = groundCheck.position;
+        
+        RaycastHit2D hit = Physics2D.Raycast(spawnPos, Vector2.down, 1f, groundLayer);
+        if (hit.collider != null)
+        {
+            spawnPos = hit.point; // เอาจุดที่กระทบพื้นเป๊ะๆ
+        }
+        else
+        {
+            spawnPos.y -= 0.1f; // เผื่อไว้ถ้ายิงไม่โดน ให้ดรอปลงมานิดนึง
+        }
+        
+        oil.transform.position = spawnPos;
+
+        // สุ่มหมุนนิดเดียว และทำให้แบนๆ กว้างๆ
+        oil.transform.rotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(-5f, 5f));
+        oil.transform.localScale = new Vector3(UnityEngine.Random.Range(1.2f, 2.0f), UnityEngine.Random.Range(0.2f, 0.4f), 1f);
+
+        var sr = oil.AddComponent<SpriteRenderer>();
+        
+        // ใช้รูประบบที่ผู้เล่นใส่มาให้ ถ้าไม่มีค่อยสร้างเอง
+        if (customOilSprite != null)
+        {
+            sr.sprite = customOilSprite;
+        }
+        else
+        {
+            if (cachedOilSprite == null)
+            {
+                Texture2D tex = new Texture2D(16, 16);
+                Color[] pixels = new Color[256];
+                for (int y = 0; y < 16; y++)
+                {
+                    for (int x = 0; x < 16; x++)
+                    {
+                        // วาดวงกลม (เช็คระยะจากจุดศูนย์กลาง)
+                        float dist = Vector2.Distance(new Vector2(x, y), new Vector2(7.5f, 7.5f));
+                        pixels[y * 16 + x] = (dist <= 7.5f) ? Color.white : Color.clear;
+                    }
+                }
+                tex.SetPixels(pixels);
+                tex.Apply();
+                tex.filterMode = FilterMode.Point;
+                cachedOilSprite = Sprite.Create(tex, new Rect(0, 0, 16, 16), new Vector2(0.5f, 0.5f), 16);
+            }
+            sr.sprite = cachedOilSprite;
+        }
+        
+        sr.color = new Color(1f, 0.8f, 0.1f, 0.6f); // สีเหลืองทอง
+        sr.sortingOrder = -1; // ให้อยู่หลังตัวละครและหน้าฉาก
+
+        Destroy(oil, 1.5f);
+        StartCoroutine(FadeOutOil(sr));
+    }
+
+    private System.Collections.IEnumerator FadeOutOil(SpriteRenderer sr)
+    {
+        float timer = 0f;
+        float duration = 1.5f;
+        Color startColor = sr.color;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            if (sr == null) yield break;
+            sr.color = new Color(startColor.r, startColor.g, startColor.b, Mathf.Lerp(startColor.a, 0f, timer / duration));
+            yield return null;
+        }
     }
 
     // =========================================================
