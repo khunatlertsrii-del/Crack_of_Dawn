@@ -220,7 +220,6 @@ public class PlayerController : MonoBehaviour
 
         jumpAction.started += _ => OnJumpStarted();
         jumpAction.canceled += _ => OnJumpCanceled();
-        dashAction.performed += _ => OnDashPerformed();
     }
 
     private void OnDisable()
@@ -253,19 +252,33 @@ public class PlayerController : MonoBehaviour
         
         if (dashCooldownTimer > 0) dashCooldownTimer -= Time.deltaTime;
 
+        // เช็คว่าผู้เล่นกดปุ่มสไลด์ค้างอยู่หรือไม่
+        bool wantsToSlide = dashAction.IsPressed();
+
+        if (wantsToSlide && IsGrounded && !IsShadowDashing && dashCooldownTimer <= 0)
+        {
+            StartSlide();
+        }
+        else if (IsShadowDashing && (!wantsToSlide || !IsGrounded))
+        {
+            EndSlide();
+        }
+
         if (IsShadowDashing)
         {
             dashTimer -= Time.deltaTime;
             
-            // เปิด Trail ให้ลากยาวเฉพาะตอนเท้าแตะพื้น
+            // หมดเวลาอมตะ 0.2 วิแรก
+            if (dashTimer <= 0)
+            {
+                var health = GetComponent<PlayerHealth>();
+                if (health != null) health.SetManualInvincible(false);
+            }
+
+            // เปิด Trail ให้ลากยาวเฉพาะตอนเท้าแตะพื้น (กันเหนียว)
             if (oilTrailRenderer != null)
             {
                 oilTrailRenderer.emitting = IsGrounded;
-            }
-
-            if (dashTimer <= 0)
-            {
-                EndDash();
             }
         }
         else
@@ -292,13 +305,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (IsShadowDashing)
+        // ในแบบสไลด์ค้าง เรายังคงใช้ HandleMovement จัดการแรงเดินปกติ 
+        // แค่เปลี่ยนความเร็วสูงสุด (Speed) ชั่วคราว
+        HandleMovement();
+        
+        if (!IsShadowDashing)
         {
-            rb.linearVelocity = dashDirection * dashSpeed;
-        }
-        else
-        {
-            HandleMovement();
             HandleWallSlide();
             ApplyBetterJumpGravity();
         }
@@ -329,6 +341,17 @@ public class PlayerController : MonoBehaviour
         if (IsGrounded && !wasGrounded)
         {
             extraJumpsRemaining = extraJumps;
+        }
+
+        // Coyote Time
+        if (wasGrounded && !IsGrounded)
+        {
+            coyoteTimeCounter = coyoteTime;
+        }
+        else if (IsGrounded)
+        {
+            coyoteTimeCounter = 0;
+            IsWallSliding = false;
         }
     }
 
@@ -395,13 +418,16 @@ public class PlayerController : MonoBehaviour
     {
         if (wallJumpLockTimer > 0) return; // ล็อคการเคลื่อนที่ชั่วขณะหลัง Wall Jump
 
-        float currentMoveSpeed = moveSpeed;
+        // ถ้าสไลด์อยู่ ใช้ความเร็วสไลด์แทนความเร็ววิ่ง
+        float currentMoveSpeed = IsShadowDashing ? dashSpeed : moveSpeed;
 
         float targetSpeed = MoveInput * currentMoveSpeed;
         float speedDifference = targetSpeed - rb.linearVelocity.x;
 
         // ใช้ acceleration ตอนเร่ง, deceleration ตอนชะลอ
         float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
+        if (IsShadowDashing) accelRate *= 0.5f; // ควบคุมยากขึ้นนิดหน่อยเวลาสไลด์ (อารมณ์ไถล)
+
         float movement = speedDifference * accelRate * Time.fixedDeltaTime;
 
         rb.linearVelocity = new Vector2(
@@ -520,26 +546,15 @@ public class PlayerController : MonoBehaviour
     }
 
     // =========================================================
-    // SHADOW DASH
+    // SIZZLING SLIDE (HOLD TO SLIDE)
     // =========================================================
 
-    private void OnDashPerformed()
+    private void StartSlide()
     {
-        if (dashCooldownTimer > 0) return;
-        if (IsShadowDashing) return;
-
-        // หาทิศทางพุ่ง ถ้ากดปุ่มเดินอยู่ก็พุ่งตามปุ่ม ถ้าไม่ได้กดให้พุ่งตามหน้า
-        float dashDir = MoveInput != 0 ? Mathf.Sign(MoveInput) : (IsFacingRight ? 1 : -1);
-        dashDirection = new Vector2(dashDir, 0);
-
         IsShadowDashing = true;
-        dashTimer = dashDuration;
-        dashCooldownTimer = dashCooldown;
+        dashTimer = dashDuration; // dashDuration ตอนนี้จะทำหน้าที่เป็นแค่เวลา "อมตะ (I-Frame)" ตอนเริ่มสไลด์ 0.2 วิ
 
-        rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0; // ปิดแรงโน้มถ่วงเพื่อไม่ให้ตก
-        
-        // I-Frame (อมตะชั่วขณะ)
+        // I-Frame (อมตะชั่วขณะตอนเริ่มสไลด์)
         var health = GetComponent<PlayerHealth>();
         if (health != null) health.SetManualInvincible(true);
 
@@ -547,11 +562,10 @@ public class PlayerController : MonoBehaviour
         ScreenEffectManager.Instance?.TriggerAdrenaline();
     }
 
-    private void EndDash()
+    private void EndSlide()
     {
         IsShadowDashing = false;
-        rb.gravityScale = initialGravityScale;
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x * 0.3f, 0); // เบรกเล็กน้อยตอนจบ
+        dashCooldownTimer = dashCooldown; // เริ่มนับ Cooldown เล็กน้อยหลังจากปล่อยปุ่ม
 
         // ปิด I-Frame
         var health = GetComponent<PlayerHealth>();
@@ -607,8 +621,9 @@ public class PlayerController : MonoBehaviour
         // ถ้ากำลังสไลด์ ให้หันหน้าไปตามทิศทางที่สไลด์ (ซ้าย/ขวา) แทนการหันตามเมาส์
         if (IsShadowDashing)
         {
-            if (dashDirection.x > 0 && !IsFacingRight) Flip();
-            else if (dashDirection.x < 0 && IsFacingRight) Flip();
+            float slideDir = MoveInput != 0 ? MoveInput : rb.linearVelocity.x;
+            if (slideDir > 0.1f && !IsFacingRight) Flip();
+            else if (slideDir < -0.1f && IsFacingRight) Flip();
             return;
         }
 
