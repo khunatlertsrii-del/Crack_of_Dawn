@@ -165,12 +165,19 @@ public class PlayerShooting : MonoBehaviour
         return rt;
     }
 
+    private Vector3 originalGunPivotLocalPos;
+
     private void Start()
     {
         ammoRect = GetAmmoDodgeRect();
         if (ammoRect != null)
         {
             ammoOriginalPos = ammoRect.anchoredPosition;
+        }
+
+        if (gunPivot != null)
+        {
+            originalGunPivotLocalPos = gunPivot.localPosition;
         }
     }
 
@@ -228,11 +235,14 @@ public class PlayerShooting : MonoBehaviour
             ammoRect.anchoredPosition = pos;
         }
 
-        // --- Visual Recoil (มือกระตุก) ---
-        if (gunSprite != null)
+        // --- Visual Recoil (ดึงแขน/ปืนกระตุกถอยหลัง) ---
+        if (gunPivot != null)
         {
             currentVisualRecoil = Mathf.Lerp(currentVisualRecoil, 0f, 15f * Time.deltaTime);
-            gunSprite.transform.localPosition = new Vector3(-currentVisualRecoil, 0, 0); // ถอยหลังแกน X
+            
+            // คำนวณทิศทางถอยหลังในแกน Local ของ Player
+            Vector3 recoilDirLocal = -gunPivot.parent.InverseTransformDirection(gunPivot.right);
+            gunPivot.localPosition = originalGunPivotLocalPos + (recoilDirLocal * currentVisualRecoil);
         }
 
         UpdateAmmoUI();

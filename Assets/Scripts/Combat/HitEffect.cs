@@ -30,10 +30,18 @@ public class HitEffect : MonoBehaviour
     [SerializeField] private float normalShakeIntensity = 0.1f;
     [SerializeField] private float normalShakeDuration = 0.1f;
 
-    [Header("Parry Effect Settings")]
+    [Header("Parry Effect")]
+    [Tooltip("Prefab ประกายไฟส้มๆ ตอนปัดกระสุน")]
+    public GameObject parryParticlePrefab;
+    [Tooltip("ความสว่างของแสงวาบตอนแพรี่")]
+    public float parryLightIntensity = 1.5f;
+    [Tooltip("ความกว้างของแสงวาบตอนแพรี่")]
+    public float parryLightRadius = 5f;
+    [Tooltip("สีของแสงวาบตอนแพรี่")]
+    public Color parryLightColor = Color.white;
+    public float parryHitstopDuration = 0.15f;
     [Tooltip("เปิดระบบซูมกล้องตอน Parry (ถ้ามึนหัวให้เอาติ๊กออก)")]
     [SerializeField] private bool enableParryZoom = true;
-    [SerializeField] private float parryHitstopDuration = 0.15f;
     [SerializeField] private float parryShakeIntensity = 0.5f;
     [SerializeField] private float parryShakeDuration = 0.3f;
     [SerializeField] private float parryZoomAmount = 1.0f; // ปรับลงมาหน่อยเผื่อตาลาย
@@ -45,9 +53,6 @@ public class HitEffect : MonoBehaviour
 
     [Tooltip("Particle ตอนยิงโดนไข่ขาว (แนะนำสีขาว/เหลือง)")]
     [SerializeField] private GameObject normalHitParticlePrefab;
-
-    [Tooltip("Particle ตอนปัดกระสุน (แนะนำประกายไฟ)")]
-    [SerializeField] private GameObject parryParticlePrefab;
 
     [Tooltip("Particle ตอนกระสุนชนกำแพง/พื้น (แนะนำฝุ่น/ควัน)")]
     [SerializeField] private GameObject impactParticlePrefab;
@@ -224,9 +229,9 @@ public class HitEffect : MonoBehaviour
         parryFlash.transform.position = position;
         var light2D = parryFlash.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
         light2D.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
-        light2D.color = new Color(1f, 1f, 1f); // สีขาวจ้า
-        light2D.intensity = 3f;
-        light2D.pointLightOuterRadius = 6f;
+        light2D.color = parryLightColor; // ใช้สีที่ตั้งค่าไว้
+        light2D.intensity = parryLightIntensity; // ใช้ความสว่างที่ตั้งค่าไว้
+        light2D.pointLightOuterRadius = parryLightRadius; // ใช้ขนาดที่ตั้งค่าไว้
         Destroy(parryFlash, 0.1f);
     }
 
