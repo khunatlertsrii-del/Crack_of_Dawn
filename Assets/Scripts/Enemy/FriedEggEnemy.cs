@@ -76,7 +76,7 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
     [SerializeField] private float fireRate = 1.5f;
 
     [Tooltip("ความเร็วกระสุน")]
-    [SerializeField] private float bulletSpeed = 16f; // เพิ่มความเร็วให้เท่ากับกระสุนสะท้อน
+    [SerializeField] private float bulletSpeed = 32f; // เร่งความเร็วเพื่อกันการสไลด์หนีง่ายๆ
 
     [Header("=== Advanced Attack ===")]
     [Tooltip("ยิงเป็นชุด (Burst) ใส่ 3 คือยิง 3 นัดติดกัน")]

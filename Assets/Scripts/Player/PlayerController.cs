@@ -69,9 +69,13 @@ public class PlayerController : MonoBehaviour
 
     // ===================== SIZZLING SLIDE (Oil Dash) =====================
     [Header("Sizzling Slide (Oil Dash)")]
-    [Tooltip("ความเร็วตอนพุ่งสไลด์")]
+    [Tooltip("ความเร็วตอนสไลด์ค้าง")]
     [SerializeField] private float dashSpeed = 25f;
-    [Tooltip("ระยะเวลาที่สไลด์ (วินาที)")]
+
+    [Tooltip("ความเร็วที่จะถูกนำไปใช้ตอนกระโดดสไลด์ (Slide Jump Momentum)")]
+    [SerializeField] private float slideJumpSpeed = 15f;
+
+    [Tooltip("ระยะเวลาความคงกระพันตอนเริ่มสไลด์")]
     [SerializeField] private float dashDuration = 0.2f;
     [Tooltip("ดีเลย์ก่อนสไลด์ครั้งต่อไป (วินาที)")]
     [SerializeField] private float dashCooldown = 1f;
@@ -131,6 +135,7 @@ public class PlayerController : MonoBehaviour
     private float dashTimer;
     private float dashCooldownTimer;
     private Vector2 dashDirection;
+    private bool isSlideJumping;
 
     private float initialGravityScale;
 
@@ -250,16 +255,28 @@ public class PlayerController : MonoBehaviour
         UpdateJumpBuffer();
         UpdateWallJumpLock();
         
+        if (jumpAction.IsPressed() && IsGrounded && rb.linearVelocity.y <= 0f)
+        {
+            // บัพเฟอร์กระโดดไว้เลยถ้ากดค้างแล้วเท้าแตะพื้น (Bunny Hop)
+            jumpBufferCounter = jumpBufferTime;
+        }
+
         if (dashCooldownTimer > 0) dashCooldownTimer -= Time.deltaTime;
+
+        // เช็คสถานะ Parry เพื่อไม่ให้สไลด์พร้อมฟันดาบ
+        PlayerParry parrySystem = GetComponent<PlayerParry>();
+        bool isParrying = parrySystem != null && parrySystem.IsParrying;
 
         // เช็คว่าผู้เล่นกดปุ่มสไลด์ค้างอยู่หรือไม่
         bool wantsToSlide = dashAction.IsPressed();
 
-        if (wantsToSlide && IsGrounded && !IsShadowDashing && dashCooldownTimer <= 0)
+        // เริ่มสไลด์ได้ก็ต่อเมื่อไม่ได้ Parry อยู่
+        if (wantsToSlide && IsGrounded && !IsShadowDashing && dashCooldownTimer <= 0 && !isParrying)
         {
             StartSlide();
         }
-        else if (IsShadowDashing && (!wantsToSlide || !IsGrounded))
+        // เลิกสไลด์ถ้าปล่อยปุ่ม, เท้าหลุดจากพื้น, หรือกด Parry แทรก
+        else if (IsShadowDashing && (!wantsToSlide || !IsGrounded || isParrying))
         {
             EndSlide();
         }
@@ -337,10 +354,11 @@ public class PlayerController : MonoBehaviour
 
         IsGrounded = hitCenter || hitLeft || hitRight;
 
-        // Reset extra jumps เมื่อแตะพื้น
+        // Reset extra jumps และโมเมนตัม เมื่อแตะพื้น
         if (IsGrounded && !wasGrounded)
         {
             extraJumpsRemaining = extraJumps;
+            isSlideJumping = false; // ยกเลิกโมเมนตัมเมื่อเท้าแตะพื้น
         }
 
         // Coyote Time
@@ -418,15 +436,21 @@ public class PlayerController : MonoBehaviour
     {
         if (wallJumpLockTimer > 0) return; // ล็อคการเคลื่อนที่ชั่วขณะหลัง Wall Jump
 
-        // ถ้าสไลด์อยู่ ใช้ความเร็วสไลด์แทนความเร็ววิ่ง
-        float currentMoveSpeed = IsShadowDashing ? dashSpeed : moveSpeed;
+        // ถ้าสไลด์อยู่ หรือ โดดขึ้นมาจากสไลด์ (Slide Jump) ให้คงความเร็วสูงไว้!
+        float currentMoveSpeed = moveSpeed;
+        if (IsShadowDashing) currentMoveSpeed = dashSpeed;
+        else if (isSlideJumping) currentMoveSpeed = slideJumpSpeed;
 
         float targetSpeed = MoveInput * currentMoveSpeed;
         float speedDifference = targetSpeed - rb.linearVelocity.x;
 
         // ใช้ acceleration ตอนเร่ง, deceleration ตอนชะลอ
         float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
-        if (IsShadowDashing) accelRate *= 0.5f; // ควบคุมยากขึ้นนิดหน่อยเวลาสไลด์ (อารมณ์ไถล)
+        
+        if (IsShadowDashing) 
+            accelRate *= 0.5f; // ควบคุมยากขึ้นนิดหน่อยเวลาสไลด์ (อารมณ์ไถลบนน้ำมัน)
+        else if (isSlideJumping) 
+            accelRate *= 0.3f; // กลางอากาศบังคับตัวยากมากถ้าพุ่งมาแรงๆ (คงโมเมนตัม)
 
         float movement = speedDifference * accelRate * Time.fixedDeltaTime;
 
@@ -487,6 +511,12 @@ public class PlayerController : MonoBehaviour
 
     private void PerformJump()
     {
+        // โดดจากสไลด์ (Slide Jump) จะเก็บโมเมนตัมความเร็วเอาไว้กลางอากาศ
+        if (IsShadowDashing || (dashCooldownTimer > dashCooldown - 0.1f && dashCooldownTimer > 0)) 
+        {
+            isSlideJumping = true;
+        }
+
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
