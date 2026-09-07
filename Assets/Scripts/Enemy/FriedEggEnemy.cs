@@ -95,12 +95,18 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
     [Header("=== Visuals (Placeholder) ===")]
     [SerializeField] private SpriteRenderer whiteRenderer;  // ไข่ขาว
     [SerializeField] private SpriteRenderer yolkRenderer;    // ไข่แดง
+    
+    [Tooltip("จุดหมุนหัว (แยกจากตัว เพื่อหันตาม Player)")]
+    [SerializeField] private Transform headPivot;
+    
+    [Tooltip("จุดหมุนปืนและแขน (แยกจากตัว เพื่อหันตาม Player)")]
+    [SerializeField] private Transform gunPivot;
 
     // ===================== STATE =====================
     public bool IsAlive => currentHealth > 0;
 
-    private enum EnemyState { Patrol, Alert, Attack, Dead, EnteringDoor }
-    private EnemyState state = EnemyState.Patrol;
+    private enum EnemyState { Idle, Alert, Attack, Dead, EnteringDoor }
+    private EnemyState state = EnemyState.Idle;
 
     private float currentHealth;
     private float patrolStartX;
@@ -181,67 +187,71 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         if (GameManager.Instance != null &&
             GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
 
-        // หา Player (พยายามหาเรื่อยๆ แต่ไม่บล็อค patrol)
+        // หา Player (พยายามหาเรื่อยๆ แต่ไม่บล็อค idle)
         if (playerTransform == null)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null) playerTransform = player.transform;
-            // ไม่ return! ให้ patrol ทำงานต่อได้แม้ยังหา Player ไม่เจอ
+        }
+
+        // หันหน้าและเล็งปืนตาม Player ตลอดเวลาถ้าเห็น
+        if (playerTransform != null && state != EnemyState.EnteringDoor && state != EnemyState.Dead)
+        {
+            AimAtPlayer();
         }
 
         switch (state)
         {
             case EnemyState.EnteringDoor:
-                // เพิ่งเกิดจากประตู: เดินออกมามึนๆ โดยไม่สนใจ Player
+                // เพิ่งเกิดจากประตู: เดินออกมามึนๆ
                 transform.Translate(Vector2.right * patrolDirection * moveSpeed * Time.deltaTime);
                 waitTimer -= Time.deltaTime;
                 if (waitTimer <= 0)
                 {
-                    state = EnemyState.Patrol;
+                    state = EnemyState.Idle;
                 }
                 break;
-            case EnemyState.Patrol:
-                UpdatePatrol();
-                if (playerTransform != null) CheckForPlayer(); // เช็คเฉพาะเมื่อมี Player
+            case EnemyState.Idle:
+                // อยู่เฉยๆ รอผู้เล่นเข้าระยะ
+                if (playerTransform != null) CheckForPlayer();
                 break;
             case EnemyState.Alert:
             case EnemyState.Attack:
                 if (playerTransform != null)
                     UpdateAttack();
                 else
-                    state = EnemyState.Patrol; // กลับ patrol ถ้าหา Player ไม่เจอ
+                    state = EnemyState.Idle; // กลับ idle ถ้าหา Player ไม่เจอ
                 CheckPlayerOutOfRange();
                 break;
         }
     }
 
-    // =========================================================
-    // AI — PATROL
-    // =========================================================
-
-    private void UpdatePatrol()
+    private void AimAtPlayer()
     {
-        if (waitTimer > 0)
+        // 1. หันตัวพลิกซ้ายขวา
+        float dirToPlayer = Mathf.Sign(playerTransform.position.x - transform.position.x);
+        FaceDirection(dirToPlayer > 0);
+
+        // 2. หมุนปืนและหัวให้ชี้ไปหา Player
+        Vector2 direction = (playerTransform.position - transform.position).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        if (transform.localScale.x < 0)
         {
-            waitTimer -= Time.deltaTime;
-            return;
+            angle += 180f; // ถ้าหันซ้ายต้องบวก 180 องศาให้ปืนพลิกถูก
         }
 
-        // เดินไปมา
-        float targetX = patrolStartX + patrolDirection * patrolDistance;
-        float dirToTarget = Mathf.Sign(targetX - transform.position.x);
-
-        // ใช้ Translate — เรียบง่ายและทำงานได้แน่นอนกับ Kinematic body
-        transform.Translate(Vector2.right * dirToTarget * moveSpeed * Time.deltaTime);
-
-        // Flip ตามทิศเดิน → ไข่แดงจะหันไปทางนั้นด้วย!
-        FaceDirection(dirToTarget > 0);
-
-        // ถึงจุดกลับตัว?
-        if (Mathf.Abs(transform.position.x - targetX) < 0.2f)
+        if (gunPivot != null)
         {
-            patrolDirection *= -1;
-            waitTimer = waitTimeAtEnd;
+            gunPivot.rotation = Quaternion.Euler(0, 0, angle);
+        }
+
+        if (headPivot != null)
+        {
+            // หมุนหัวเบาๆ (ก้ม-เงย ไม่เกิน 25 องศา)
+            float headAngle = Mathf.Atan2(direction.y, Mathf.Abs(direction.x)) * Mathf.Rad2Deg;
+            headAngle = Mathf.Clamp(headAngle, -25f, 25f);
+            headPivot.localRotation = Quaternion.Euler(0, 0, headAngle);
         }
     }
 
@@ -273,14 +283,14 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
     {
         if (playerTransform == null)
         {
-            state = EnemyState.Patrol;
+            state = EnemyState.Idle;
             return;
         }
 
         float distance = Vector2.Distance(transform.position, playerTransform.position);
         if (distance > detectionRange * 1.5f) // ให้ระยะหลุดไกลกว่าระยะตรวจจับ
         {
-            state = EnemyState.Patrol;
+            state = EnemyState.Idle;
         }
     }
 

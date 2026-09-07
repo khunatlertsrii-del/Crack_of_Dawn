@@ -113,6 +113,12 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         ScreenEffectManager.Instance?.PlayDamageEffect();
         ScreenEffectManager.Instance?.TriggerAdrenaline();
 
+        // หักคะแนน
+        if (LevelRatingManager.Instance != null)
+        {
+            LevelRatingManager.Instance.ApplyPenalty("Damage Taken", LevelRatingManager.Instance.damagePenalty);
+        }
+
         Debug.Log($"[Player] โดนยิง! Damage: {damage} | HP: {CurrentHealth}/{maxHealth}");
 
         // Knockback

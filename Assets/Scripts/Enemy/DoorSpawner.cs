@@ -135,14 +135,22 @@ public class DoorSpawner : MonoBehaviour
     {
         for (int i = 0; i < enemyCount; i++)
         {
-            SpawnSingleEnemy();
+            FriedEggEnemy spawnedEnemy = SpawnSingleEnemy();
+
+            // รอจนกว่าศัตรูตัวนี้จะตาย
+            if (spawnedEnemy != null)
+            {
+                yield return new WaitUntil(() => spawnedEnemy == null || !spawnedEnemy.IsAlive);
+            }
+
+            // ดีเลย์เล็กน้อยก่อนตัวถัดไปออกมา
             yield return new WaitForSeconds(spawnDelay);
         }
 
         IsSpawningComplete = true; // สปอนเสร็จครบทุกตัวแล้ว
     }
 
-    private void SpawnSingleEnemy()
+    private FriedEggEnemy SpawnSingleEnemy()
     {
         FriedEggEnemy eggScript = null;
 
@@ -172,6 +180,8 @@ public class DoorSpawner : MonoBehaviour
 
             eggScript.SpawnFromDoor(walkDir);
         }
+
+        return eggScript;
     }
 
     // =========================================================
