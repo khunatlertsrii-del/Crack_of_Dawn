@@ -217,16 +217,20 @@ MonoBehaviour:
   waitTimeAtEnd: 0.5
   detectionRange: 8
   detectionAngle: 90
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 64
   playerLayer:
     serializedVersion: 2
     m_Bits: 0
   enemyBulletPrefab: {fileID: 0}
+  accuracySpread: 5
   firePoint: {fileID: 7500110097614045434}
   fireRate: 1.5
   bulletSpeed: 12
-  burstCount: 3
+  burstCount: 1
   timeBetweenBurstShots: 0.1
-  burstsBeforeReload: 3
+  burstsBeforeReload: 12
   reloadTime: 2
   whiteRenderer: {fileID: 5472697668548672714}
   yolkRenderer: {fileID: 2437846765032935679}

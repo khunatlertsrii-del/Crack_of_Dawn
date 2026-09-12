@@ -61,6 +61,9 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
     [Tooltip("มุมมองเห็น (องศา, จาก forward direction)")]
     [SerializeField] private float detectionAngle = 90f;
 
+    [Tooltip("Layer ของกำแพง/พื้น ที่ใช้บังสายตา (Obstacles)")]
+    [SerializeField] private LayerMask obstacleLayer;
+
     [Tooltip("Layer ของผู้เล่น")]
     [SerializeField] private LayerMask playerLayer;
 
@@ -68,6 +71,9 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
     [Header("=== Attack ===")]
     [Tooltip("Prefab กระสุนศัตรู")]
     [SerializeField] private GameObject enemyBulletPrefab;
+
+    [Tooltip("ความแม่นยำการยิง (องศากระจายของกระสุน ยิ่งเยอะยิ่งยิงมั่ว)")]
+    [SerializeField] private float accuracySpread = 8f;
 
     [Tooltip("จุดยิงกระสุน")]
     [SerializeField] private Transform firePoint;
@@ -273,8 +279,13 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
 
             if (angle <= detectionAngle)
             {
-                state = EnemyState.Attack;
-                // หยุดเดิน (ไม่ต้องตั้ง velocity เพราะเป็น Kinematic + ใช้ MovePosition)
+                // เช็คว่ามีกำแพงบังหรือไม่ (Line of Sight)
+                RaycastHit2D hit = Physics2D.Linecast(transform.position, playerTransform.position, obstacleLayer);
+                if (hit.collider == null)
+                {
+                    state = EnemyState.Attack;
+                    // หยุดเดิน (ไม่ต้องตั้ง velocity เพราะเป็น Kinematic + ใช้ MovePosition)
+                }
             }
         }
     }
@@ -288,7 +299,11 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         }
 
         float distance = Vector2.Distance(transform.position, playerTransform.position);
-        if (distance > detectionRange * 1.5f) // ให้ระยะหลุดไกลกว่าระยะตรวจจับ
+        
+        // ถ้าอยู่ไกลไป หรือ มีกำแพงบัง (หลบหลังกำแพง)
+        bool isBehindWall = Physics2D.Linecast(transform.position, playerTransform.position, obstacleLayer).collider != null;
+
+        if (distance > detectionRange * 1.5f || isBehindWall) // ให้ระยะหลุดไกลกว่าระยะตรวจจับ
         {
             state = EnemyState.Idle;
         }
@@ -336,7 +351,9 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
             if (playerTransform == null || !IsAlive) break;
             
             FireAtPlayer();
-            yield return new WaitForSeconds(timeBetweenBurstShots);
+            // สุ่มหน่วงเวลานิดๆ ให้การยิงดูไม่เป็นหุ่นยนต์เกินไป
+            float randomBurstDelay = timeBetweenBurstShots + Random.Range(-0.02f, 0.05f);
+            yield return new WaitForSeconds(Mathf.Max(0.01f, randomBurstDelay));
         }
 
         currentBurstsFired++;
@@ -362,13 +379,14 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
 
             currentBurstsFired = 0;
             isReloadingEnemy = false;
-            fireTimer = 1f / fireRate; // พักแป๊บนึงก่อนยิงชุดถัดไปหลังรีโหลดเสร็จ
+            // พักแป๊บนึงก่อนยิงชุดถัดไปหลังรีโหลดเสร็จ + สุ่มหน่วงเวลาให้คาดเดายาก
+            fireTimer = (1f / fireRate) + Random.Range(0f, 0.3f); 
         }
         else
         {
-            // ยังไม่หมดแม็กซ์ รอ fireRate ปกติ
+            // ยังไม่หมดแม็กซ์ รอ fireRate ปกติ + สุ่มจังหวะให้ยิงเหลื่อมๆ กัน
             isShootingBurst = false;
-            fireTimer = 1f / fireRate;
+            fireTimer = (1f / fireRate) + Random.Range(0f, 0.2f);
         }
     }
 
@@ -377,6 +395,10 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         if (playerTransform == null || firePoint == null) return;
 
         Vector2 direction = ((Vector2)playerTransform.position - (Vector2)firePoint.position).normalized;
+
+        // สุ่มให้กระสุนกระจาย (Accuracy Spread)
+        float spreadAngle = Random.Range(-accuracySpread, accuracySpread);
+        direction = Quaternion.Euler(0, 0, spreadAngle) * direction;
 
         if (enemyBulletPrefab != null)
         {
