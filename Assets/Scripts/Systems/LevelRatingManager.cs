@@ -40,6 +40,9 @@ public class LevelRatingManager : MonoBehaviour
     [Tooltip("Text แสดงตัวอักษร Rank (S, A, B, C)")]
     public TMPro.TMP_Text finalGradeText;
     
+    [Tooltip("Panel หน้า Game Over")]
+    public GameObject gameOverPanel;
+
     // Events
     public event Action<int> OnScoreChanged;
     public event Action<string> OnGradeCalculated;
@@ -51,6 +54,7 @@ public class LevelRatingManager : MonoBehaviour
             Instance = this;
             currentScore = maxScore;
             if (victoryPanel != null) victoryPanel.SetActive(false);
+            if (gameOverPanel != null) gameOverPanel.SetActive(false);
         }
         else
         {
@@ -90,8 +94,10 @@ public class LevelRatingManager : MonoBehaviour
     public void PlayerDied()
     {
         isLevelActive = false;
-        // Optionally show Game Over UI here in the future
-        // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
     }
 
     public string CalculateFinalGrade()
