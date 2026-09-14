@@ -173,11 +173,6 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
             col.isTrigger = true;
         }
 
-        // Register with GameManager
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.RegisterEnemy();
-        }
     }
 
     private void Start()
@@ -190,8 +185,7 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
     private void Update()
     {
         if (!IsAlive) return;
-        if (GameManager.Instance != null &&
-            GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
 
         // หา Player (พยายามหาเรื่อยๆ แต่ไม่บล็อค idle)
         if (playerTransform == null)
@@ -544,10 +538,10 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
                 HitEffect.Instance.PlayNormalHitEffect(hitPoint, randomDir);
         }
 
-        // แจ้ง GameManager
-        if (GameManager.Instance != null)
+        // แจ้ง LevelRatingManager (นับ Kills)
+        if (LevelRatingManager.Instance != null)
         {
-            GameManager.Instance.EnemyKilled(isCritical);
+            LevelRatingManager.Instance.RegisterKill(isCritical);
         }
 
 

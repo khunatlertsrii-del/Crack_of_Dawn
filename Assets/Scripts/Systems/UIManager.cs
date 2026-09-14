@@ -71,14 +71,6 @@ public class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // Subscribe to events
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
-            GameManager.Instance.OnEnemyKilled += HandleEnemyKilled;
-            GameManager.Instance.OnScoreChanged += HandleScoreChanged;
-        }
-
         if (SlowMotionManager.Instance != null)
         {
             SlowMotionManager.Instance.OnMeterChanged += HandleSlowMoChanged;
@@ -95,16 +87,6 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         // Re-subscribe (in case managers initialized after us)
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
-            GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
-            GameManager.Instance.OnEnemyKilled -= HandleEnemyKilled;
-            GameManager.Instance.OnEnemyKilled += HandleEnemyKilled;
-            GameManager.Instance.OnScoreChanged -= HandleScoreChanged;
-            GameManager.Instance.OnScoreChanged += HandleScoreChanged;
-        }
-
         if (SlowMotionManager.Instance != null)
         {
             SlowMotionManager.Instance.OnMeterChanged -= HandleSlowMoChanged;
@@ -187,13 +169,6 @@ public class UIManager : MonoBehaviour
 
     private void OnDisable()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
-            GameManager.Instance.OnEnemyKilled -= HandleEnemyKilled;
-            GameManager.Instance.OnScoreChanged -= HandleScoreChanged;
-        }
-
         if (SlowMotionManager.Instance != null)
         {
             SlowMotionManager.Instance.OnMeterChanged -= HandleSlowMoChanged;
@@ -237,19 +212,6 @@ public class UIManager : MonoBehaviour
         // UI removed
     }
 
-    private void HandleGameStateChanged(GameManager.GameState state)
-    {
-        switch (state)
-        {
-            case GameManager.GameState.GameOver:
-                ShowGameOver();
-                break;
-            case GameManager.GameState.Victory:
-                ShowVictory();
-                break;
-        }
-    }
-
     // =========================================================
     // UI UPDATES
     // =========================================================
@@ -262,36 +224,6 @@ public class UIManager : MonoBehaviour
     private void UpdateScore(int score)
     {
         // UI removed
-    }
-
-    private void ShowGameOver()
-    {
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(true);
-            if (gameOverScoreText != null && GameManager.Instance != null)
-            {
-                gameOverScoreText.text = $"SCORE: {GameManager.Instance.Score:N0}\n" +
-                                         $"KILLS: {GameManager.Instance.TotalKills}\n" +
-                                         $"CRITICAL: {GameManager.Instance.CriticalKills}\n\n" +
-                                         $"Press R to Restart";
-            }
-        }
-    }
-
-    private void ShowVictory()
-    {
-        if (victoryPanel != null)
-        {
-            victoryPanel.SetActive(true);
-            if (victoryScoreText != null && GameManager.Instance != null)
-            {
-                victoryScoreText.text = $"SCORE: {GameManager.Instance.Score:N0}\n" +
-                                        $"KILLS: {GameManager.Instance.TotalKills}\n" +
-                                        $"CRITICAL: {GameManager.Instance.CriticalKills}\n\n" +
-                                        $"OMELET RUSH!";
-            }
-        }
     }
 
     // =========================================================
@@ -328,26 +260,6 @@ public class UIManager : MonoBehaviour
             slowMoSlider = CreateSlider("SlowMo_Bar",
                 new Vector2(20, -50), new Vector2(200, 15),
                 slowMoBarColor, "SLOW-MO");
-        }
-
-        // === Game Over Panel ===
-        if (gameOverPanel == null)
-        {
-            gameOverPanel = CreatePanel("GameOver_Panel",
-                new Color(0.1f, 0.05f, 0.05f, 0.85f));
-            gameOverScoreText = CreateCenterText(gameOverPanel, "GAME OVER\n\nPress R to Restart");
-            var restartHandler = gameOverPanel.AddComponent<RestartHandler>();
-            gameOverPanel.SetActive(false);
-        }
-
-        // === Victory Panel ===
-        if (victoryPanel == null)
-        {
-            victoryPanel = CreatePanel("Victory_Panel",
-                new Color(0.05f, 0.1f, 0.05f, 0.85f));
-            victoryScoreText = CreateCenterText(victoryPanel, "VICTORY!\n\nOMELET RUSH!");
-            var restartHandler = victoryPanel.AddComponent<RestartHandler>();
-            victoryPanel.SetActive(false);
         }
     }
 
@@ -500,10 +412,8 @@ public class RestartHandler : MonoBehaviour
         if (UnityEngine.InputSystem.Keyboard.current != null &&
             UnityEngine.InputSystem.Keyboard.current.rKey.wasPressedThisFrame)
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.RestartLevel();
-            }
+            Time.timeScale = 1f;
+            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
         }
     }
 }

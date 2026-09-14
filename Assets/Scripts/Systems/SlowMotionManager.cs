@@ -99,12 +99,8 @@ public class SlowMotionManager : MonoBehaviour
 
     private void Update()
     {
-        // ข้ามถ้าเกมไม่ได้อยู่ในสถานะ Playing
-        if (GameManager.Instance != null &&
-            GameManager.Instance.CurrentState != GameManager.GameState.Playing)
-        {
-            return;
-        }
+        // ข้ามถ้าจบเกมแล้ว
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
 
         HandleSlowMotionInput();
         UpdateTimeScale();

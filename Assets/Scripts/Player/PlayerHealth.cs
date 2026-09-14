@@ -148,10 +148,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         Debug.Log("[Player] ไข่เจียวตาย! GAME OVER!");
         OnDied?.Invoke();
 
-        // แจ้ง GameManager
-        if (GameManager.Instance != null)
+        // แจ้ง LevelRatingManager
+        if (LevelRatingManager.Instance != null)
         {
-            GameManager.Instance.PlayerDied();
+            LevelRatingManager.Instance.PlayerDied();
         }
 
         // ปิดการควบคุม

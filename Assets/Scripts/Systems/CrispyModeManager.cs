@@ -73,7 +73,7 @@ public class CrispyModeManager : MonoBehaviour
 
     private void Update()
     {
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameManager.GameState.Playing)
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive)
             return;
 
         if (IsCrispyActive)

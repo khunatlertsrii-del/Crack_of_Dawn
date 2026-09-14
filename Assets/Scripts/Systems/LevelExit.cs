@@ -29,11 +29,7 @@ public class LevelExit : MonoBehaviour
             hasTriggered = true;
             Debug.Log("[LevelExit] ผู้เล่นเข้าเส้นชัย! จบด่าน!");
 
-            // 1. บอก GameManager ว่าจบเกม (ชนะ)
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.SetState(GameManager.GameState.Victory);
-            }
+            // 1. บอกระบบให้สรุปผล (LevelRatingManager จะหยุดเวลาให้ด้วย)
 
             // 2. สั่งคำนวณและโชว์เกรด
             if (LevelRatingManager.Instance != null)

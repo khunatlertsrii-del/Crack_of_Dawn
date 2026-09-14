@@ -152,11 +152,11 @@ public class LevelBuilder : MonoBehaviour
 
     private void CreateManagers()
     {
-        // Game Manager
-        if (GameManager.Instance == null)
+        // Level Rating Manager (แทน GameManager)
+        if (LevelRatingManager.Instance == null)
         {
-            GameObject gm = new GameObject("GameManager");
-            gm.AddComponent<GameManager>();
+            GameObject lrm = new GameObject("LevelRatingManager");
+            lrm.AddComponent<LevelRatingManager>();
         }
 
         // Slow Motion Manager

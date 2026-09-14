@@ -236,12 +236,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        // Skip ถ้าเกมไม่ได้ Playing
-        if (GameManager.Instance != null &&
-            GameManager.Instance.CurrentState != GameManager.GameState.Playing)
-        {
-            return;
-        }
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
 
         // Read input
         MoveInput = moveAction.ReadValue<float>();
@@ -316,11 +311,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (GameManager.Instance != null &&
-            GameManager.Instance.CurrentState != GameManager.GameState.Playing)
-        {
-            return;
-        }
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
 
         // ในแบบสไลด์ค้าง เรายังคงใช้ HandleMovement จัดการแรงเดินปกติ 
         // แค่เปลี่ยนความเร็วสูงสุด (Speed) ชั่วคราว

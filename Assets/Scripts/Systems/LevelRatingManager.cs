@@ -21,23 +21,24 @@ public class LevelRatingManager : MonoBehaviour
     [Header("Level Stats")]
     private float timeElapsed = 0f;
     private int totalEnemiesInLevel = 0;
-    private bool isLevelActive = true;
+    public bool isLevelActive { get; private set; } = true;
+    public int TotalKills { get; private set; } = 0;
 
     [Header("Custom UI Bindings")]
     [Tooltip("Panel หน้าสรุปผลตอนจบด่าน (ซ่อนไว้ตอนเริ่มเกม)")]
     public GameObject victoryPanel;
     
     [Tooltip("Text แสดงเวลาที่ใช้ไป")]
-    public Text timeText;
+    public TMPro.TMP_Text timeText;
     
     [Tooltip("Text แสดงจำนวนศัตรูที่จัดการได้ (เช่น 5/5)")]
-    public Text enemiesKilledText;
+    public TMPro.TMP_Text enemiesKilledText;
     
     [Tooltip("Text แสดงคะแนนสุทธิ")]
-    public Text finalScoreText;
+    public TMPro.TMP_Text finalScoreText;
     
     [Tooltip("Text แสดงตัวอักษร Rank (S, A, B, C)")]
-    public Text finalGradeText;
+    public TMPro.TMP_Text finalGradeText;
     
     // Events
     public event Action<int> OnScoreChanged;
@@ -80,6 +81,19 @@ public class LevelRatingManager : MonoBehaviour
         OnScoreChanged?.Invoke(currentScore);
     }
 
+    public void RegisterKill(bool isCritical)
+    {
+        TotalKills++;
+        Debug.Log($"[LevelRating] Enemy killed! Total: {TotalKills} / {totalEnemiesInLevel}");
+    }
+
+    public void PlayerDied()
+    {
+        isLevelActive = false;
+        // Optionally show Game Over UI here in the future
+        // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     public string CalculateFinalGrade()
     {
         string grade = "D";
@@ -98,9 +112,10 @@ public class LevelRatingManager : MonoBehaviour
     public void ShowVictorySummary()
     {
         isLevelActive = false; // หยุดเวลา
+        Time.timeScale = 0f; // หยุดเกม
 
         // ตรวจสอบเควส: ฆ่าศัตรูครบไหม?
-        int kills = GameManager.Instance != null ? GameManager.Instance.TotalKills : 0;
+        int kills = TotalKills;
         if (kills < totalEnemiesInLevel)
         {
             int missed = totalEnemiesInLevel - kills;
@@ -143,11 +158,13 @@ public class LevelRatingManager : MonoBehaviour
     // ฟังก์ชันสำหรับปุ่ม
     public void RetryLevel()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void NextLevel(string nextSceneName)
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(nextSceneName);
     }
 }

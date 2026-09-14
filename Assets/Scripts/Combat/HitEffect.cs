@@ -287,9 +287,8 @@ public class HitEffect : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(duration);
 
-        // คืนค่า timeScale (ถ้าเกมไม่ได้ Pause)
-        if (GameManager.Instance == null ||
-            GameManager.Instance.CurrentState == GameManager.GameState.Playing)
+        // คืนค่า timeScale (ถ้าเกมไม่ได้จบ)
+        if (LevelRatingManager.Instance == null || LevelRatingManager.Instance.isLevelActive)
         {
             Time.timeScale = originalTimeScale;
         }
