@@ -52,16 +52,24 @@ public class DialogueManager : MonoBehaviour
         nextAction.Disable();
     }
 
+    private bool skipNextInput = false;
+
     private void Update()
     {
         // ถ้ากล่องข้อความเปิดอยู่ และผู้เล่นกด E
         if (dialogueBoxPanel.activeSelf && nextAction.WasPressedThisFrame())
         {
+            if (skipNextInput)
+            {
+                skipNextInput = false;
+                return;
+            }
+
             if (isTyping)
             {
                 // ถ้ากำลังพิมพ์อยู่ ให้โชว์ข้อความทั้งหมดทันที (ข้ามแอนิเมชันพิมพ์)
                 StopAllCoroutines();
-                dialogueText.text = currentSentence;
+                dialogueText.maxVisibleCharacters = currentSentence.Length;
                 isTyping = false;
             }
             else
@@ -75,6 +83,7 @@ public class DialogueManager : MonoBehaviour
     // ฟังก์ชันสำหรับรับข้อความจากสิ่งของ (Interactable Object)
     public void StartDialogue(string[] lines)
     {
+        skipNextInput = true;
         dialogueBoxPanel.SetActive(true);
         sentences.Clear();
 
@@ -106,12 +115,18 @@ public class DialogueManager : MonoBehaviour
     IEnumerator TypeSentence(string sentence)
     {
         isTyping = true;
-        dialogueText.text = "";
-        foreach (char letter in sentence.ToCharArray())
+        
+        // ใส่ข้อความไปให้หมดก่อน เพื่อให้มันจัดบรรทัด (Word Wrap) ล่วงหน้า จะได้ไม่กระโดด
+        dialogueText.text = sentence;
+        dialogueText.maxVisibleCharacters = 0; // ซ่อนไว้ก่อน
+        
+        // ใช้ regular for loop
+        for (int i = 0; i <= sentence.Length; i++)
         {
-            dialogueText.text += letter;
+            dialogueText.maxVisibleCharacters = i;
             yield return new WaitForSecondsRealtime(typingSpeed); // ใช้ Realtime เพราะเราหยุดเวลา (TimeScale=0)
         }
+        
         isTyping = false;
     }
 
