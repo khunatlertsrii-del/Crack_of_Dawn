@@ -84,6 +84,11 @@ public class SlowMotionManager : MonoBehaviour
         CurrentMeter = maxMeter;
     }
 
+    private void Start()
+    {
+        OnMeterChanged?.Invoke(MeterPercent);
+    }
+
     private void OnEnable()
     {
         slowMoAction.Enable();

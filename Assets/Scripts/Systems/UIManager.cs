@@ -165,6 +165,13 @@ public class UIManager : MonoBehaviour
             slowPos.y = Mathf.Lerp(slowPos.y, slowTargetY, 15f * Time.unscaledDeltaTime);
             slowMoRect.anchoredPosition = slowPos;
         }
+
+        // ซ่อน HUD เมื่อจบด่าน
+        bool isActive = LevelRatingManager.Instance == null || LevelRatingManager.Instance.isLevelActive;
+        if (hpSlider != null && hpSlider.gameObject.activeSelf != isActive)
+            hpSlider.gameObject.SetActive(isActive);
+        if (slowMoSlider != null && slowMoSlider.gameObject.activeSelf != isActive)
+            slowMoSlider.gameObject.SetActive(isActive);
     }
 
     private void OnDisable()

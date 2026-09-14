@@ -71,6 +71,11 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         CurrentHealth = maxHealth;
     }
 
+    private void Start()
+    {
+        OnHealthChanged?.Invoke(HealthPercent);
+    }
+
     private void Update()
     {
         if (!IsAlive) return;

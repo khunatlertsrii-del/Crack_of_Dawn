@@ -97,10 +97,10 @@ public class LevelRatingManager : MonoBehaviour
     public string CalculateFinalGrade()
     {
         string grade = "D";
-        if (currentScore >= 9500) grade = "S";
-        else if (currentScore >= 8000) grade = "A";
-        else if (currentScore >= 6000) grade = "B";
-        else if (currentScore >= 4000) grade = "C";
+        if (currentScore >= 8000) grade = "S";
+        else if (currentScore >= 6000) grade = "A";
+        else if (currentScore >= 4000) grade = "B";
+        else grade = "C";
 
         OnGradeCalculated?.Invoke(grade);
         return grade;
@@ -142,7 +142,7 @@ public class LevelRatingManager : MonoBehaviour
             {
                 finalGradeText.text = finalGrade;
                 // เปลี่ยนสีตามเกรด
-                if (finalGrade == "S") finalGradeText.color = Color.yellow;
+                if (finalGrade == "S") finalGradeText.color = Color.red;
                 else if (finalGrade == "A") finalGradeText.color = Color.green;
                 else if (finalGrade == "B") finalGradeText.color = Color.blue;
                 else if (finalGrade == "C") finalGradeText.color = new Color(1f, 0.5f, 0f);
