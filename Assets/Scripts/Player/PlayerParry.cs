@@ -80,6 +80,9 @@ public class PlayerParry : MonoBehaviour
 
     private void Update()
     {
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
+        if (PauseManager.Instance != null && PauseManager.Instance.IsPaused) return;
+
         // ยกเลิก Overheat เมื่อหลอดชาร์จกลับมาถึง 20% ของหลอดเต็ม (หรือตามที่ตั้งค่าไว้)
         if (isOverheated && currentParryMeter >= maxParryMeter * overheatRecoveryThreshold)
         {

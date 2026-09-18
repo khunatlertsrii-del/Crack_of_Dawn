@@ -192,11 +192,24 @@ public class UIManager : MonoBehaviour
         {
             hpSlider.value = percent;
 
-            // เปลี่ยนสีเมื่อ HP ต่ำ
-            Image fill = hpSlider.fillRect?.GetComponent<Image>();
+            Image fill = hpSlider.fillRect != null ? hpSlider.fillRect.GetComponent<Image>() : null;
+            if (fill == null)
+            {
+                Image[] images = hpSlider.GetComponentsInChildren<Image>();
+                foreach (var img in images) { if (img.type == Image.Type.Filled) { fill = img; break; } }
+            }
+
             if (fill != null)
             {
+                // เปลี่ยนสีเมื่อ HP ต่ำ
                 fill.color = percent < 0.3f ? hpBarLowColor : hpBarColor;
+
+                // ถ้ายกเลิกการผูก Fill Rect เอาไว้ (เพื่อทำ Center Fill)
+                // เราจะใช้การสเกลแกน X แทน (ต้องตั้ง Pivot X ของรูปให้เป็น 0.5)
+                if (hpSlider.fillRect == null)
+                {
+                    fill.transform.localScale = new Vector3(percent, 1f, 1f);
+                }
             }
         }
     }
@@ -206,6 +219,18 @@ public class UIManager : MonoBehaviour
         if (slowMoSlider != null)
         {
             slowMoSlider.value = percent;
+
+            Image fill = slowMoSlider.fillRect != null ? slowMoSlider.fillRect.GetComponent<Image>() : null;
+            if (fill == null)
+            {
+                Image[] images = slowMoSlider.GetComponentsInChildren<Image>();
+                foreach (var img in images) { if (img.name == "Fill" || img.type == Image.Type.Simple || img.type == Image.Type.Sliced) { fill = img; break; } }
+            }
+
+            if (fill != null && slowMoSlider.fillRect == null)
+            {
+                fill.transform.localScale = new Vector3(percent, 1f, 1f);
+            }
         }
     }
 
