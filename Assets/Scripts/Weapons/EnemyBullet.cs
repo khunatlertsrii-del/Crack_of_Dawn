@@ -98,13 +98,23 @@ public class EnemyBullet : MonoBehaviour
         float currentSpeed = rb.linearVelocity.magnitude;
         rb.linearVelocity = newDirection.normalized * currentSpeed * 2f;
         
-        // หมุนหัวกระสุน
+        // หันหน้าใหม่
         float angle = Mathf.Atan2(newDirection.y, newDirection.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
 
-        // เปลี่ยนสีกระสุนเป็นสีฟ้าเรืองแสง
+        // --- เปลี่ยนสีกระสุนและหางเป็นสีฟ้า (Cyan) ---
+        float glowIntensity = 3f;
+        Color cyanGlow = new Color(0f, 1f, 1f, 0.5f) * glowIntensity; // สีฟ้าเรืองแสง
+
         var sr = GetComponent<SpriteRenderer>();
-        if (sr != null) sr.color = new Color(0f, 1f, 1f, 1f);
+        if (sr != null) sr.color = cyanGlow;
+
+        var trail = GetComponent<TrailRenderer>();
+        if (trail != null)
+        {
+            trail.startColor = cyanGlow;
+            trail.endColor = new Color(cyanGlow.r, cyanGlow.g, cyanGlow.b, 0f); // ค่อยๆ เฟด
+        }
 
         timer = lifetime; // รีเซ็ตเวลา
     }

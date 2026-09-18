@@ -104,8 +104,9 @@ public class SlowMotionManager : MonoBehaviour
 
     private void Update()
     {
-        // ข้ามถ้าจบเกมแล้ว
+        // ข้ามถ้าจบเกมแล้ว หรือเกมหยุดอยู่
         if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
+        if (PauseManager.Instance != null && PauseManager.Instance.IsPaused) return;
 
         HandleSlowMotionInput();
         UpdateTimeScale();
@@ -162,6 +163,14 @@ public class SlowMotionManager : MonoBehaviour
 
     private void UpdateTimeScale()
     {
+        // ถ้าเกมถูก Pause อยู่ หรือ จบด่านแล้ว หรือ คุยอยู่ ห้ามให้ SlowMotionManager ไปยุ่งกับ Time.timeScale!
+        if ((PauseManager.Instance != null && PauseManager.Instance.IsPaused) ||
+            (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) ||
+            (DialogueManager.Instance != null && DialogueManager.Instance.dialogueBoxPanel != null && DialogueManager.Instance.dialogueBoxPanel.activeSelf))
+        {
+            return; 
+        }
+
         // Smooth transition ไปยัง target timeScale
         Time.timeScale = Mathf.MoveTowards(
             Time.timeScale,

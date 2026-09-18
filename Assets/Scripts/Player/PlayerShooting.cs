@@ -203,6 +203,11 @@ public class PlayerShooting : MonoBehaviour
             return;
         }
 
+        if (PauseManager.Instance != null && PauseManager.Instance.IsPaused)
+        {
+            return;
+        }
+
         // ถ้ากำลังรำดาบอยู่ ห้ามยิงปืน! (ป้องกันความขัดแย้งของอนิเมชั่นและเกมเพลย์)
         if (playerParry != null && playerParry.IsParrying)
         {

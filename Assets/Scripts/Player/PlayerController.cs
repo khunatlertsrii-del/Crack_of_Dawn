@@ -237,6 +237,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
+        if (PauseManager.Instance != null && PauseManager.Instance.IsPaused) return;
 
         // Read input
         MoveInput = moveAction.ReadValue<float>();
