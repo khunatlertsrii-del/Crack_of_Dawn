@@ -226,13 +226,28 @@ public class Bullet : MonoBehaviour
     private void CreateTrailEffect()
     {
         var trail = gameObject.AddComponent<TrailRenderer>();
-        trail.time = 0.15f;
-        trail.startWidth = 0.08f;
+        trail.time = 0.2f; // ลากหางยาวขึ้นนิดนึง
+        trail.startWidth = 0.15f; // ให้กระสุนดูอ้วน/สว่างขึ้น
         trail.endWidth = 0.01f;
-        trail.startColor = trailColor;
-        trail.endColor = new Color(trailColor.r, trailColor.g, trailColor.b, 0f);
+
+        // คลูณสีให้สว่างทะลุหลอด (HDR Glow)
+        float glowIntensity = 3f; 
+        Color glowColor = new Color(trailColor.r * glowIntensity, trailColor.g * glowIntensity, trailColor.b * glowIntensity, trailColor.a);
+        
+        trail.startColor = glowColor;
+        trail.endColor = new Color(glowColor.r, glowColor.g, glowColor.b, 0f);
+        
         trail.sortingOrder = 9;
+        
+        // ถ้าใช้ Material ปกติ จะรองรับ HDR และทำให้ Bloom ทำงานถ้ามีการตั้งค่า PostProcessing ไว้
         trail.material = new Material(Shader.Find("Sprites/Default"));
         trail.numCornerVertices = 2;
+
+        // ปรับ SpriteRenderer ของกระสุนให้สว่างขึ้นด้วย
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.color = new Color(sr.color.r * glowIntensity, sr.color.g * glowIntensity, sr.color.b * glowIntensity, sr.color.a);
+        }
     }
 }

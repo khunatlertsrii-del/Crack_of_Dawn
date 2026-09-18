@@ -37,6 +37,37 @@ public class EnemyBullet : MonoBehaviour
         if (col != null) col.isTrigger = true;
     }
 
+    private void Start()
+    {
+        CreateTrailEffect();
+    }
+
+    private void CreateTrailEffect()
+    {
+        var trail = gameObject.AddComponent<TrailRenderer>();
+        trail.time = 0.15f; 
+        trail.startWidth = 0.12f; // อ้วนหน่อย
+        trail.endWidth = 0.01f;
+
+        // คลูณสีให้สว่างทะลุหลอด (HDR Glow สีแดงๆ เหลืองๆ สำหรับศัตรู)
+        float glowIntensity = 3f; 
+        Color baseColor = new Color(1f, 0.2f, 0.2f, 0.5f); // กระสุนศัตรูสีแดง
+        Color glowColor = new Color(baseColor.r * glowIntensity, baseColor.g * glowIntensity, baseColor.b * glowIntensity, baseColor.a);
+        
+        trail.startColor = glowColor;
+        trail.endColor = new Color(glowColor.r, glowColor.g, glowColor.b, 0f);
+        
+        trail.sortingOrder = 9;
+        trail.material = new Material(Shader.Find("Sprites/Default"));
+        trail.numCornerVertices = 2;
+
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.color = new Color(sr.color.r * glowIntensity, sr.color.g * glowIntensity, sr.color.b * glowIntensity, sr.color.a);
+        }
+    }
+
     private void Update()
     {
         timer -= Time.deltaTime;
