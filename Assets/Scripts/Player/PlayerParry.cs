@@ -177,8 +177,23 @@ public class PlayerParry : MonoBehaviour
 
         if (parrySlider != null)
         {
-            parrySlider.value = currentParryMeter / maxParryMeter;
+            float percent = currentParryMeter / maxParryMeter;
+            parrySlider.value = percent;
             parrySlider.gameObject.SetActive(currentParryMeter < maxParryMeter || isParrying);
+
+            // รองรับ Center Fill
+            if (parrySlider.fillRect == null)
+            {
+                Image[] images = parrySlider.GetComponentsInChildren<Image>();
+                foreach (var img in images)
+                {
+                    if (img.name == "Fill" || img.type == Image.Type.Simple || img.type == Image.Type.Sliced)
+                    {
+                        img.transform.localScale = new Vector3(percent, 1f, 1f);
+                        break;
+                    }
+                }
+            }
         }
 
         // อัปเดตขนาดให้ตรงกับค่าใน Inspector เสมอ (เผื่อคุณปรับแก้ตอนเล่น)
