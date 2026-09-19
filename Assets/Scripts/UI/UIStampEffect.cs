@@ -26,6 +26,7 @@ public class UIStampEffect : MonoBehaviour
     private AudioSource audioSource;
     private CanvasGroup canvasGroup;
     private UIWobble wobbleScript;
+    private UIButtonEffect buttonEffectScript;
     private Vector3 originalScale; // เก็บขนาดดั้งเดิมจาก Editor
 
     private void Awake()
@@ -38,8 +39,9 @@ public class UIStampEffect : MonoBehaviour
         // ลองหา AudioSource เผื่ออยากใส่เสียง
         audioSource = GetComponent<AudioSource>();
 
-        // ลองหา UIWobble
+        // ลองหา UIWobble และ UIButtonEffect
         wobbleScript = GetComponent<UIWobble>();
+        buttonEffectScript = GetComponent<UIButtonEffect>();
 
         // ซ่อนไว้ก่อน
         canvasGroup = GetComponent<CanvasGroup>();
@@ -54,8 +56,9 @@ public class UIStampEffect : MonoBehaviour
 
     private void OnEnable()
     {
-        // ปิด Wobble ไว้ก่อนช่วงที่กำลัง Stamp
+        // ปิดสคริปต์สเกลอื่นๆ ไว้ก่อนช่วงที่กำลัง Stamp เพื่อไม่ให้แย่งกันปรับขนาด
         if (wobbleScript != null) wobbleScript.enabled = false;
+        if (buttonEffectScript != null) buttonEffectScript.enabled = false;
         
         // มั่นใจว่าปุ่มกดไม่ได้
         if (canvasGroup != null) canvasGroup.blocksRaycasts = false;
@@ -104,10 +107,14 @@ public class UIStampEffect : MonoBehaviour
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true; // เปิดให้กดปุ่มได้แล้ว!
 
-        // เปิด Wobble กลับมาทำงาน
+        // เปิด Wobble และ ButtonEffect กลับมาทำงาน
         if (wobbleScript != null)
         {
             wobbleScript.enabled = true;
+        }
+        if (buttonEffectScript != null)
+        {
+            buttonEffectScript.enabled = true;
         }
 
         // เล่นเสียงกระแทก (ถ้ามี)

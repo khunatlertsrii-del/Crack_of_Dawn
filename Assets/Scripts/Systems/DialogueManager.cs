@@ -92,9 +92,6 @@ public class DialogueManager : MonoBehaviour
             sentences.Enqueue(line);
         }
 
-        // หยุดเวลาในเกมเวลาคุย (ให้ไข่เจียวหยุดเดิน)
-        Time.timeScale = 0f; 
-
         DisplayNextSentence();
     }
 
@@ -133,7 +130,6 @@ public class DialogueManager : MonoBehaviour
     public void EndDialogue()
     {
         dialogueBoxPanel.SetActive(false);
-        Time.timeScale = 1f; // ให้เวลาเดินต่อ
         lastDialogueEndTime = Time.unscaledTime; // เก็บเวลาตอนคุยจบ
     }
 }
