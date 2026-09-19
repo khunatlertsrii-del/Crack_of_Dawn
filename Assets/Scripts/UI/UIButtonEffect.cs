@@ -39,6 +39,16 @@ public class UIButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         }
     }
 
+    private void OnEnable()
+    {
+        // รีเซ็ตตอนเปิดขึ้นมาใหม่ด้วย
+        targetScale = originalScale;
+        if (useColorChange) targetColor = originalColor;
+
+        transform.localScale = originalScale;
+        if (targetGraphic != null && useColorChange) targetGraphic.color = originalColor;
+    }
+
     private void OnDisable()
     {
         // รีเซ็ตค่ากลับเป็นค่าตั้งต้นเวลาปิดหน้าจอ (ป้องกันบั๊กสีค้าง/สเกลค้าง)

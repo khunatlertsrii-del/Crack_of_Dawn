@@ -73,6 +73,10 @@ public class UIStampEffect : MonoBehaviour
         // ซ่อนไว้ก่อน
         canvasGroup.alpha = 0f;
         
+        // รอ 1 เฟรมเพื่อให้ Awake ของสคริปต์อื่น (เช่น UIButtonEffect) ดึงค่า originalScale ให้เสร็จก่อน
+        // ไม่งั้นมันจะดึงค่าตอนที่โดนขยาย 5 เท่าไปเป็นค่าตั้งต้น!
+        yield return new WaitForEndOfFrame();
+
         Vector3 startScale = originalScale * startScaleMultiplier;
         rectTransform.localScale = startScale;
 
