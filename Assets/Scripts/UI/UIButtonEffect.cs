@@ -76,6 +76,11 @@ public class UIButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         targetScale = originalScale * hoverScaleMultiplier;
         if (useColorChange) targetColor = hoverColor;
+        
+        if (AudioManager.Instance != null && AudioManager.Instance.uiHoverSound != null)
+        {
+            AudioManager.Instance.PlayUISound(AudioManager.Instance.uiHoverSound);
+        }
     }
 
     // เอาเมาส์ออก
@@ -90,6 +95,11 @@ public class UIButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         targetScale = originalScale * clickScaleMultiplier;
         if (useColorChange) targetColor = clickColor;
+
+        if (AudioManager.Instance != null && AudioManager.Instance.uiClickSound != null)
+        {
+            AudioManager.Instance.PlayUISound(AudioManager.Instance.uiClickSound);
+        }
     }
 
     // ปล่อยเมาส์

@@ -149,6 +149,9 @@ public class SlowMotionManager : MonoBehaviour
         {
             IsSlowMotionActive = true;
             targetTimeScale = slowMotionScale;
+            
+            if (AudioManager.Instance != null && AudioManager.Instance.slowMoEnterSound != null)
+                AudioManager.Instance.PlayUISound(AudioManager.Instance.slowMoEnterSound);
         }
     }
 
@@ -158,6 +161,9 @@ public class SlowMotionManager : MonoBehaviour
         {
             IsSlowMotionActive = false;
             targetTimeScale = 1f;
+            
+            if (AudioManager.Instance != null && AudioManager.Instance.slowMoExitSound != null)
+                AudioManager.Instance.PlayUISound(AudioManager.Instance.slowMoExitSound);
         }
     }
 

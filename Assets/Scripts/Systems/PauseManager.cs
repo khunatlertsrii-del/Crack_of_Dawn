@@ -43,14 +43,21 @@ public class PauseManager : MonoBehaviour
 
         if (canPause && escapeAction.WasPressedThisFrame())
         {
-            if (IsPaused)
-            {
-                ResumeGame();
-            }
-            else
-            {
-                PauseGame();
-            }
+            TogglePause();
+        }
+    }
+
+    public void TogglePause()
+    {
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
+
+        IsPaused = !IsPaused;
+        if (pausePanel != null) pausePanel.SetActive(IsPaused);
+        Time.timeScale = IsPaused ? 0f : 1f;
+        
+        if (IsPaused && AudioManager.Instance != null && AudioManager.Instance.pauseOpenSound != null)
+        {
+            AudioManager.Instance.PlayUISound(AudioManager.Instance.pauseOpenSound);
         }
     }
 

@@ -21,6 +21,8 @@ public class PlayerParry : MonoBehaviour
     public float parryDamage = 5f;
     [Tooltip("ความถี่ในการทำดาเมจ (วินาที)")]
     public float parryDamageRate = 0.1f;
+    [Tooltip("เกจที่ได้คืนเมื่อฟันโดนศัตรู (เปอร์เซ็นต์ของหลอดสูงสุดต่อการฟันโดน 1 ตัว)")]
+    public float meterRegenPerHit = 5f;
 
     [Header("UI")]
     [Tooltip("Slider สำหรับหลอดปัดกระสุน")]
@@ -136,6 +138,9 @@ public class PlayerParry : MonoBehaviour
                                 ScreenEffectManager.Instance.PlayScreenBloodSplatter(Random.Range(1, 4));
                                 ScreenEffectManager.Instance.TriggerAdrenaline();
                             }
+
+                            // ฟื้นฟูหลอด Parry ตามที่ฟันโดน (เติมเลือดหลอด)
+                            currentParryMeter += meterRegenPerHit;
                         }
                     }
                 }
