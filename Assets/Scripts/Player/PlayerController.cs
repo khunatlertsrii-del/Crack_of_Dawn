@@ -193,7 +193,7 @@ public class PlayerController : MonoBehaviour
 
         // Shadow Dash
         dashAction = new InputAction("Dash", InputActionType.Button);
-        dashAction.AddBinding("<Keyboard>/leftShift");
+        dashAction.AddBinding("<Keyboard>/s");
         dashAction.AddBinding("<Gamepad>/rightShoulder");
 
         // Auto-create ground/wall check points if not assigned

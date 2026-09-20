@@ -109,7 +109,7 @@ public class PlayerShooting : MonoBehaviour
         shootAction.AddBinding("<Gamepad>/rightTrigger");
 
         reloadAction = new InputAction("Reload", InputActionType.Button);
-        reloadAction.AddBinding("<Keyboard>/r");
+        reloadAction.AddBinding("<Mouse>/rightButton");
         reloadAction.AddBinding("<Gamepad>/buttonWest");
 
         CurrentAmmo = ammoCapacity;

@@ -75,9 +75,9 @@ public class SlowMotionManager : MonoBehaviour
         }
         Instance = this;
 
-        // Setup input — Right Mouse Button
+        // Setup input — Shift
         slowMoAction = new InputAction("SlowMotion", InputActionType.Button);
-        slowMoAction.AddBinding("<Mouse>/rightButton");
+        slowMoAction.AddBinding("<Keyboard>/leftShift");
         slowMoAction.AddBinding("<Gamepad>/leftTrigger");
 
         defaultFixedDeltaTime = Time.fixedDeltaTime;
@@ -119,20 +119,21 @@ public class SlowMotionManager : MonoBehaviour
 
     private void HandleSlowMotionInput()
     {
-        bool pressedThisFrame = slowMoAction.WasPressedThisFrame();
+        bool isHolding = slowMoAction.IsPressed();
 
-        // สลับเปิด/ปิดเมื่อกดปุ่ม (เช็คคูลดาวน์ด้วย)
-        if (pressedThisFrame && Time.unscaledTime - lastToggleTime >= toggleCooldown)
+        // กดค้างเพื่อเปิดสโลว์ ปล่อยเพื่อปิด
+        if (isHolding)
+        {
+            if (!IsSlowMotionActive && CurrentMeter > minimumMeterToActivate)
+            {
+                ActivateSlowMotion();
+            }
+        }
+        else
         {
             if (IsSlowMotionActive)
             {
                 DeactivateSlowMotion();
-                lastToggleTime = Time.unscaledTime;
-            }
-            else if (CurrentMeter > minimumMeterToActivate)
-            {
-                ActivateSlowMotion();
-                lastToggleTime = Time.unscaledTime;
             }
         }
 
