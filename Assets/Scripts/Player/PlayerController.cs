@@ -474,11 +474,12 @@ public class PlayerController : MonoBehaviour
         if (jumpBufferCounter <= 0) return;
 
         // Wall Jump (ใช้ wallCoyoteCounter แทน IsWallSliding เพื่อให้กระโดดง่ายขึ้น)
-        if (wallCoyoteCounter > 0 && !IsGrounded)
+        if (wallCoyoteCounter > 0 && !IsGrounded && wallJumpLockTimer <= 0)
         {
             PerformWallJump();
             jumpBufferCounter = 0;
             wallCoyoteCounter = 0;
+            coyoteTimeCounter = 0; // ล้าง Normal Coyote Time ด้วย ป้องกันบั๊กโดดซ้อนหลังลอยออกจากกำแพง
             return;
         }
 
@@ -520,6 +521,9 @@ public class PlayerController : MonoBehaviour
 
         // ล็อคทิศชั่วขณะ ไม่ให้ผู้เล่นดึงกลับทันที
         wallJumpLockTimer = wallJumpLockTime;
+
+        // ล้างสิทธิ์การ Double Jump ทิ้งเพื่อไม่ให้กระโดดซ้อนกลางอากาศได้อีก
+        extraJumpsRemaining = 0;
 
         // Flip ไปฝั่งตรงข้าม
         if ((wallDirection > 0 && IsFacingRight) || (wallDirection < 0 && !IsFacingRight))
@@ -574,11 +578,7 @@ public class PlayerController : MonoBehaviour
     private void StartSlide()
     {
         IsShadowDashing = true;
-        dashTimer = dashDuration; // dashDuration ตอนนี้จะทำหน้าที่เป็นแค่เวลา "อมตะ (I-Frame)" ตอนเริ่มสไลด์ 0.2 วิ
-
-        // I-Frame (อมตะชั่วขณะตอนเริ่มสไลด์)
-        var health = GetComponent<PlayerHealth>();
-        if (health != null) health.SetManualInvincible(true);
+        dashTimer = dashDuration; 
 
         // ระเบิดขอบจอ (ความเร็ว)
         ScreenEffectManager.Instance?.TriggerAdrenaline();
@@ -588,10 +588,6 @@ public class PlayerController : MonoBehaviour
     {
         IsShadowDashing = false;
         dashCooldownTimer = dashCooldown; // เริ่มนับ Cooldown เล็กน้อยหลังจากปล่อยปุ่ม
-
-        // ปิด I-Frame
-        var health = GetComponent<PlayerHealth>();
-        if (health != null) health.SetManualInvincible(false);
     }
 
     private TrailRenderer oilTrailRenderer;

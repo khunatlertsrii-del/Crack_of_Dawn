@@ -335,6 +335,20 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         }
     }
 
+    private float GetDynamicFireDelay(float baseDelay)
+    {
+        if (playerTransform == null) return baseDelay;
+        float distance = Vector2.Distance(transform.position, playerTransform.position);
+        // ระยะยิ่งใกล้ (distance น้อย) ค่า multiplier ยิ่งน้อย (หน่วงเวลาน้อยลง = ยิงรัวขึ้น)
+        // สมมติระยะหวังผล 15 หน่วย. ถ้าอยู่ห่าง 15 จะเป็น 1x (ปกติ). ถ้าอยู่ห่างแค่ 3 หน่วยจะเป็น 0.2x (รัวมาก)
+        float distanceMultiplier = Mathf.Clamp(distance / 15f, 0.3f, 1.5f);
+        
+        // สุ่มเพิ่ม-ลดความหน่วง ±30% ให้ดูไม่เป็นหุ่นยนต์เกินไป
+        float randomMultiplier = Random.Range(0.7f, 1.3f);
+        
+        return baseDelay * distanceMultiplier * randomMultiplier;
+    }
+
     private IEnumerator BurstFireRoutine()
     {
         isShootingBurst = true;
@@ -367,20 +381,21 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
                 gunRenderer.color = new Color(1f, 0.3f, 0.3f); // ปืนสีแดง = Reload
             }
 
-            yield return new WaitForSeconds(reloadTime);
+            yield return new WaitForSeconds(GetDynamicFireDelay(reloadTime));
 
             if (gunRenderer != null) gunRenderer.color = oldGunColor;
 
             currentBurstsFired = 0;
             isReloadingEnemy = false;
-            // พักแป๊บนึงก่อนยิงชุดถัดไปหลังรีโหลดเสร็จ + สุ่มหน่วงเวลาให้คาดเดายาก
-            fireTimer = (1f / fireRate) + Random.Range(0f, 0.3f); 
+            
+            // พักแป๊บนึงก่อนยิงชุดถัดไปหลังรีโหลดเสร็จ
+            fireTimer = GetDynamicFireDelay(1f / fireRate); 
         }
         else
         {
-            // ยังไม่หมดแม็กซ์ รอ fireRate ปกติ + สุ่มจังหวะให้ยิงเหลื่อมๆ กัน
+            // ยังไม่หมดแม็กซ์ รอ fireRate ปกติ
             isShootingBurst = false;
-            fireTimer = (1f / fireRate) + Random.Range(0f, 0.2f);
+            fireTimer = GetDynamicFireDelay(1f / fireRate);
         }
     }
 
