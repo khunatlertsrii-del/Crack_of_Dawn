@@ -1016,6 +1016,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1425434218}
   - component: {fileID: 1425434217}
+  - component: {fileID: 1425434219}
   m_Layer: 0
   m_Name: MainMenuManager
   m_TagString: Untagged
@@ -1052,6 +1053,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1425434219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425434216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 531f152778537bd4ebbcc6bb1d0a7546, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  mainMenuBGM: {fileID: 8300000, guid: 0cfab7786792ac14c9f2721e7dad9f23, type: 3}
+  levelBGM: {fileID: 8300000, guid: ca2e0711726ebe444bbb14721b2c6555, type: 3}
+  victoryBGM: {fileID: 8300000, guid: 0eed316785193904da5d549a0f43cd9f, type: 3}
+  gameOverBGM: {fileID: 0}
+  shootSounds: []
+  reloadSound: {fileID: 0}
+  jumpSound: {fileID: 0}
+  wallJumpSound: {fileID: 0}
+  dashSlideSound: {fileID: 0}
+  playerHitSound: {fileID: 0}
+  swordSpinSound: {fileID: 0}
+  swordHitEnemySound: {fileID: 0}
+  parrySuccessSound: {fileID: 0}
+  enemyDeathSound: {fileID: 0}
+  enemyShootSound: {fileID: 0}
+  slowMoEnterSound: {fileID: 0}
+  slowMoExitSound: {fileID: 0}
+  pauseOpenSound: {fileID: 0}
+  uiHoverSound: {fileID: 0}
+  uiClickSound: {fileID: 0}
+  musicVolume: 0.5
+  sfxVolume: 0.8
+  uiVolume: 1
+  slowMoPitch: 0.6
 --- !u!1 &1444078229
 GameObject:
   m_ObjectHideFlags: 0

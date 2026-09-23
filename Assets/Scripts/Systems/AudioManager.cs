@@ -65,6 +65,36 @@ public class AudioManager : MonoBehaviour
         musicSource.volume = musicVolume;
     }
 
+    private void Start()
+    {
+        // ตรวจสอบฉากเริ่มต้น (กรณีเปิดเกมจากหน้าเมนู)
+        var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        if (scene.name.Contains("Menu") || scene.buildIndex == 0)
+        {
+            PlayMusic(mainMenuBGM);
+        }
+    }
+
+    private void OnEnable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        // ถ้าเป็นฉากเมนู ให้เล่นเพลงเมนู
+        // (สมมติว่าฉากเมนูชื่อ MainMenu หรือหน้าจอแรกสุด index 0)
+        if (scene.name.Contains("Menu") || scene.buildIndex == 0)
+        {
+            PlayMusic(mainMenuBGM);
+        }
+    }
+
     private void Update()
     {
         // ปรับ Pitch ของเพลงและเสียงประกอบตาม TimeScale ถ้าอยู่ในฉากเลเวล

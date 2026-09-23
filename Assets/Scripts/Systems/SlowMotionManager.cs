@@ -126,7 +126,12 @@ public class SlowMotionManager : MonoBehaviour
         {
             if (!IsSlowMotionActive && CurrentMeter > minimumMeterToActivate)
             {
-                ActivateSlowMotion();
+                // ตรวจสอบ Cooldown ว่าผ่านไปนานพอหรือยัง ถึงจะกดใช้รอบใหม่ได้
+                if (Time.unscaledTime - lastToggleTime >= toggleCooldown)
+                {
+                    ActivateSlowMotion();
+                    lastToggleTime = Time.unscaledTime; // บันทึกเวลาที่เริ่มใช้สโลว์
+                }
             }
         }
         else
@@ -134,6 +139,8 @@ public class SlowMotionManager : MonoBehaviour
             if (IsSlowMotionActive)
             {
                 DeactivateSlowMotion();
+                // (ถ้าอยากให้คูลดาวน์นับตั้งแต่ตอนปิด ให้บรรทัดนี้ทำงานด้วย)
+                // lastToggleTime = Time.unscaledTime; 
             }
         }
 

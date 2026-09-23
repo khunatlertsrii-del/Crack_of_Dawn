@@ -67,6 +67,12 @@ public class LevelRatingManager : MonoBehaviour
         // นับจำนวนศัตรูทั้งหมดในฉากตอนเริ่มเกม
         FriedEggEnemy[] enemies = FindObjectsByType<FriedEggEnemy>(FindObjectsSortMode.None);
         totalEnemiesInLevel = enemies.Length;
+
+        // เริ่มเล่นเพลงด่าน
+        if (AudioManager.Instance != null && AudioManager.Instance.levelBGM != null)
+        {
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.levelBGM);
+        }
     }
 
     private void Update()
@@ -98,6 +104,12 @@ public class LevelRatingManager : MonoBehaviour
         {
             gameOverPanel.SetActive(true);
         }
+
+        // เล่นเพลง Game Over
+        if (AudioManager.Instance != null && AudioManager.Instance.gameOverBGM != null)
+        {
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.gameOverBGM);
+        }
     }
 
     public string CalculateFinalGrade()
@@ -119,6 +131,12 @@ public class LevelRatingManager : MonoBehaviour
     {
         isLevelActive = false; // หยุดเวลา
         Time.timeScale = 0f; // หยุดเกม
+
+        // เล่นเพลงหน้าชนะ
+        if (AudioManager.Instance != null && AudioManager.Instance.victoryBGM != null)
+        {
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.victoryBGM);
+        }
 
         // ตรวจสอบเควส: ฆ่าศัตรูครบไหม?
         int kills = TotalKills;
