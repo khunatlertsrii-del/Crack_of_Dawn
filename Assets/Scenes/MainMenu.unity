@@ -1070,7 +1070,7 @@ MonoBehaviour:
     volume: 0.8
   levelBGM:
     clip: {fileID: 8300000, guid: ca2e0711726ebe444bbb14721b2c6555, type: 3}
-    volume: 0.48
+    volume: 0.25
   victoryBGM:
     clip: {fileID: 8300000, guid: 0eed316785193904da5d549a0f43cd9f, type: 3}
     volume: 0.8
