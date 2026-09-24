@@ -6,11 +6,18 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
+    [System.Serializable]
+    public class MusicTrack
+    {
+        public AudioClip clip;
+        [Range(0f, 1f)] public float volume = 1f;
+    }
+
     [Header("BGM (เสียงเพลง)")]
-    public AudioClip mainMenuBGM;
-    public AudioClip levelBGM;
-    public AudioClip victoryBGM;
-    public AudioClip gameOverBGM;
+    public MusicTrack mainMenuBGM;
+    public MusicTrack levelBGM;
+    public MusicTrack victoryBGM;
+    public MusicTrack gameOverBGM;
 
     [Header("Player (ไข่เจียว)")]
     public AudioClip[] shootSounds;
@@ -87,11 +94,22 @@ public class AudioManager : MonoBehaviour
 
     private void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
     {
+        // Safety net: รีเซ็ต TimeScale ทุกครั้งที่โหลดฉากใหม่
+        // (ป้องกัน Victory/GameOver ค้าง Time.timeScale = 0 ข้ามฉาก)
+        Time.timeScale = 1f;
+
         // ถ้าเป็นฉากเมนู ให้เล่นเพลงเมนู
-        // (สมมติว่าฉากเมนูชื่อ MainMenu หรือหน้าจอแรกสุด index 0)
         if (scene.name.Contains("Menu") || scene.buildIndex == 0)
         {
-            PlayMusic(mainMenuBGM);
+            if (mainMenuBGM != null && mainMenuBGM.clip != null) PlayMusic(mainMenuBGM);
+        }
+        else
+        {
+            // ฉากอื่นที่ไม่ใช่เมนู = ฉากเลเวล → เล่นเพลงด่าน
+            if (levelBGM != null && levelBGM.clip != null)
+            {
+                PlayMusic(levelBGM);
+            }
         }
     }
 
@@ -133,13 +151,14 @@ public class AudioManager : MonoBehaviour
     // ==========================================
     // MUSIC
     // ==========================================
-    public void PlayMusic(AudioClip clip)
+    public void PlayMusic(MusicTrack track)
     {
-        if (clip == null) return;
-        if (musicSource.clip == clip && musicSource.isPlaying) return;
+        if (track == null || track.clip == null) return;
+        if (musicSource.clip == track.clip && musicSource.isPlaying) return;
 
-        musicSource.clip = clip;
-        musicSource.volume = musicVolume;
+        musicSource.clip = track.clip;
+        // ปริมาณเสียง = global music volume * individual track volume
+        musicSource.volume = musicVolume * track.volume;
         musicSource.Play();
     }
 

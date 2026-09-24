@@ -1065,10 +1065,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 531f152778537bd4ebbcc6bb1d0a7546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
-  mainMenuBGM: {fileID: 8300000, guid: 0cfab7786792ac14c9f2721e7dad9f23, type: 3}
-  levelBGM: {fileID: 8300000, guid: ca2e0711726ebe444bbb14721b2c6555, type: 3}
-  victoryBGM: {fileID: 8300000, guid: 0eed316785193904da5d549a0f43cd9f, type: 3}
-  gameOverBGM: {fileID: 0}
+  mainMenuBGM:
+    clip: {fileID: 8300000, guid: 0cfab7786792ac14c9f2721e7dad9f23, type: 3}
+    volume: 0.8
+  levelBGM:
+    clip: {fileID: 8300000, guid: ca2e0711726ebe444bbb14721b2c6555, type: 3}
+    volume: 0.48
+  victoryBGM:
+    clip: {fileID: 8300000, guid: 0eed316785193904da5d549a0f43cd9f, type: 3}
+    volume: 0.8
+  gameOverBGM:
+    clip: {fileID: 0}
+    volume: 1
   shootSounds: []
   reloadSound: {fileID: 0}
   jumpSound: {fileID: 0}

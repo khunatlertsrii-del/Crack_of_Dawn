@@ -280,13 +280,6 @@ public class PlayerController : MonoBehaviour
         if (IsShadowDashing)
         {
             dashTimer -= Time.deltaTime;
-            
-            // หมดเวลาอมตะ 0.2 วิแรก
-            if (dashTimer <= 0)
-            {
-                var health = GetComponent<PlayerHealth>();
-                if (health != null) health.SetManualInvincible(false);
-            }
 
             // เปิด Trail ให้ลากยาวเฉพาะตอนเท้าแตะพื้น (กันเหนียว)
             if (oilTrailRenderer != null)
@@ -597,6 +590,14 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateCoyoteTime()
     {
+        // ถ้ายังอยู่ในช่วง Wall Jump Lock → ห้ามเติมเวลาใดๆ กลับ (ป้องกันโดดซ้อน!)
+        if (wallJumpLockTimer > 0)
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+            wallCoyoteCounter -= Time.deltaTime;
+            return;
+        }
+
         if (IsGrounded)
         {
             coyoteTimeCounter = coyoteTime;
@@ -607,10 +608,9 @@ public class PlayerController : MonoBehaviour
         }
 
         // Wall Coyote Time (ทำให้แตะกำแพงหรือหลุดกำแพงนิดๆ ก็โดดได้)
-        if (isTouchingWall)
+        if (isTouchingWall && !IsGrounded)
         {
             wallCoyoteCounter = wallCoyoteTime;
-            // ไม่ต้องเซ็ต wallDirection ตรงนี้แล้ว เพราะ CheckWall จัดการให้แล้ว
         }
         else
         {

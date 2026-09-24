@@ -45,6 +45,7 @@ public class MainMenuManager : MonoBehaviour
     public void LoadLevel(string sceneName)
     {
         Debug.Log($"กำลังโหลดด่าน: {sceneName}");
+        Time.timeScale = 1f; // รีเซ็ต TimeScale ก่อนเสมอ (กัน Victory Screen ค้าง TimeScale = 0)
         SceneManager.LoadScene(sceneName);
     }
 

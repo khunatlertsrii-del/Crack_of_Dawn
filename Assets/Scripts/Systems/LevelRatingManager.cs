@@ -69,7 +69,7 @@ public class LevelRatingManager : MonoBehaviour
         totalEnemiesInLevel = enemies.Length;
 
         // เริ่มเล่นเพลงด่าน
-        if (AudioManager.Instance != null && AudioManager.Instance.levelBGM != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.levelBGM != null && AudioManager.Instance.levelBGM.clip != null)
         {
             AudioManager.Instance.PlayMusic(AudioManager.Instance.levelBGM);
         }
@@ -106,7 +106,7 @@ public class LevelRatingManager : MonoBehaviour
         }
 
         // เล่นเพลง Game Over
-        if (AudioManager.Instance != null && AudioManager.Instance.gameOverBGM != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.gameOverBGM != null && AudioManager.Instance.gameOverBGM.clip != null)
         {
             AudioManager.Instance.PlayMusic(AudioManager.Instance.gameOverBGM);
         }
@@ -133,7 +133,7 @@ public class LevelRatingManager : MonoBehaviour
         Time.timeScale = 0f; // หยุดเกม
 
         // เล่นเพลงหน้าชนะ
-        if (AudioManager.Instance != null && AudioManager.Instance.victoryBGM != null)
+        if (AudioManager.Instance != null && AudioManager.Instance.victoryBGM != null && AudioManager.Instance.victoryBGM.clip != null)
         {
             AudioManager.Instance.PlayMusic(AudioManager.Instance.victoryBGM);
         }
