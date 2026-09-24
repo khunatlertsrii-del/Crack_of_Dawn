@@ -63,13 +63,16 @@ public class AudioManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject); // ให้ AudioManager อยู่ข้ามฉากได้
 
         // สร้าง AudioSource สำหรับเพลงหลัก
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.loop = true;
         musicSource.playOnAwake = false;
         musicSource.volume = musicVolume;
+
+        // ถอดตัวเองออกจาก Parent เพื่อป้องกันไม่ให้เผลอทำให้ Manager ตัวอื่นเป็นอมตะไปด้วย
+        transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
