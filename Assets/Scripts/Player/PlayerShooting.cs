@@ -410,6 +410,13 @@ public class PlayerShooting : MonoBehaviour
         // === Muzzle Flash ===
         ShowMuzzleFlash();
 
+        // === Sound Effect ===
+        if (AudioManager.Instance != null && AudioManager.Instance.shootSounds != null && AudioManager.Instance.shootSounds.Length > 0)
+        {
+            AudioClip randomShootSound = AudioManager.Instance.shootSounds[UnityEngine.Random.Range(0, AudioManager.Instance.shootSounds.Length)];
+            AudioManager.Instance.PlaySFX(randomShootSound, 0.6f);
+        }
+
         // === Visual Recoil (ปืนกระตุกถอยหลัง) ===
         currentVisualRecoil = visualRecoilDistance;
 

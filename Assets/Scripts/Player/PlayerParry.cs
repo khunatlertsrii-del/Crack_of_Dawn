@@ -141,6 +141,12 @@ public class PlayerParry : MonoBehaviour
 
                             // ฟื้นฟูหลอด Parry ตามที่ฟันโดน (เติมเลือดหลอด)
                             currentParryMeter += meterRegenPerHit;
+
+                            // เล่นเสียงดาบฟันโดน
+                            if (AudioManager.Instance != null && AudioManager.Instance.swordHitEnemySound != null)
+                            {
+                                AudioManager.Instance.PlaySFX(AudioManager.Instance.swordHitEnemySound, 0.5f);
+                            }
                         }
                     }
                 }
@@ -221,6 +227,12 @@ public class PlayerParry : MonoBehaviour
 
         // ระเบิดขอบจอ (Adrenaline!)
         ScreenEffectManager.Instance?.TriggerAdrenaline();
+
+        // เสียงแพรี่
+        if (AudioManager.Instance != null && AudioManager.Instance.parrySuccessSound != null)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.parrySuccessSound, 0.8f);
+        }
     }
 }
 

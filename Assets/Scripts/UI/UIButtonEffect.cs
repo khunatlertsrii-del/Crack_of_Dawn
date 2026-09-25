@@ -12,6 +12,8 @@ public class UIButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     [Header("Color Effect (เอฟเฟกต์เปลี่ยนสี)")]
     public bool useColorChange = true;
+    [Tooltip("ถลาก Image หรือ Text มาใส่ตรงนี้เพื่อบังคับให้เปลี่ยนสีตัวนี้ (ถ้าเว้นว่างไว้ จะสุ่มเปลี่ยนตัวแรกที่เจอ)")]
+    public Graphic specificGraphicToColor;
     public Color hoverColor = new Color(1f, 0.9f, 0.5f); // สีเหลืองอ่อนๆ ตอนชี้
     public Color clickColor = new Color(0.8f, 0.7f, 0.4f); // สีเข้มตอนกด
     public float colorSpeed = 10f;
@@ -28,9 +30,17 @@ public class UIButtonEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         originalScale = transform.localScale;
         targetScale = originalScale;
         
-        // ดึง Image หรือ Text มาเปลี่ยนสี (เอาจากตัวมันเอง หรือตัวลูกก็ได้)
-        targetGraphic = GetComponent<Graphic>();
-        if (targetGraphic == null) targetGraphic = GetComponentInChildren<Graphic>();
+        // ถ้าใส่แบบเฉพาะเจาะจงมา ให้ใช้ตัวนั้นเลย
+        if (specificGraphicToColor != null)
+        {
+            targetGraphic = specificGraphicToColor;
+        }
+        else
+        {
+            // ดึง Image หรือ Text มาเปลี่ยนสี (เอาจากตัวมันเอง หรือตัวลูกก็ได้)
+            targetGraphic = GetComponent<Graphic>();
+            if (targetGraphic == null) targetGraphic = GetComponentInChildren<Graphic>();
+        }
 
         if (targetGraphic != null)
         {
