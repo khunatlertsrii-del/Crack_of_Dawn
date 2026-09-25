@@ -182,16 +182,23 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
         if (player != null) playerTransform = player.transform;
     }
 
+    private float playerSearchTimer = 0f;
+
     private void Update()
     {
         if (!IsAlive) return;
         if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
 
-        // หา Player (พยายามหาเรื่อยๆ แต่ไม่บล็อค idle)
+        // หา Player (พยายามหาเรื่อยๆ แต่ไม่บล็อค idle และไม่ทำทุกเฟรมเพื่อลดแลค)
         if (playerTransform == null)
         {
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null) playerTransform = player.transform;
+            playerSearchTimer -= Time.deltaTime;
+            if (playerSearchTimer <= 0f)
+            {
+                GameObject player = GameObject.FindGameObjectWithTag("Player");
+                if (player != null) playerTransform = player.transform;
+                playerSearchTimer = 1f; // หาไม่เจอรอ 1 วิค่อยหาใหม่
+            }
         }
 
         // หันหน้าและเล็งปืนตาม Player ตลอดเวลาถ้าเห็น

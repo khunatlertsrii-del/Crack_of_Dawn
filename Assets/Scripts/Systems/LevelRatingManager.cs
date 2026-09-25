@@ -158,9 +158,9 @@ public class LevelRatingManager : MonoBehaviour
             int seconds = Mathf.FloorToInt(timeElapsed - minutes * 60);
             string timeString = string.Format("{0:00}:{1:00}", minutes, seconds);
 
-            if (timeText != null) timeText.text = $"Time: {timeString}";
-            if (enemiesKilledText != null) enemiesKilledText.text = $"Enemies Killed: {kills} / {totalEnemiesInLevel}";
-            if (finalScoreText != null) finalScoreText.text = $"Score: {currentScore}";
+            if (timeText != null) timeText.text = timeString;
+            if (enemiesKilledText != null) enemiesKilledText.text = $"{kills} / {totalEnemiesInLevel}";
+            if (finalScoreText != null) finalScoreText.text = currentScore.ToString();
             
             if (finalGradeText != null)
             {

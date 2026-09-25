@@ -121,6 +121,8 @@ public class PlayerParry : MonoBehaviour
             if (damageTimer >= parryDamageRate)
             {
                 damageTimer = 0f;
+                bool hitAtLeastOne = false;
+
                 foreach (var hit in allHits)
                 {
                     if (hit.CompareTag("Enemy"))
@@ -128,26 +130,30 @@ public class PlayerParry : MonoBehaviour
                         var enemy = hit.GetComponent<FriedEggEnemy>();
                         if (enemy != null)
                         {
+                            hitAtLeastOne = true;
                             Vector2 hitDirection = (hit.transform.position - transform.position).normalized;
                             enemy.TakeDamage(parryDamage, hit.transform.position, false, hitDirection);
 
-                            // เลือดสาด 360 องศา และแปะหน้าจอ!
+                            // เลือดสาด 360 องศา (Particle Effect รันต่อศัตรูได้ ไม่แลค)
                             if (HitEffect.Instance != null) HitEffect.Instance.PlayMeleeHitEffect(hit.transform.position);
-                            if (ScreenEffectManager.Instance != null) 
-                            {
-                                ScreenEffectManager.Instance.PlayScreenBloodSplatter(Random.Range(1, 4));
-                                ScreenEffectManager.Instance.TriggerAdrenaline();
-                            }
 
-                            // ฟื้นฟูหลอด Parry ตามที่ฟันโดน (เติมเลือดหลอด)
+                            // ฟื้นฟูหลอด Parry ตามที่ฟันโดน
                             currentParryMeter += meterRegenPerHit;
-
-                            // เล่นเสียงดาบฟันโดน
-                            if (AudioManager.Instance != null && AudioManager.Instance.swordHitEnemySound != null)
-                            {
-                                AudioManager.Instance.PlaySFX(AudioManager.Instance.swordHitEnemySound, 0.5f);
-                            }
                         }
+                    }
+                }
+
+                if (hitAtLeastOne)
+                {
+                    // เรียกของหนักๆ (UI เลือดแปะจอ, จอกระพริบ, เล่นเสียง) แค่ 1 ครั้งต่อการฟัน 1 รอบ (กันแลค/เสียงซ้อน)
+                    if (ScreenEffectManager.Instance != null) 
+                    {
+                        ScreenEffectManager.Instance.PlayScreenBloodSplatter(Random.Range(1, 3));
+                        ScreenEffectManager.Instance.TriggerAdrenaline();
+                    }
+                    if (AudioManager.Instance != null && AudioManager.Instance.swordHitEnemySound != null)
+                    {
+                        AudioManager.Instance.PlaySFX(AudioManager.Instance.swordHitEnemySound, 0.5f);
                     }
                 }
             }
