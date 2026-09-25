@@ -423,6 +423,12 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
 
         // เอฟเฟกต์แสงไฟปลายปืน
         HitEffect.Instance?.PlayMuzzleFlash(firePoint.position, direction);
+
+        // เล่นเสียงยิงของศัตรู
+        if (AudioManager.Instance != null && AudioManager.Instance.enemyShootSound != null)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.enemyShootSound, 0.4f);
+        }
     }
 
     private void SpawnDefaultEnemyBullet(Vector2 direction)
@@ -559,7 +565,11 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
             LevelRatingManager.Instance.RegisterKill(isCritical);
         }
 
-
+        // เล่นเสียงไข่ดาวตาย
+        if (AudioManager.Instance != null && AudioManager.Instance.enemyDeathSound != null)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.enemyDeathSound, 0.6f);
+        }
 
         // เล่น Death Animation/Effect
         StartCoroutine(DeathSequence(isCritical));

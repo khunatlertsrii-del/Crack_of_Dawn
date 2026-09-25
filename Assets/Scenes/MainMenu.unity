@@ -269,6 +269,7 @@ MonoBehaviour:
   clickScaleMultiplier: 0.95
   scaleSpeed: 10
   useColorChange: 1
+  specificGraphicToColor: {fileID: 0}
   hoverColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   clickColor: {r: 0.9019608, g: 0.49411765, b: 0.13333334, a: 1}
   colorSpeed: 10
@@ -422,6 +423,7 @@ MonoBehaviour:
   clickScaleMultiplier: 0.95
   scaleSpeed: 10
   useColorChange: 1
+  specificGraphicToColor: {fileID: 0}
   hoverColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   clickColor: {r: 0.9019608, g: 0.49411765, b: 0.13333334, a: 1}
   colorSpeed: 10
@@ -789,6 +791,7 @@ MonoBehaviour:
   clickScaleMultiplier: 0.95
   scaleSpeed: 10
   useColorChange: 1
+  specificGraphicToColor: {fileID: 0}
   hoverColor: {r: 1, g: 1, b: 1, a: 1}
   clickColor: {r: 0.7529413, g: 0.7529413, b: 0.7529413, a: 1}
   colorSpeed: 10
@@ -1223,7 +1226,7 @@ MonoBehaviour:
     volume: 0.8
   levelBGM:
     clip: {fileID: 8300000, guid: c3377ab9e04c0be4f8978ee5b2b9e5fc, type: 3}
-    volume: 0.8
+    volume: 0.5
   victoryBGM:
     clip: {fileID: 8300000, guid: 6134a24fbcfbd53468d5968d95607026, type: 3}
     volume: 0.8
@@ -1231,9 +1234,8 @@ MonoBehaviour:
     clip: {fileID: 0}
     volume: 1
   shootSounds:
-  - {fileID: 8300000, guid: b3a8644d5e3eb5247a4a5c58801c10f7, type: 3}
-  - {fileID: 8300000, guid: 2adf2c86edd56cd438c2de5237eae858, type: 3}
-  reloadSound: {fileID: 8300000, guid: e51859e6cc420b047bfbbc78cb1f04d0, type: 3}
+  - {fileID: 8300000, guid: 63d94a6916aea7d42b94f7ee31d0a65c, type: 3}
+  reloadSound: {fileID: 8300000, guid: 700974b3656d55043b84d95e276760a4, type: 3}
   jumpSound: {fileID: 8300000, guid: 538c83e37c47e5d4b8c9c20bf7b9c2a1, type: 3}
   wallJumpSound: {fileID: 8300000, guid: 485070915a1155b44b4097a591a255ea, type: 3}
   dashSlideSound: {fileID: 0}
@@ -1242,7 +1244,7 @@ MonoBehaviour:
   swordHitEnemySound: {fileID: 0}
   parrySuccessSound: {fileID: 0}
   enemyDeathSound: {fileID: 0}
-  enemyShootSound: {fileID: 8300000, guid: 2adf2c86edd56cd438c2de5237eae858, type: 3}
+  enemyShootSound: {fileID: 8300000, guid: 63d94a6916aea7d42b94f7ee31d0a65c, type: 3}
   slowMoEnterSound: {fileID: 0}
   slowMoExitSound: {fileID: 0}
   pauseOpenSound: {fileID: 8300000, guid: 74563d2d111fc0743846a775048aaee0, type: 3}
@@ -2106,6 +2108,7 @@ MonoBehaviour:
   clickScaleMultiplier: 0.95
   scaleSpeed: 10
   useColorChange: 1
+  specificGraphicToColor: {fileID: 0}
   hoverColor: {r: 1, g: 1, b: 1, a: 1}
   clickColor: {r: 0.6627451, g: 0.6627451, b: 0.6627451, a: 1}
   colorSpeed: 10

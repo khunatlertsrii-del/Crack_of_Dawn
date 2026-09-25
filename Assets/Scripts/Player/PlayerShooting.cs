@@ -362,6 +362,12 @@ public class PlayerShooting : MonoBehaviour
     {
         isReloading = true;
         
+        // === เล่นเสียงรีโหลด ===
+        if (AudioManager.Instance != null && AudioManager.Instance.reloadSound != null)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.reloadSound, 0.7f);
+        }
+
         float timer = 0f;
         while (timer < reloadTime)
         {

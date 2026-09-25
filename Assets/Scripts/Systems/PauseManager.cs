@@ -55,9 +55,22 @@ public class PauseManager : MonoBehaviour
         if (pausePanel != null) pausePanel.SetActive(IsPaused);
         Time.timeScale = IsPaused ? 0f : 1f;
         
-        if (IsPaused && AudioManager.Instance != null && AudioManager.Instance.pauseOpenSound != null)
+        if (IsPaused)
         {
-            AudioManager.Instance.PlayUISound(AudioManager.Instance.pauseOpenSound);
+            if (AudioManager.Instance != null)
+            {
+                if (AudioManager.Instance.pauseOpenSound != null)
+                    AudioManager.Instance.PlayUISound(AudioManager.Instance.pauseOpenSound);
+                
+                AudioManager.Instance.PauseMusic();
+            }
+        }
+        else
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.ResumeMusic();
+            }
         }
     }
 
@@ -66,6 +79,8 @@ public class PauseManager : MonoBehaviour
         IsPaused = true;
         Time.timeScale = 0f; // หยุดเวลาในเกม (ศัตรู/กระสุน จะหยุดนิ่ง)
         if (pausePanel != null) pausePanel.SetActive(true); // โชว์ UI
+        
+        if (AudioManager.Instance != null) AudioManager.Instance.PauseMusic();
     }
 
     public void ResumeGame()
@@ -73,6 +88,8 @@ public class PauseManager : MonoBehaviour
         IsPaused = false;
         Time.timeScale = 1f; // ให้เวลาเดินตามปกติ
         if (pausePanel != null) pausePanel.SetActive(false); // ซ่อน UI
+        
+        if (AudioManager.Instance != null) AudioManager.Instance.ResumeMusic();
     }
 
     // ฟังก์ชันสำหรับผูกกับปุ่ม Retry ในหน้า Pause
