@@ -1240,7 +1240,7 @@ MonoBehaviour:
   wallJumpSound: {fileID: 8300000, guid: 485070915a1155b44b4097a591a255ea, type: 3}
   dashSlideSound: {fileID: 0}
   playerHitSound: {fileID: 0}
-  swordSpinSound: {fileID: 0}
+  swordSpinSound: {fileID: 8300000, guid: af0b601a853b00a488e33242a18ea385, type: 3}
   swordHitEnemySound: {fileID: 0}
   parrySuccessSound: {fileID: 0}
   enemyDeathSound: {fileID: 0}
