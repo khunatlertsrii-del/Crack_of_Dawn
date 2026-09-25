@@ -42,12 +42,19 @@ public class PlayerParry : MonoBehaviour
     public bool IsParrying => isParrying;
     private CircleCollider2D parryCollider;
     private InputAction parryAction;
+    private AudioSource spinAudioSource;
     private Transform parryVisualTransform;
     private float damageTimer;
 
     private void Awake()
     {
         currentParryMeter = maxParryMeter;
+
+        // สร้าง AudioSource สำหรับเสียงหมุนดาบ
+        spinAudioSource = gameObject.AddComponent<AudioSource>();
+        spinAudioSource.loop = true;
+        spinAudioSource.playOnAwake = false;
+        spinAudioSource.volume = 0.5f;
 
         // สร้าง Collider ไว้ปัดกระสุน
         GameObject parryZone = new GameObject("ParryZone");
@@ -93,6 +100,16 @@ public class PlayerParry : MonoBehaviour
 
         if (parryAction.IsPressed() && currentParryMeter > 0 && !isOverheated)
         {
+            if (!isParrying)
+            {
+                // เพิ่งเริ่มหมุนดาบ
+                if (AudioManager.Instance != null && AudioManager.Instance.swordSpinSound != null)
+                {
+                    spinAudioSource.clip = AudioManager.Instance.swordSpinSound;
+                    if (!spinAudioSource.isPlaying) spinAudioSource.Play();
+                }
+            }
+
             isParrying = true;
             parryCollider.enabled = true;
             if (parryVisualEffects != null)
@@ -125,21 +142,19 @@ public class PlayerParry : MonoBehaviour
 
                 foreach (var hit in allHits)
                 {
-                    if (hit.CompareTag("Enemy"))
+                    // เช็คด้วย Component แทน Tag เพราะศัตรูอาจไม่ได้ตั้ง Tag "Enemy" ไว้
+                    var enemy = hit.GetComponent<FriedEggEnemy>();
+                    if (enemy != null)
                     {
-                        var enemy = hit.GetComponent<FriedEggEnemy>();
-                        if (enemy != null)
-                        {
-                            hitAtLeastOne = true;
-                            Vector2 hitDirection = (hit.transform.position - transform.position).normalized;
-                            enemy.TakeDamage(parryDamage, hit.transform.position, false, hitDirection);
+                        hitAtLeastOne = true;
+                        Vector2 hitDirection = (hit.transform.position - transform.position).normalized;
+                        enemy.TakeDamage(parryDamage, hit.transform.position, false, hitDirection);
 
-                            // เลือดสาด 360 องศา (Particle Effect รันต่อศัตรูได้ ไม่แลค)
-                            if (HitEffect.Instance != null) HitEffect.Instance.PlayMeleeHitEffect(hit.transform.position);
+                        // เลือดสาด 360 องศา (Particle Effect รันต่อศัตรูได้ ไม่แลค)
+                        if (HitEffect.Instance != null) HitEffect.Instance.PlayMeleeHitEffect(hit.transform.position);
 
-                            // ฟื้นฟูหลอด Parry ตามที่ฟันโดน
-                            currentParryMeter += meterRegenPerHit;
-                        }
+                        // ฟื้นฟูหลอด Parry ตามที่ฟันโดน
+                        currentParryMeter += meterRegenPerHit;
                     }
                 }
 
@@ -172,6 +187,12 @@ public class PlayerParry : MonoBehaviour
         }
         else
         {
+            if (isParrying)
+            {
+                // เพิ่งหยุดหมุนดาบ
+                spinAudioSource.Stop();
+            }
+
             isParrying = false;
             parryCollider.enabled = false;
             if (parryVisualEffects != null)
