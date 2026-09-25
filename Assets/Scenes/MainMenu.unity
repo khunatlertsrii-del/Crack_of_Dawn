@@ -1233,7 +1233,7 @@ MonoBehaviour:
   shootSounds:
   - {fileID: 8300000, guid: b3a8644d5e3eb5247a4a5c58801c10f7, type: 3}
   - {fileID: 8300000, guid: 2adf2c86edd56cd438c2de5237eae858, type: 3}
-  reloadSound: {fileID: 0}
+  reloadSound: {fileID: 8300000, guid: e51859e6cc420b047bfbbc78cb1f04d0, type: 3}
   jumpSound: {fileID: 8300000, guid: 538c83e37c47e5d4b8c9c20bf7b9c2a1, type: 3}
   wallJumpSound: {fileID: 8300000, guid: 485070915a1155b44b4097a591a255ea, type: 3}
   dashSlideSound: {fileID: 0}
