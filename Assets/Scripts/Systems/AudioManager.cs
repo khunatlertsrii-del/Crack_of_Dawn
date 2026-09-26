@@ -129,7 +129,7 @@ public class AudioManager : MonoBehaviour
         // ทำให้ดนตรีค่อยๆ บิดเบี้ยวตามสโลว์โมชั่น
         musicSource.pitch = Mathf.Lerp(musicSource.pitch, currentPitch, Time.unscaledDeltaTime * 10f);
 
-        // จัดการลบ AudioSource ที่เล่นจบแล้ว และปรับ Pitch ของเสียงที่กำลังเล่นอยู่
+        // จัดการ list ของ SFX ที่กำลังเล่น และปรับ Pitch
         for (int i = sfxSources.Count - 1; i >= 0; i--)
         {
             if (sfxSources[i] == null)
@@ -140,7 +140,7 @@ public class AudioManager : MonoBehaviour
 
             if (!sfxSources[i].isPlaying)
             {
-                Destroy(sfxSources[i].gameObject);
+                // เล่นจบแล้ว ลบออกจาก list (ไม่ต้อง Destroy เพราะเป็น pool)
                 sfxSources.RemoveAt(i);
             }
             else
@@ -212,34 +212,52 @@ public class AudioManager : MonoBehaviour
     }
 
     // ==========================================
-    // HELPER
+    // HELPER — ใช้ Pool แทนการสร้าง/ลบ GameObject ทุกครั้ง
     // ==========================================
+    private const int AUDIO_POOL_SIZE = 16;
+    private AudioSource[] audioPool;
+    private int audioPoolIndex = 0;
+
+    private void InitAudioPool()
+    {
+        audioPool = new AudioSource[AUDIO_POOL_SIZE];
+        for (int i = 0; i < AUDIO_POOL_SIZE; i++)
+        {
+            GameObject soundObj = new GameObject("SFXPool_" + i);
+            soundObj.transform.SetParent(transform);
+            AudioSource src = soundObj.AddComponent<AudioSource>();
+            src.playOnAwake = false;
+            audioPool[i] = src;
+        }
+    }
+
     private void CreateAudioSource(AudioClip clip, float volume, bool isSFX)
     {
-        GameObject soundObj = new GameObject("Sound_" + clip.name);
-        soundObj.transform.SetParent(transform);
-        AudioSource source = soundObj.AddComponent<AudioSource>();
-        
+        if (audioPool == null) InitAudioPool();
+
+        // หา AudioSource ที่ว่างอยู่จากกะบะ (Round-Robin)
+        AudioSource source = audioPool[audioPoolIndex];
+        audioPoolIndex = (audioPoolIndex + 1) % AUDIO_POOL_SIZE;
+
+        source.Stop(); // หยุดเสียงเก่าถ้ากำลังเล่นอยู่
         source.clip = clip;
         source.volume = volume;
-        source.playOnAwake = false;
         
         // ถ้าเป็น SFX ปกติ ให้เซ็ต Pitch เริ่มต้นตามสถานะปัจจุบัน
         if (isSFX && SlowMotionManager.Instance != null && SlowMotionManager.Instance.IsSlowMotionActive)
         {
             source.pitch = slowMoPitch;
         }
+        else
+        {
+            source.pitch = 1f;
+        }
 
         source.Play();
 
-        if (isSFX)
+        if (isSFX && !sfxSources.Contains(source))
         {
             sfxSources.Add(source); // เก็บลง List เพื่ออัปเดต Pitch เรียลไทม์
-        }
-        else
-        {
-            // ถ้าเป็นเสียง UI ให้ลบทำลายทิ้งหลังเล่นจบแบบไม่ต้องสนใจ Pitch
-            Destroy(soundObj, clip.length + 0.1f);
         }
     }
 }
