@@ -66,7 +66,10 @@ public class Bullet : MonoBehaviour
         timer -= Time.deltaTime;
         if (timer <= 0)
         {
-            Destroy(gameObject);
+            if (ObjectPoolManager.Instance != null && GetComponent<PooledObject>() != null)
+                ObjectPoolManager.Instance.ReturnToPool(gameObject);
+            else
+                Destroy(gameObject);
         }
     }
 
@@ -81,6 +84,8 @@ public class Bullet : MonoBehaviour
     public void Initialize(Vector2 dir)
     {
         direction = dir.normalized;
+        hasHit = false;
+        timer = lifetime;
 
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         rb.linearVelocity = direction * speed;
@@ -88,6 +93,16 @@ public class Bullet : MonoBehaviour
         // Rotate กระสุนตามทิศ
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        // รีเซ็ต Trail ให้ไม่โยงกับจุดเก่า
+        var trail = GetComponent<TrailRenderer>();
+        if (trail != null) trail.Clear();
+        
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null) sr.enabled = true;
+        
+        var col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = true;
     }
 
     // =========================================================
@@ -191,8 +206,21 @@ public class Bullet : MonoBehaviour
         // หยุดเคลื่อนที่
         if (rb != null) rb.linearVelocity = Vector2.zero;
 
-        // ทำลายหลัง delay เล็กน้อย (เพื่อให้ trail effect เล่นจบ)
-        Destroy(gameObject, 0.1f);
+        // ทำลาย/คืนกะบะ (หน่วงเวลานิดนึงเพื่อให้ trail effect ลากจบก่อนหาย)
+        if (ObjectPoolManager.Instance != null && GetComponent<PooledObject>() != null)
+        {
+            // Invoke สำหรับคืนของลงกะบะหลัง 0.1 วิ
+            Invoke(nameof(ReturnToPoolDelayed), 0.1f);
+        }
+        else
+        {
+            Destroy(gameObject, 0.1f);
+        }
+    }
+
+    private void ReturnToPoolDelayed()
+    {
+        ObjectPoolManager.Instance.ReturnToPool(gameObject);
     }
 
     private void SpawnImpactEffect()

@@ -413,7 +413,17 @@ public class PlayerShooting : MonoBehaviour
                 direction = (muzzlePoint.position - gunPivot.position).normalized;
             }
 
-            GameObject bullet = Instantiate(bulletPrefab, muzzlePoint.position, Quaternion.identity);
+            GameObject bullet = null;
+            
+            // เรียกใช้ระบบ Pool ถอดป้าย Instantiate ทิ้ง
+            if (ObjectPoolManager.Instance != null)
+            {
+                bullet = ObjectPoolManager.Instance.SpawnFromPool(bulletPrefab, muzzlePoint.position, Quaternion.identity);
+            }
+            else
+            {
+                bullet = Instantiate(bulletPrefab, muzzlePoint.position, Quaternion.identity);
+            }
 
             Bullet bulletScript = bullet.GetComponent<Bullet>();
             if (bulletScript != null)
