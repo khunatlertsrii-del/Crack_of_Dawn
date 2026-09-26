@@ -200,6 +200,20 @@ public class PlayerShooting : MonoBehaviour
     {
         if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive)
         {
+            // ซ่อน UI กระสุนเมื่อจบด่าน
+            if (ammoRect != null && ammoRect.gameObject.activeSelf) 
+            {
+                ammoRect.gameObject.SetActive(false);
+            }
+            else if (ammoText != null && ammoText.gameObject.activeSelf)
+            {
+                ammoText.gameObject.SetActive(false);
+            }
+            if (reloadProgressBar != null && reloadProgressBar.gameObject.activeSelf)
+            {
+                reloadProgressBar.gameObject.SetActive(false);
+            }
+
             return;
         }
 
