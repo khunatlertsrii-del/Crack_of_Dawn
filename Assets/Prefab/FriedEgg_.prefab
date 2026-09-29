@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7802829198917985907}
   - component: {fileID: 5472697668548672714}
   m_Layer: 0
-  m_Name: EggWhite_Visual
+  m_Name: EggWhite_
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 445616631614947854}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.054, y: -0.505, z: 0}
+  m_LocalPosition: {x: 0.0539999, y: -0.5050001, z: 0}
   m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -195,7 +195,7 @@ MonoBehaviour:
   timeBetweenBurstShots: 0.1
   burstsBeforeReload: 12
   reloadTime: 2
-  whiteRenderer: {fileID: 5472697668548672714}
+  whiteRenderer: {fileID: 1259194507315312345}
   yolkRenderer: {fileID: 2437846765032935679}
   headPivot: {fileID: 4964960095303055901}
   gunPivot: {fileID: 4207649433857598197}
