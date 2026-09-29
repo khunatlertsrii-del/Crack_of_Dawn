@@ -15,6 +15,7 @@ public class AudioManager : MonoBehaviour
 
     [Header("BGM (เสียงเพลง)")]
     public MusicTrack mainMenuBGM;
+    public MusicTrack tutorialBGM;
     public MusicTrack levelBGM;
     public MusicTrack victoryBGM;
     public MusicTrack gameOverBGM;
@@ -106,9 +107,14 @@ public class AudioManager : MonoBehaviour
         {
             if (mainMenuBGM != null && mainMenuBGM.clip != null) PlayMusic(mainMenuBGM);
         }
+        else if (scene.name.ToLower().Contains("tutorial"))
+        {
+            // ถ้าเป็นฉากฝึกสอน
+            if (tutorialBGM != null && tutorialBGM.clip != null) PlayMusic(tutorialBGM);
+        }
         else
         {
-            // ฉากอื่นที่ไม่ใช่เมนู = ฉากเลเวล → เล่นเพลงด่าน
+            // ฉากอื่นที่ไม่ใช่เมนูและฝึกสอน = ฉากเลเวล → เล่นเพลงด่าน
             if (levelBGM != null && levelBGM.clip != null)
             {
                 PlayMusic(levelBGM);
@@ -178,6 +184,14 @@ public class AudioManager : MonoBehaviour
         if (musicSource != null && !musicSource.isPlaying)
         {
             musicSource.UnPause();
+        }
+    }
+
+    public void SwitchToLevelBGM()
+    {
+        if (levelBGM != null && levelBGM.clip != null)
+        {
+            PlayMusic(levelBGM);
         }
     }
 

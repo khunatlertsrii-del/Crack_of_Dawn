@@ -12,6 +12,10 @@ public class InteractableObject : MonoBehaviour
     [Tooltip("ใส่ GameObject ที่เป็นรูปปุ่ม E หรือเครื่องหมายตกใจ (จะโชว์ตอนเดินเข้าไปใกล้)")]
     public GameObject interactPromptUI;
 
+    [Header("⚡ คำสั่งพิเศษเมื่อกดสำรวจ (Optional)")]
+    [Tooltip("ใส่คำสั่งที่จะให้ทำงานทันทีเมื่อกดสำรวจ เช่น ลบประตู, เปลี่ยนเพลง, สปอนศัตรู")]
+    public UnityEngine.Events.UnityEvent OnInteract;
+
     private bool isPlayerInRange = false;
     private InputAction interactAction;
 
@@ -43,7 +47,13 @@ public class InteractableObject : MonoBehaviour
                 if (Time.unscaledTime - DialogueManager.Instance.lastDialogueEndTime < 0.5f) return;
 
                 // ส่งข้อความไปให้ DialogueManager เปิดกล่อง
-                DialogueManager.Instance.StartDialogue(dialogues);
+                if (dialogues != null && dialogues.Length > 0)
+                {
+                    DialogueManager.Instance.StartDialogue(dialogues);
+                }
+
+                // เรียกคำสั่งพิเศษ (ถ้ามี)
+                OnInteract?.Invoke();
             }
         }
     }

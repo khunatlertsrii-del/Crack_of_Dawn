@@ -201,10 +201,28 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
             }
         }
 
-        // หันหน้าและเล็งปืนตาม Player ตลอดเวลาถ้าเห็น
-        if (playerTransform != null && state != EnemyState.EnteringDoor && state != EnemyState.Dead)
+        // เช็คว่ามองเห็น Player จริงๆ ไหม (ทะลุกำแพงไหม, อยู่ในระยะไหม)
+        bool canSeePlayer = false;
+        if (playerTransform != null)
+        {
+            float distance = Vector2.Distance(transform.position, playerTransform.position);
+            if (distance <= detectionRange)
+            {
+                RaycastHit2D hit = Physics2D.Linecast(transform.position, playerTransform.position, obstacleLayer);
+                if (hit.collider == null) canSeePlayer = true;
+            }
+        }
+
+        // หันหน้าและเล็งปืนตาม Player เฉพาะตอนที่ "มองเห็น" เท่านั้น (ป้องกัน X-Ray)
+        if (canSeePlayer && state != EnemyState.EnteringDoor && state != EnemyState.Dead)
         {
             AimAtPlayer();
+        }
+        else if (!canSeePlayer && state != EnemyState.Dead)
+        {
+            // ถ้ามองไม่เห็น ให้ปืนชี้กลับไปด้านหน้าปกติ
+            if (gunPivot != null) gunPivot.localRotation = Quaternion.identity;
+            if (headPivot != null) headPivot.localRotation = Quaternion.identity;
         }
 
         switch (state)
@@ -220,14 +238,14 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
                 break;
             case EnemyState.Idle:
                 // อยู่เฉยๆ รอผู้เล่นเข้าระยะ
-                if (playerTransform != null) CheckForPlayer();
+                if (canSeePlayer) CheckForPlayer();
                 break;
             case EnemyState.Alert:
             case EnemyState.Attack:
-                if (playerTransform != null)
+                if (canSeePlayer)
                     UpdateAttack();
                 else
-                    state = EnemyState.Idle; // กลับ idle ถ้าหา Player ไม่เจอ
+                    state = EnemyState.Idle; // กลับ idle ถ้าหา Player ไม่เจอ (หรือเดินหลบหลังกำแพง)
                 CheckPlayerOutOfRange();
                 break;
         }

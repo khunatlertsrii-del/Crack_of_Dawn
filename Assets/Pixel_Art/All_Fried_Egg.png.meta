@@ -14,6 +14,9 @@ TextureImporter:
   - first:
       213: 8478765258852652585
     second: All_Fried_Egg_3
+  - first:
+      213: -6431972443452712019
+    second: All_Fried_Egg_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,9 +116,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 3
-        y: 237
-        width: 41
-        height: 32
+        y: 236
+        width: 49
+        height: 33
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,10 +159,10 @@ TextureImporter:
       name: All_Fried_Egg_2
       rect:
         serializedVersion: 2
-        x: 49
+        x: 50
         y: 221
-        width: 29
-        height: 34
+        width: 25
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -196,11 +199,33 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: All_Fried_Egg_4
+      rect:
+        serializedVersion: 2
+        x: 114
+        y: 221
+        width: 29
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dab56e6042b0db6a0800000000000000
+      internalID: -6431972443452712019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: a360194495a8a704bbc3d2cd2386f307
+    spriteID: e6575353ea96638428ba7838a093ceeb
     internalID: 0
     vertices: []
     indices: 
@@ -214,6 +239,7 @@ TextureImporter:
       All_Fried_Egg_1: 2398480121033753095
       All_Fried_Egg_2: 1111155138974920256
       All_Fried_Egg_3: 8478765258852652585
+      All_Fried_Egg_4: -6431972443452712019
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
