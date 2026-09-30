@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using System.Collections.Generic;
 
 /// <summary>
-/// สคริปต์ปิด-เปิดแสง 2D อัตโนมัติ (Culling)
-/// ช่วยลดความแลคจาก 2D Lights จำนวนมากในฉาก
-/// โดยจะปิดแสงที่อยู่นอกจอ และเปิดเฉพาะแสงที่อยู่ในจอ
+/// สคริปต์ปิด-เปิดแสง 2D อัตโนมัติ (Culling) + ควบคุมเงาฉลาด (Smart Shadows)
+/// ช่วยลดความแลคจาก 2D Lights จำนวนมากในฉากได้อย่างมหาศาล
 /// </summary>
 public class LightCuller2D : MonoBehaviour
 {
@@ -14,20 +14,44 @@ public class LightCuller2D : MonoBehaviour
     [Tooltip("อัปเดตทุกๆ กี่วินาที (0.2 คืออัปเดต 5 ครั้งต่อวินาที ช่วยประหยัด CPU)")]
     public float updateInterval = 0.2f;
 
-    private Light2D[] allLights;
+    [Header("Shadow Optimization")]
+    [Tooltip("เปิดระบบควบคุมเงาอัจฉริยะ (ให้เฉพาะไฟใกล้ๆ ผู้เล่นที่สร้างเงาได้)")]
+    public bool optimizeShadows = true;
+    
+    [Tooltip("จำนวนไฟสูงสุดบนจอที่จะให้มีเงาดำ (แนะนำ 2-4 จะลื่นมาก)")]
+    public int maxShadowCastingLights = 4;
+
+    private struct LightData
+    {
+        public Light2D light;
+        public bool originalShadows;
+    }
+
+    private List<LightData> allLights = new List<LightData>();
     private Camera mainCam;
     private float timer;
+    private Transform playerTransform;
 
     private void Start()
     {
         mainCam = Camera.main;
-        // หาแสง 2D ทั้งหมดในฉากตอนเริ่มเกม
-        allLights = FindObjectsByType<Light2D>(FindObjectsSortMode.None);
+        
+        // หา Player
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null) playerTransform = player.transform;
+
+        // หาแสง 2D ทั้งหมดในฉากตอนเริ่มเกม แล้วจำค่าเดิมของมันไว้
+        Light2D[] lights = FindObjectsByType<Light2D>(FindObjectsSortMode.None);
+        foreach (var l in lights)
+        {
+            if (l.lightType == Light2D.LightType.Global) continue; // ข้าม Global
+            allLights.Add(new LightData { light = l, originalShadows = l.shadowsEnabled });
+        }
     }
 
     private void Update()
     {
-        if (mainCam == null || allLights == null || allLights.Length == 0) return;
+        if (mainCam == null || allLights.Count == 0) return;
 
         timer += Time.deltaTime;
         if (timer >= updateInterval)
@@ -39,34 +63,63 @@ public class LightCuller2D : MonoBehaviour
 
     private void CullLights()
     {
-        // หาขอบเขตของกล้อง
         float camHeight = 2f * mainCam.orthographicSize;
         float camWidth = camHeight * mainCam.aspect;
-        
         Vector3 camPos = mainCam.transform.position;
         
-        // ขอบเขตที่แสงควรจะทำงาน (รวม margin แล้ว)
         float minX = camPos.x - (camWidth / 2f) - cullMargin;
         float maxX = camPos.x + (camWidth / 2f) + cullMargin;
         float minY = camPos.y - (camHeight / 2f) - cullMargin;
         float maxY = camPos.y + (camHeight / 2f) + cullMargin;
 
-        foreach (var light in allLights)
+        List<LightData> activeLightsOnScreen = new List<LightData>();
+
+        // 1. ปิด/เปิด ไฟตามขอบจอ
+        for (int i = 0; i < allLights.Count; i++)
         {
-            if (light == null) continue;
+            LightData data = allLights[i];
+            if (data.light == null) continue;
 
-            // ไม่ต้องยุ่งกับ Global Light (แสงสว่างทั้งฉาก) เพราะถ้าปิดฉากจะมืดสนิท
-            if (light.lightType == Light2D.LightType.Global) continue;
-
-            // เช็คว่าตำแหน่งของแสงอยู่ในกรอบที่กำหนดไหม
-            Vector3 lightPos = light.transform.position;
+            Vector3 lightPos = data.light.transform.position;
             bool isInside = lightPos.x >= minX && lightPos.x <= maxX && 
                             lightPos.y >= minY && lightPos.y <= maxY;
 
-            // ปิด/เปิด Component Light2D (ดีกว่าปิด GameObject เพราะไม่กระทบ Script อื่น)
-            if (light.enabled != isInside)
+            if (data.light.enabled != isInside)
             {
-                light.enabled = isInside;
+                data.light.enabled = isInside;
+            }
+
+            if (isInside && data.originalShadows)
+            {
+                activeLightsOnScreen.Add(data);
+            }
+        }
+
+        // 2. จัดการเงา (เก็บเงาให้ไฟที่ใกล้ผู้เล่นที่สุดเท่านั้น)
+        if (optimizeShadows && playerTransform != null && activeLightsOnScreen.Count > maxShadowCastingLights)
+        {
+            // เรียงลำดับไฟตามระยะห่างจากผู้เล่น (ใกล้ไปไกล)
+            activeLightsOnScreen.Sort((a, b) => 
+                Vector2.Distance(playerTransform.position, a.light.transform.position)
+                .CompareTo(Vector2.Distance(playerTransform.position, b.light.transform.position))
+            );
+
+            // เปิดเงาให้แค่ N ตัวแรก ที่เหลือปิดเงาชั่วคราว
+            for (int i = 0; i < activeLightsOnScreen.Count; i++)
+            {
+                bool shouldHaveShadow = (i < maxShadowCastingLights);
+                if (activeLightsOnScreen[i].light.shadowsEnabled != shouldHaveShadow)
+                {
+                    activeLightsOnScreen[i].light.shadowsEnabled = shouldHaveShadow;
+                }
+            }
+        }
+        else if (optimizeShadows && activeLightsOnScreen.Count <= maxShadowCastingLights)
+        {
+            // ถ้าไฟน้อยกว่าลิมิต ก็ให้เปิดเงาตามปกติให้ครบทุกดวง
+            foreach (var data in activeLightsOnScreen)
+            {
+                if (!data.light.shadowsEnabled) data.light.shadowsEnabled = true;
             }
         }
     }

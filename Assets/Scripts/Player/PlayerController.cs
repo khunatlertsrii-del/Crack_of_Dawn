@@ -125,6 +125,7 @@ public class PlayerController : MonoBehaviour
     private float jumpBufferCounter;
     private int extraJumpsRemaining;
     private bool isJumpHeld;
+    private bool hasJumped;
 
     // Wall Jump state
     private bool isTouchingWall;
@@ -344,17 +345,23 @@ public class PlayerController : MonoBehaviour
         {
             extraJumpsRemaining = extraJumps;
             isSlideJumping = false; // ยกเลิกโมเมนตัมเมื่อเท้าแตะพื้น
+            hasJumped = false;
         }
 
         // Coyote Time
-        if (wasGrounded && !IsGrounded)
+        if (IsGrounded)
         {
+            // เติม Coyote Time ไว้เต็มเสมอตอนอยู่บนพื้น (เพื่อใช้เป็นเงื่อนไขในการกระโดดปกติ)
             coyoteTimeCounter = coyoteTime;
-        }
-        else if (IsGrounded)
-        {
-            coyoteTimeCounter = 0;
             IsWallSliding = false;
+        }
+        else if (wasGrounded && !IsGrounded)
+        {
+            // เพิ่งหลุดจากพื้น ถ้าไม่ได้กระโดด ให้คงค่า Coyote Time ไว้ให้นับถอยหลัง
+            if (hasJumped)
+            {
+                coyoteTimeCounter = 0;
+            }
         }
     }
 
@@ -503,6 +510,7 @@ public class PlayerController : MonoBehaviour
             isSlideJumping = true;
         }
 
+        hasJumped = true;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
 
@@ -598,11 +606,7 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        if (IsGrounded)
-        {
-            coyoteTimeCounter = coyoteTime;
-        }
-        else
+        if (coyoteTimeCounter > 0 && !IsGrounded)
         {
             coyoteTimeCounter -= Time.deltaTime;
         }
