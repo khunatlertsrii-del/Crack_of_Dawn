@@ -67,12 +67,6 @@ public class LevelRatingManager : MonoBehaviour
         // นับจำนวนศัตรูทั้งหมดในฉากตอนเริ่มเกม
         FriedEggEnemy[] enemies = FindObjectsByType<FriedEggEnemy>(FindObjectsSortMode.None);
         totalEnemiesInLevel = enemies.Length;
-
-        // เริ่มเล่นเพลงด่าน
-        if (AudioManager.Instance != null && AudioManager.Instance.levelBGM != null && AudioManager.Instance.levelBGM.clip != null)
-        {
-            AudioManager.Instance.PlayMusic(AudioManager.Instance.levelBGM);
-        }
     }
 
     private void Update()

@@ -11,6 +11,7 @@ public class AudioManager : MonoBehaviour
     {
         public AudioClip clip;
         [Range(0f, 1f)] public float volume = 1f;
+        public string trackName = "Unknown Track"; // ชื่อเพลงสำหรับแสดงใน UI Katana Zero
     }
 
     [Header("BGM (เสียงเพลง)")]
@@ -160,6 +161,9 @@ public class AudioManager : MonoBehaviour
     // ==========================================
     // MUSIC
     // ==========================================
+    // Event สำหรับส่งชื่อเพลงไปให้ UI แสดง
+    public event System.Action<string> OnMusicChanged;
+
     public void PlayMusic(MusicTrack track)
     {
         if (track == null || track.clip == null) return;
@@ -169,6 +173,9 @@ public class AudioManager : MonoBehaviour
         // ปริมาณเสียง = global music volume * individual track volume
         musicSource.volume = musicVolume * track.volume;
         musicSource.Play();
+        
+        // ส่ง Event ไปบอก UI ว่าเปลี่ยนเพลงแล้ว
+        OnMusicChanged?.Invoke(track.trackName);
     }
 
     public void PauseMusic()
