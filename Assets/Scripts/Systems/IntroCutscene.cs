@@ -3,34 +3,36 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// คัตซีนเปิดด่าน Level 1:
-/// 1. ไข่ดาว 2 ตัวยืนคุยกัน (ใช้ DialogueManager)
-/// 2. ผู้เล่น (ไข่เจียว) พุ่งทะลุหน้าต่างเข้ามาจากซ้าย
-/// 3. เวลาหยุด → โชว์ TutorialPrompt สอนกด Shift (สโลว์โม)
-/// 4. ผู้เล่นกด Shift → โชว์สอนคลิกซ้ายยิง
-/// 5. ผู้เล่นคลิกยิง → เวลากลับมาเดิน กระสุนพุ่งฆ่าไข่ดาว 2 ตัว
-/// 
-/// วิธีใช้: สร้าง Empty GameObject ชื่อ "IntroCutscene" แล้วลากสคริปต์นี้ใส่
+/// คัตซีนเปิดด่าน Level 1 (ปรับปรุงใหม่ V2):
+/// - ควบคุมกล้องแยกจาก Player (ตั้งมุมกล้องเองได้)
+/// - Player พุ่งเข้ามาแบบมีแอนิเมชัน (วิถีโค้ง + หมุน + ลงพื้นเท่ๆ)
+/// - ล็อคทุกอย่างระหว่างคัตซีน (เดินไม่ได้ ยิงไม่ได้)
+/// - มี Screen Shake + เสียง + Flash ตอน Player พุ่งเข้ามา
+/// - เปิด PlayerShooting ชั่วคราวตอนสอนยิง
 /// </summary>
 public class IntroCutscene : MonoBehaviour
 {
     [Header("=== ตัวละคร ===")]
-    [Tooltip("ตัวผู้เล่น (ไข่เจียว) ที่จะพุ่งเข้ามา")]
     public GameObject player;
     
-    [Tooltip("จุดเริ่มต้นของผู้เล่น (อยู่นอกจอด้านซ้าย ตรงหน้าต่าง)")]
+    [Tooltip("จุดเริ่มต้นที่ Player จะพุ่งมา (นอกจอด้านซ้าย)")]
     public Transform playerStartPoint;
     
-    [Tooltip("จุดที่ผู้เล่นลงจอด (ในห้อง)")]
+    [Tooltip("จุดที่ Player ลงจอด (ในห้อง)")]
     public Transform playerLandPoint;
 
+    [Header("=== กล้อง ===")]
+    [Tooltip("จุดที่กล้องจะจับตอน NPC คุยกัน (ลาก Empty มาตั้งตรงกลางระหว่าง NPC)")]
+    public Transform cameraFocusNPC;
+    
+    [Tooltip("จุดที่กล้องจะย้ายไปตอน Player พุ่งเข้ามา")]
+    public Transform cameraFocusAction;
+
     [Header("=== ไข่ดาว NPC ===")]
-    [Tooltip("ไข่ดาว NPC ตัวที่ 1 (ไม่ใช่ FriedEggEnemy ธรรมดา ใช้แค่ Sprite + Collider)")]
     public GameObject eggNPC1;
-    [Tooltip("ไข่ดาว NPC ตัวที่ 2")]
     public GameObject eggNPC2;
 
-    [Header("=== บทพูด (ก่อน Player เข้ามา) ===")]
+    [Header("=== บทพูด ===")]
     [TextArea(2, 5)]
     public string[] npcDialogues = new string[]
     {
@@ -40,18 +42,25 @@ public class IntroCutscene : MonoBehaviour
     };
 
     [Header("=== Tutorial Prompts ===")]
-    [Tooltip("UI ที่แสดงปุ่ม Shift (โชว์ตอนสอนสโลว์โม)")]
     public GameObject slowMoPrompt;
-    [Tooltip("UI ที่แสดงปุ่มคลิกซ้าย (โชว์ตอนสอนยิง)")]
     public GameObject shootPrompt;
 
-    [Header("=== แก้วหน้าต่าง (Optional) ===")]
-    [Tooltip("เอฟเฟกต์กระจกแตก หรือ Particle System (เล่นตอนผู้เล่นพุ่งเข้ามา)")]
+    [Header("=== เอฟเฟกต์ ===")]
+    [Tooltip("เอฟเฟกต์กระจกแตก / Particle (Optional)")]
     public GameObject windowBreakEffect;
+    
+    [Tooltip("เสียงกระจกแตกตอน Player พุ่งเข้ามา")]
+    public AudioClip windowBreakSound;
+    
+    [Tooltip("เสียงลงพื้น (ตูม!)")]
+    public AudioClip landingSound;
 
-    [Header("=== Settings ===")]
-    public float playerEntrySpeed = 15f;
+    [Header("=== ตั้งค่า ===")]
+    public float playerEntryDuration = 0.8f;
     public float delayBeforeEntry = 0.5f;
+    public float cameraFollowSpeed = 5f;
+    [Tooltip("ความสูงสูงสุดของวิถีโค้ง (ยิ่งเยอะ Player พุ่งสูงยิ่งเท่)")]
+    public float arcHeight = 3f;
 
     // State
     private bool cutsceneActive = false;
@@ -62,10 +71,13 @@ public class IntroCutscene : MonoBehaviour
     private Rigidbody2D playerRb;
     private PlayerController playerController;
     private PlayerShooting playerShooting;
+    private PlayerParry playerParry;
+    private CameraFollow cameraFollow;
+    private SlowMotionManager slowMotionManager;
+    private Camera mainCam;
 
     private void Awake()
     {
-        // สร้าง input actions สำหรับเช็คว่าผู้เล่นกดยัง
         slowMoAction = new InputAction("CutsceneSlowMo", InputActionType.Button);
         slowMoAction.AddBinding("<Keyboard>/leftShift");
         
@@ -75,7 +87,6 @@ public class IntroCutscene : MonoBehaviour
 
     private void Start()
     {
-        // ซ่อน prompts ไว้ก่อน
         if (slowMoPrompt != null) slowMoPrompt.SetActive(false);
         if (shootPrompt != null) shootPrompt.SetActive(false);
 
@@ -84,9 +95,13 @@ public class IntroCutscene : MonoBehaviour
             playerRb = player.GetComponent<Rigidbody2D>();
             playerController = player.GetComponent<PlayerController>();
             playerShooting = player.GetComponent<PlayerShooting>();
+            playerParry = player.GetComponent<PlayerParry>();
         }
 
-        // เริ่มคัตซีน!
+        mainCam = Camera.main;
+        cameraFollow = CameraFollow.Instance;
+        slowMotionManager = SlowMotionManager.Instance;
+
         StartCoroutine(PlayCutscene());
     }
 
@@ -106,14 +121,12 @@ public class IntroCutscene : MonoBehaviour
     {
         if (!cutsceneActive) return;
 
-        // ขั้นตอน: รอผู้เล่นกดสโลว์โม
         if (waitingForSlowMo && slowMoAction.WasPressedThisFrame())
         {
             waitingForSlowMo = false;
             StartCoroutine(OnSlowMoPressed());
         }
 
-        // ขั้นตอน: รอผู้เล่นกดยิง
         if (waitingForShoot && shootAction.WasPressedThisFrame())
         {
             waitingForShoot = false;
@@ -129,124 +142,252 @@ public class IntroCutscene : MonoBehaviour
     {
         cutsceneActive = true;
 
-        // === 1. ปิดการควบคุมผู้เล่น ===
-        DisablePlayerControl();
+        // === 1. ปิดทุกอย่าง (เดิน ยิง สโลว์ ดาบ) ===
+        LockAllPlayerSystems();
 
-        // ย้ายผู้เล่นไปซ่อนนอกจอ
-        if (playerStartPoint != null)
-        {
-            player.transform.position = playerStartPoint.position;
-        }
-        // ซ่อนผู้เล่นไว้ก่อน
+        // ซ่อน Player นอกจอ
+        if (playerStartPoint != null) player.transform.position = playerStartPoint.position;
         player.SetActive(false);
 
-        // === 2. ไข่ดาว NPC คุยกัน ===
+        // === 2. ย้ายกล้องไปที่ NPC (ไม่ตาม Player!) ===
+        if (cameraFollow != null) cameraFollow.enabled = false;
+        if (cameraFocusNPC != null && mainCam != null)
+        {
+            // Snap กล้องไปที่จุด NPC ทันที
+            Vector3 camPos = cameraFocusNPC.position;
+            camPos.z = mainCam.transform.position.z;
+            mainCam.transform.position = camPos;
+        }
+
+        // === 3. NPC คุยกัน ===
         if (DialogueManager.Instance != null && npcDialogues.Length > 0)
         {
             DialogueManager.Instance.StartDialogue(npcDialogues);
-
-            // รอจนกว่ากล่องข้อความจะปิด
-            yield return new WaitUntil(() => 
+            yield return new WaitUntil(() =>
                 !DialogueManager.Instance.dialogueBoxPanel.activeSelf);
         }
 
         yield return new WaitForSecondsRealtime(delayBeforeEntry);
 
-        // === 3. ผู้เล่นพุ่งเข้ามาทะลุหน้าต่าง! ===
-        player.SetActive(true);
-
-        // เล่นเอฟเฟกต์กระจกแตก
-        if (windowBreakEffect != null)
+        // === 4. ย้ายกล้องไปจุด Action (ค่อยๆ แพน) ===
+        if (cameraFocusAction != null && mainCam != null)
         {
-            windowBreakEffect.SetActive(true);
+            yield return StartCoroutine(PanCameraTo(cameraFocusAction.position, 0.6f));
         }
 
-        // พุ่งผู้เล่นเข้ามาในฉาก
-        yield return StartCoroutine(MovePlayerToLandPoint());
+        // === 5. Player พุ่งเข้ามาทะลุหน้าต่าง! (แบบมีวิถีโค้ง + หมุน) ===
+        player.SetActive(true);
+        
+        // เอฟเฟกต์กระจกแตก
+        if (windowBreakEffect != null) windowBreakEffect.SetActive(true);
+        if (windowBreakSound != null && AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(windowBreakSound, 1f);
 
-        // === 4. หยุดเวลา! (Freeze Frame) ===
+        // Screen Shake ตอนทะลุหน้าต่าง!
+        if (CameraFollow.Instance != null)
+            CameraFollow.Instance.ShakeCamera(0.3f, 0.4f);
+
+        // Player พุ่งเข้ามาแบบวิถีโค้ง + หมุนตัว
+        yield return StartCoroutine(ArcEntryAnimation());
+
+        // เสียงลงพื้น + Screen Shake ตอนลงจอด!
+        if (landingSound != null && AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(landingSound, 0.8f);
+        if (CameraFollow.Instance != null)
+            CameraFollow.Instance.ShakeCamera(0.4f, 0.3f);
+
+        // === 6. Freeze Frame! (หยุดเวลา) ===
         Time.timeScale = 0f;
 
-        // === 5. โชว์ TutorialPrompt สอน Shift (สโลว์โม) ===
-        if (slowMoPrompt != null) slowMoPrompt.SetActive(true);
-        waitingForSlowMo = true;
+        // แฟลชขาวจอ (ถ้ามี ScreenEffectManager)
+        yield return new WaitForSecondsRealtime(0.3f);
 
-        // รอผู้เล่นกดใน Update()...
+        // === 7. สอน Shift (สโลว์โม) ===
+        if (slowMoPrompt != null)
+        {
+            slowMoPrompt.SetActive(true);
+            // เด้งเข้ามาเล็กน้อย
+            StartCoroutine(PulseEffect(slowMoPrompt.transform));
+        }
+        waitingForSlowMo = true;
     }
 
     private IEnumerator OnSlowMoPressed()
     {
-        // ซ่อน prompt สโลว์โม
         if (slowMoPrompt != null) slowMoPrompt.SetActive(false);
 
-        // เปิดสโลว์โม (ค่อยๆ ให้เวลาวิ่งช้าๆ)
-        Time.timeScale = 0.1f;
+        // เปิดสโลว์โม (ไม่ใช้ SlowMotionManager เพราะมันถูกล็อค)
+        Time.timeScale = 0.15f;
 
-        // รอสักครู่ให้ผู้เล่นรู้สึกถึงสโลว์โม
-        yield return new WaitForSecondsRealtime(0.5f);
+        // เปิดเอฟเฟกต์ขอบฟิล์มสโลว์
+        if (ScreenEffectManager.Instance != null)
+            ScreenEffectManager.Instance.TriggerAdrenaline();
 
-        // === 6. โชว์ TutorialPrompt สอนคลิกซ้ายยิง ===
-        if (shootPrompt != null) shootPrompt.SetActive(true);
+        yield return new WaitForSecondsRealtime(0.6f);
+
+        // === 8. สอนคลิกซ้ายยิง ===
+        // **เปิด PlayerShooting ชั่วคราวเพื่อให้ยิงได้!**
+        if (playerShooting != null) playerShooting.enabled = true;
+
+        if (shootPrompt != null)
+        {
+            shootPrompt.SetActive(true);
+            StartCoroutine(PulseEffect(shootPrompt.transform));
+        }
         waitingForShoot = true;
-
-        // รอผู้เล่นกดใน Update()...
     }
 
     private IEnumerator OnShootPressed()
     {
-        // ซ่อน prompt ยิง
         if (shootPrompt != null) shootPrompt.SetActive(false);
 
-        // === 7. เวลากลับมาเดินปกติ! ===
+        // ปิด shooting กลับ (จะเปิดอีกทีตอนจบคัตซีน)
+        // ไม่ปิดเพราะกระสุนต้องบินไปก่อน
+
+        // เวลากลับมาเดินปกติ!
         Time.timeScale = 1f;
 
-        // รอสักนิดให้กระสุนบินไป
-        yield return new WaitForSeconds(0.5f);
+        // Screen Shake เบาๆ ตอนกระสุนออก
+        if (CameraFollow.Instance != null)
+            CameraFollow.Instance.ShakeCamera(0.15f, 0.2f);
 
-        // === 8. จบคัตซีน — คืนการควบคุมให้ผู้เล่น ===
-        EnablePlayerControl();
+        // รอให้กระสุนบินไปโดน NPC
+        yield return new WaitForSeconds(0.8f);
+
+        // === 9. จบคัตซีน — คืนการควบคุมทุกอย่าง ===
+        UnlockAllPlayerSystems();
         cutsceneActive = false;
 
-        // ทำลายสคริปต์นี้ทิ้งเพื่อไม่ให้กินทรัพยากร
+        // เปิดกล้องตาม Player กลับ
+        if (cameraFollow != null) cameraFollow.enabled = true;
+
         Destroy(gameObject, 1f);
     }
 
     // =========================================================
-    // HELPERS
+    // ANIMATION — วิถีโค้ง + หมุนตัว
     // =========================================================
 
-    private IEnumerator MovePlayerToLandPoint()
+    private IEnumerator ArcEntryAnimation()
     {
         if (playerLandPoint == null) yield break;
 
-        Vector3 target = playerLandPoint.position;
-        
-        // พุ่งเข้ามาแบบเป็นเส้นตรง (แนว physics จำลอง)
-        while (Vector2.Distance(player.transform.position, target) > 0.3f)
+        Vector3 start = player.transform.position;
+        Vector3 end = playerLandPoint.position;
+        float elapsed = 0f;
+
+        // เก็บ rotation เดิม
+        Quaternion originalRotation = player.transform.rotation;
+
+        while (elapsed < playerEntryDuration)
         {
-            Vector2 dir = (target - player.transform.position).normalized;
-            player.transform.position += (Vector3)(dir * playerEntrySpeed * Time.unscaledDeltaTime);
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / playerEntryDuration);
+
+            // Ease out (เริ่มเร็ว ชะลอตอนท้าย)
+            float easedT = 1f - Mathf.Pow(1f - t, 3f);
+
+            // ตำแหน่ง Lerp ตรงๆ
+            Vector3 pos = Vector3.Lerp(start, end, easedT);
+
+            // เพิ่มวิถีโค้ง (พาราโบลา)
+            float arc = arcHeight * 4f * t * (1f - t); // สูงสุดตรงกลาง
+            pos.y += arc;
+
+            player.transform.position = pos;
+
+            // หมุนตัว Player (Flip + Spin) 
+            float spin = t * 360f; // หมุนครบ 1 รอบ
+            player.transform.rotation = Quaternion.Euler(0, 0, -spin);
+
             yield return null;
         }
-        player.transform.position = target;
 
-        // หยุดตัวผู้เล่น
-        if (playerRb != null)
-        {
-            playerRb.linearVelocity = Vector2.zero;
-        }
-    }
+        // ลงจุดพอดี + รีเซ็ต rotation
+        player.transform.position = end;
+        player.transform.rotation = originalRotation;
 
-    private void DisablePlayerControl()
-    {
-        if (playerController != null) playerController.enabled = false;
-        if (playerShooting != null) playerShooting.enabled = false;
+        // หยุด Rigidbody
         if (playerRb != null) playerRb.linearVelocity = Vector2.zero;
     }
 
-    private void EnablePlayerControl()
+    // =========================================================
+    // CAMERA PAN — แพนกล้องไปจุดที่ต้องการ
+    // =========================================================
+
+    private IEnumerator PanCameraTo(Vector3 target, float duration)
+    {
+        if (mainCam == null) yield break;
+
+        Vector3 start = mainCam.transform.position;
+        target.z = start.z; // คง Z ไว้
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            mainCam.transform.position = Vector3.Lerp(start, target, t);
+            yield return null;
+        }
+        mainCam.transform.position = target;
+    }
+
+    // =========================================================
+    // PULSE EFFECT — ปุ่มเด้งตอนขึ้น
+    // =========================================================
+
+    private IEnumerator PulseEffect(Transform target)
+    {
+        Vector3 originalScale = target.localScale;
+        float timer = 0f;
+
+        // เด้งใหญ่ขึ้นแล้วหดกลับ
+        while (timer < 0.4f)
+        {
+            timer += Time.unscaledDeltaTime;
+            float t = timer / 0.4f;
+            float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.3f; // เด้ง 30%
+            target.localScale = originalScale * scale;
+            yield return null;
+        }
+        target.localScale = originalScale;
+
+        // ยังค้างอยู่ = เต้นเบาๆ ไปเรื่อยๆ
+        while (target.gameObject.activeSelf)
+        {
+            float pulse = 1f + Mathf.Sin(Time.unscaledTime * 3f) * 0.08f;
+            target.localScale = originalScale * pulse;
+            yield return null;
+        }
+    }
+
+    // =========================================================
+    // LOCK / UNLOCK ทุกระบบ
+    // =========================================================
+
+    private void LockAllPlayerSystems()
+    {
+        if (playerController != null) playerController.enabled = false;
+        if (playerShooting != null) playerShooting.enabled = false;
+        if (playerParry != null) playerParry.enabled = false;
+        if (slowMotionManager != null) slowMotionManager.enabled = false;
+        if (playerRb != null)
+        {
+            playerRb.linearVelocity = Vector2.zero;
+            playerRb.bodyType = RigidbodyType2D.Kinematic;
+        }
+    }
+
+    private void UnlockAllPlayerSystems()
     {
         if (playerController != null) playerController.enabled = true;
         if (playerShooting != null) playerShooting.enabled = true;
+        if (playerParry != null) playerParry.enabled = true;
+        if (slowMotionManager != null) slowMotionManager.enabled = true;
+        if (playerRb != null)
+        {
+            playerRb.bodyType = RigidbodyType2D.Dynamic;
+        }
     }
 }
