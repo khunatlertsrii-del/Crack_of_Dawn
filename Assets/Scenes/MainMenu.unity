@@ -1242,8 +1242,8 @@ MonoBehaviour:
     volume: 0.8
     trackName: Unknown Track
   tutorialBGM:
-    clip: {fileID: 8300000, guid: 34eaeae2137f0bb42a6870524850d18c, type: 3}
-    volume: 0.8
+    clip: {fileID: 8300000, guid: c3377ab9e04c0be4f8978ee5b2b9e5fc, type: 3}
+    volume: 0.5
     trackName: Unknown Track
   levelBGM:
     clip: {fileID: 8300000, guid: c3377ab9e04c0be4f8978ee5b2b9e5fc, type: 3}
