@@ -3,12 +3,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// คัตซีนเปิดด่าน Level 1 (ปรับปรุงใหม่ V2):
-/// - ควบคุมกล้องแยกจาก Player (ตั้งมุมกล้องเองได้)
-/// - Player พุ่งเข้ามาแบบมีแอนิเมชัน (วิถีโค้ง + หมุน + ลงพื้นเท่ๆ)
-/// - ล็อคทุกอย่างระหว่างคัตซีน (เดินไม่ได้ ยิงไม่ได้)
-/// - มี Screen Shake + เสียง + Flash ตอน Player พุ่งเข้ามา
-/// - เปิด PlayerShooting ชั่วคราวตอนสอนยิง
+/// คัตซีนเปิดด่าน Level 1 (V3):
+/// 1. NPC คุยกัน (กล้องจับที่ NPC ไม่ตาม Player)
+/// 2. Player พุ่งเข้ามาทะลุหน้าต่าง + เล่นท่าสไลด์
+/// 3. ★ กลางสไลด์ → เวลาหยุด → สอนกด Shift
+/// 4. ★ กด Shift → สโลว์โม (มีขอบฟิล์ม!) → Player สไลด์ต่อแบบช้าๆ
+/// 5. สไลด์ถึงจุดจอด → สอนยิง → ยิง → จบคัตซีน
 /// </summary>
 public class IntroCutscene : MonoBehaviour
 {
@@ -56,25 +56,40 @@ public class IntroCutscene : MonoBehaviour
     public AudioClip landingSound;
 
     [Header("=== ตั้งค่า ===")]
-    public float playerEntryDuration = 0.8f;
+    public float playerEntryDuration = 1.2f;
     public float delayBeforeEntry = 0.5f;
-    public float cameraFollowSpeed = 5f;
-    [Tooltip("ความสูงสูงสุดของวิถีโค้ง (ยิ่งเยอะ Player พุ่งสูงยิ่งเท่)")]
-    public float arcHeight = 3f;
+    [Tooltip("ความสูงของวิถีโค้ง (ปรับเป็น 0 ถ้าอยากให้สไลด์มาบนพื้นตรงๆ)")]
+    public float arcHeight = 0f;
+    [Tooltip("จุดที่สไลด์ถึงแล้วจะหยุดเวลา (0.0 = เริ่มสไลด์ ถึง 1.0 = ถึงจุดจอด ปกติใช้ 0.4)")]
+    [Range(0.1f, 0.9f)]
+    public float freezeAtProgress = 0.4f;
+
+    [Header("=== แอนิเมชันและ UI ===")]
+    [Tooltip("ชื่อ State ของแอนิเมชันสไลด์ที่คุณวาดไว้ใน Animator")]
+    public string slideAnimationState = "Slide";
+    [Tooltip("ชื่อ State ท่ายืนปกติ")]
+    public string idleAnimationState = "Idle";
+    
+    [Tooltip("หน้า UI ที่ต้องการซ่อนชั่วคราวระหว่างคัตซีน (ลาก Canvas หลอดเลือด/สโลว์/กระสุน มาใส่)")]
+    public GameObject[] gameplayUI;
 
     // State
     private bool cutsceneActive = false;
     private bool waitingForSlowMo = false;
     private bool waitingForShoot = false;
+    private bool slideResumed = false;
     private InputAction slowMoAction;
     private InputAction shootAction;
     private Rigidbody2D playerRb;
     private PlayerController playerController;
     private PlayerShooting playerShooting;
     private PlayerParry playerParry;
+    private PlayerAnimator playerAnimatorScript;
+    private Animator playerAnimator;
     private CameraFollow cameraFollow;
     private SlowMotionManager slowMotionManager;
     private Camera mainCam;
+    private AnimatorUpdateMode originalAnimUpdateMode;
 
     private void Awake()
     {
@@ -96,6 +111,9 @@ public class IntroCutscene : MonoBehaviour
             playerController = player.GetComponent<PlayerController>();
             playerShooting = player.GetComponent<PlayerShooting>();
             playerParry = player.GetComponent<PlayerParry>();
+            playerAnimatorScript = player.GetComponent<PlayerAnimator>();
+            // ถ้าไม่ได้ลาก Animator ใส่มาเอง ให้ลองหาดูในลูกๆ
+            if (playerAnimator == null) playerAnimator = player.GetComponentInChildren<Animator>();
         }
 
         mainCam = Camera.main;
@@ -121,10 +139,13 @@ public class IntroCutscene : MonoBehaviour
     {
         if (!cutsceneActive) return;
 
-        if (waitingForSlowMo && slowMoAction.WasPressedThisFrame())
+        // ไม่ได้กดค้าง = false, กดค้าง = true
+        bool isHoldingSlowMo = slowMoAction.IsPressed();
+
+        // ให้อัปเดตสถานะ slideResumed ตามการกดค้าง
+        if (waitingForSlowMo)
         {
-            waitingForSlowMo = false;
-            StartCoroutine(OnSlowMoPressed());
+            slideResumed = isHoldingSlowMo;
         }
 
         if (waitingForShoot && shootAction.WasPressedThisFrame())
@@ -142,6 +163,12 @@ public class IntroCutscene : MonoBehaviour
     {
         cutsceneActive = true;
 
+        // รอ 1 เฟรม ให้สคริปต์อื่นๆ (เช่น UI) ตั้งค่าตัวเองใน Start ให้เสร็จก่อน ค่อยสั่งปิด
+        yield return null;
+
+        // ซ่อน UI ระหว่างคัตซีน
+        SetGameplayUI(false);
+
         // === 1. ปิดทุกอย่าง (เดิน ยิง สโลว์ ดาบ) ===
         LockAllPlayerSystems();
 
@@ -153,7 +180,6 @@ public class IntroCutscene : MonoBehaviour
         if (cameraFollow != null) cameraFollow.enabled = false;
         if (cameraFocusNPC != null && mainCam != null)
         {
-            // Snap กล้องไปที่จุด NPC ทันที
             Vector3 camPos = cameraFocusNPC.position;
             camPos.z = mainCam.transform.position.z;
             mainCam.transform.position = camPos;
@@ -169,15 +195,15 @@ public class IntroCutscene : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(delayBeforeEntry);
 
-        // === 4. ย้ายกล้องไปจุด Action (ค่อยๆ แพน) ===
+        // === 4. ย้ายกล้องไปจุด Action ===
         if (cameraFocusAction != null && mainCam != null)
         {
             yield return StartCoroutine(PanCameraTo(cameraFocusAction.position, 0.6f));
         }
 
-        // === 5. Player พุ่งเข้ามาทะลุหน้าต่าง! (แบบมีวิถีโค้ง + หมุน) ===
+        // === 5. Player พุ่งเข้ามา + สไลด์ (จะหยุดกลางทาง!) ===
         player.SetActive(true);
-        
+
         // เอฟเฟกต์กระจกแตก
         if (windowBreakEffect != null) windowBreakEffect.SetActive(true);
         if (windowBreakSound != null && AudioManager.Instance != null)
@@ -187,46 +213,27 @@ public class IntroCutscene : MonoBehaviour
         if (CameraFollow.Instance != null)
             CameraFollow.Instance.ShakeCamera(0.3f, 0.4f);
 
-        // Player พุ่งเข้ามาแบบวิถีโค้ง + หมุนตัว
-        yield return StartCoroutine(ArcEntryAnimation());
+        // สไลด์เข้ามา → จะหยุดกลางทาง → รอกดสโลว์ → สไลด์ต่อ → ถึงจุดจอด
+        yield return StartCoroutine(SlideEntryWithFreeze());
 
-        // เสียงลงพื้น + Screen Shake ตอนลงจอด!
+        // === ถึงจุดจอดแล้ว ===
+        
+        // เสียงลงพื้น + Screen Shake
         if (landingSound != null && AudioManager.Instance != null)
             AudioManager.Instance.PlaySFX(landingSound, 0.8f);
         if (CameraFollow.Instance != null)
             CameraFollow.Instance.ShakeCamera(0.4f, 0.3f);
 
-        // === 6. Freeze Frame! (หยุดเวลา) ===
-        Time.timeScale = 0f;
+        // หยุดท่าสไลด์ กลับมาท่า Idle
+        if (playerAnimator != null)
+        {
+            playerAnimator.Play(idleAnimationState);
+        }
 
-        // แฟลชขาวจอ (ถ้ามี ScreenEffectManager)
         yield return new WaitForSecondsRealtime(0.3f);
 
-        // === 7. สอน Shift (สโลว์โม) ===
-        if (slowMoPrompt != null)
-        {
-            slowMoPrompt.SetActive(true);
-            // เด้งเข้ามาเล็กน้อย
-            StartCoroutine(PulseEffect(slowMoPrompt.transform));
-        }
-        waitingForSlowMo = true;
-    }
-
-    private IEnumerator OnSlowMoPressed()
-    {
-        if (slowMoPrompt != null) slowMoPrompt.SetActive(false);
-
-        // เปิดสโลว์โม (ไม่ใช้ SlowMotionManager เพราะมันถูกล็อค)
-        Time.timeScale = 0.15f;
-
-        // เปิดเอฟเฟกต์ขอบฟิล์มสโลว์
-        if (ScreenEffectManager.Instance != null)
-            ScreenEffectManager.Instance.TriggerAdrenaline();
-
-        yield return new WaitForSecondsRealtime(0.6f);
-
-        // === 8. สอนคลิกซ้ายยิง ===
-        // **เปิด PlayerShooting ชั่วคราวเพื่อให้ยิงได้!**
+        // === สอนยิง ===
+        // เปิด PlayerShooting ชั่วคราว
         if (playerShooting != null) playerShooting.enabled = true;
 
         if (shootPrompt != null)
@@ -237,26 +244,154 @@ public class IntroCutscene : MonoBehaviour
         waitingForShoot = true;
     }
 
+    // =========================================================
+    // สไลด์ + หยุดกลางทาง + สโลว์โม + สไลด์ต่อ
+    // =========================================================
+
+    private IEnumerator SlideEntryWithFreeze()
+    {
+        if (playerLandPoint == null) yield break;
+
+        Vector3 start = player.transform.position;
+        Vector3 end = playerLandPoint.position;
+
+        // หันหน้าให้ถูก
+        if (player.transform.localScale.x < 0)
+        {
+            Vector3 scale = player.transform.localScale;
+            scale.x *= -1;
+            player.transform.localScale = scale;
+        }
+
+        // ปิด PlayerAnimator script ไม่ให้มันแย่งควบคุม Animator
+        if (playerAnimatorScript != null) playerAnimatorScript.enabled = false;
+
+        // ตั้ง Animator ให้อัปเดตแม้ TimeScale = 0
+        if (playerAnimator != null)
+        {
+            originalAnimUpdateMode = playerAnimator.updateMode;
+            playerAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+            playerAnimator.Play(slideAnimationState);
+        }
+
+        // === ช่วงที่ 1: สไลด์เข้ามาจนถึงจุดหยุด (freezeAtProgress) ===
+        float elapsed = 0f;
+        float phase1Duration = playerEntryDuration * freezeAtProgress;
+
+        while (elapsed < phase1Duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / playerEntryDuration); // t ตาม duration ทั้งหมด
+            float easedT = 1f - Mathf.Pow(1f - t, 3f);
+            Vector3 pos = Vector3.Lerp(start, end, easedT);
+            float arc = arcHeight * 4f * t * (1f - t);
+            pos.y += arc;
+            player.transform.position = pos;
+            yield return null;
+        }
+
+        // === ★ หยุดเวลา! (Freeze Frame กลางอากาศ/กลางสไลด์) ===
+        Time.timeScale = 0f;
+
+        yield return new WaitForSecondsRealtime(0.3f);
+
+        // โชว์ "กด Shift ค้างไว้"
+        if (slowMoPrompt != null)
+        {
+            slowMoPrompt.SetActive(true);
+            StartCoroutine(PulseEffect(slowMoPrompt.transform));
+        }
+        waitingForSlowMo = true;
+        slideResumed = false;
+
+        // รอจนกว่าจะเริ่มกด Shift (hold)
+        yield return new WaitUntil(() => slideResumed);
+
+        // ปิด Prompt "กด Shift"
+        if (slowMoPrompt != null) slowMoPrompt.SetActive(false);
+        waitingForSlowMo = false; // ไม่ต้องเช็ค prompt แล้ว
+
+        // เปิดเอฟเฟกต์ขอบฟิล์ม/Adrenaline
+        if (ScreenEffectManager.Instance != null)
+            ScreenEffectManager.Instance.TriggerAdrenaline();
+
+        if (AudioManager.Instance != null && AudioManager.Instance.slowMoEnterSound != null)
+            AudioManager.Instance.PlayUISound(AudioManager.Instance.slowMoEnterSound);
+
+        if (CameraFollow.Instance != null)
+            CameraFollow.Instance.ShakeCamera(0.15f, 0.2f);
+
+        // === ช่วงที่ 2: สไลด์ต่อแบบสโลว์โม (ระยะที่เหลือ) ===
+        // ถ้าปล่อยปุ่ม Shift เวลาจะหยุดนิ่ง!
+        while (elapsed < playerEntryDuration)
+        {
+            // เช็คว่ากดค้างอยู่ไหม (ในขณะอยู่ใน Phase 2)
+            bool isHolding = slowMoAction.IsPressed();
+
+            if (isHolding)
+            {
+                Time.timeScale = 0.15f;
+                Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+                float dt = Time.unscaledDeltaTime * Time.timeScale;
+                elapsed += dt;
+                
+                float t = Mathf.Clamp01(elapsed / playerEntryDuration);
+                float easedT = 1f - Mathf.Pow(1f - t, 3f);
+                Vector3 pos = Vector3.Lerp(start, end, easedT);
+                float arc = arcHeight * 4f * t * (1f - t);
+                pos.y += arc;
+                player.transform.position = pos;
+            }
+            else
+            {
+                // ถ้าปล่อยปุ่ม ให้หยุดนิ่ง!
+                Time.timeScale = 0f;
+                Time.fixedDeltaTime = 0f;
+            }
+
+            yield return null;
+        }
+
+        // ลงจุดพอดี
+        player.transform.position = end;
+        if (playerRb != null) playerRb.linearVelocity = Vector2.zero;
+        // คืนค่า timeScale
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
+    }
+
+
+
+    // =========================================================
+    // เมื่อกดยิง
+    // =========================================================
+
     private IEnumerator OnShootPressed()
     {
         if (shootPrompt != null) shootPrompt.SetActive(false);
 
-        // ปิด shooting กลับ (จะเปิดอีกทีตอนจบคัตซีน)
-        // ไม่ปิดเพราะกระสุนต้องบินไปก่อน
-
-        // เวลากลับมาเดินปกติ!
+        // เวลากลับมาปกติ
         Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
 
-        // Screen Shake เบาๆ ตอนกระสุนออก
+        // เสียงออกสโลว์
+        if (AudioManager.Instance != null && AudioManager.Instance.slowMoExitSound != null)
+            AudioManager.Instance.PlayUISound(AudioManager.Instance.slowMoExitSound);
+
+        // Screen Shake ตอนกระสุนออก
         if (CameraFollow.Instance != null)
             CameraFollow.Instance.ShakeCamera(0.15f, 0.2f);
 
         // รอให้กระสุนบินไปโดน NPC
         yield return new WaitForSeconds(0.8f);
 
-        // === 9. จบคัตซีน — คืนการควบคุมทุกอย่าง ===
+        // === จบคัตซีน ===
         UnlockAllPlayerSystems();
         cutsceneActive = false;
+        
+        // เปิด UI กลับมา
+        SetGameplayUI(true);
 
         // เปิดกล้องตาม Player กลับ
         if (cameraFollow != null) cameraFollow.enabled = true;
@@ -265,54 +400,7 @@ public class IntroCutscene : MonoBehaviour
     }
 
     // =========================================================
-    // ANIMATION — วิถีโค้ง + หมุนตัว
-    // =========================================================
-
-    private IEnumerator ArcEntryAnimation()
-    {
-        if (playerLandPoint == null) yield break;
-
-        Vector3 start = player.transform.position;
-        Vector3 end = playerLandPoint.position;
-        float elapsed = 0f;
-
-        // เก็บ rotation เดิม
-        Quaternion originalRotation = player.transform.rotation;
-
-        while (elapsed < playerEntryDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = Mathf.Clamp01(elapsed / playerEntryDuration);
-
-            // Ease out (เริ่มเร็ว ชะลอตอนท้าย)
-            float easedT = 1f - Mathf.Pow(1f - t, 3f);
-
-            // ตำแหน่ง Lerp ตรงๆ
-            Vector3 pos = Vector3.Lerp(start, end, easedT);
-
-            // เพิ่มวิถีโค้ง (พาราโบลา)
-            float arc = arcHeight * 4f * t * (1f - t); // สูงสุดตรงกลาง
-            pos.y += arc;
-
-            player.transform.position = pos;
-
-            // หมุนตัว Player (Flip + Spin) 
-            float spin = t * 360f; // หมุนครบ 1 รอบ
-            player.transform.rotation = Quaternion.Euler(0, 0, -spin);
-
-            yield return null;
-        }
-
-        // ลงจุดพอดี + รีเซ็ต rotation
-        player.transform.position = end;
-        player.transform.rotation = originalRotation;
-
-        // หยุด Rigidbody
-        if (playerRb != null) playerRb.linearVelocity = Vector2.zero;
-    }
-
-    // =========================================================
-    // CAMERA PAN — แพนกล้องไปจุดที่ต้องการ
+    // CAMERA PAN
     // =========================================================
 
     private IEnumerator PanCameraTo(Vector3 target, float duration)
@@ -320,7 +408,7 @@ public class IntroCutscene : MonoBehaviour
         if (mainCam == null) yield break;
 
         Vector3 start = mainCam.transform.position;
-        target.z = start.z; // คง Z ไว้
+        target.z = start.z;
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -334,7 +422,7 @@ public class IntroCutscene : MonoBehaviour
     }
 
     // =========================================================
-    // PULSE EFFECT — ปุ่มเด้งตอนขึ้น
+    // PULSE EFFECT
     // =========================================================
 
     private IEnumerator PulseEffect(Transform target)
@@ -342,18 +430,16 @@ public class IntroCutscene : MonoBehaviour
         Vector3 originalScale = target.localScale;
         float timer = 0f;
 
-        // เด้งใหญ่ขึ้นแล้วหดกลับ
         while (timer < 0.4f)
         {
             timer += Time.unscaledDeltaTime;
             float t = timer / 0.4f;
-            float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.3f; // เด้ง 30%
+            float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.3f;
             target.localScale = originalScale * scale;
             yield return null;
         }
         target.localScale = originalScale;
 
-        // ยังค้างอยู่ = เต้นเบาๆ ไปเรื่อยๆ
         while (target.gameObject.activeSelf)
         {
             float pulse = 1f + Mathf.Sin(Time.unscaledTime * 3f) * 0.08f;
@@ -363,8 +449,17 @@ public class IntroCutscene : MonoBehaviour
     }
 
     // =========================================================
-    // LOCK / UNLOCK ทุกระบบ
+    // HELPERS
     // =========================================================
+
+    private void SetGameplayUI(bool show)
+    {
+        if (gameplayUI == null) return;
+        foreach (GameObject ui in gameplayUI)
+        {
+            if (ui != null) ui.SetActive(show);
+        }
+    }
 
     private void LockAllPlayerSystems()
     {
@@ -385,6 +480,8 @@ public class IntroCutscene : MonoBehaviour
         if (playerShooting != null) playerShooting.enabled = true;
         if (playerParry != null) playerParry.enabled = true;
         if (slowMotionManager != null) slowMotionManager.enabled = true;
+        if (playerAnimatorScript != null) playerAnimatorScript.enabled = true;
+        if (playerAnimator != null) playerAnimator.updateMode = originalAnimUpdateMode;
         if (playerRb != null)
         {
             playerRb.bodyType = RigidbodyType2D.Dynamic;
