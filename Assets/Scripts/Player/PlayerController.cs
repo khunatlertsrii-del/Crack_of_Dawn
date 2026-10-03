@@ -512,6 +512,12 @@ public class PlayerController : MonoBehaviour
 
         hasJumped = true;
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        
+        // เล่นเสียงกระโดด
+        if (AudioManager.Instance != null && AudioManager.Instance.jumpSound != null)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.jumpSound, 0.8f);
+        }
     }
 
     private void PerformWallJump()
@@ -525,6 +531,12 @@ public class PlayerController : MonoBehaviour
 
         // ล้างสิทธิ์การ Double Jump ทิ้งเพื่อไม่ให้กระโดดซ้อนกลางอากาศได้อีก
         extraJumpsRemaining = 0;
+
+        // เล่นเสียง Wall Jump
+        if (AudioManager.Instance != null && AudioManager.Instance.wallJumpSound != null)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.wallJumpSound, 0.8f);
+        }
 
         // Flip ไปฝั่งตรงข้าม
         if ((wallDirection > 0 && IsFacingRight) || (wallDirection < 0 && !IsFacingRight))
