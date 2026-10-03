@@ -1240,32 +1240,37 @@ MonoBehaviour:
   mainMenuBGM:
     clip: {fileID: 8300000, guid: 350a07818d09b5b4c825ecf07234bf3e, type: 3}
     volume: 0.8
+    trackName: Unknown Track
   tutorialBGM:
     clip: {fileID: 8300000, guid: 34eaeae2137f0bb42a6870524850d18c, type: 3}
     volume: 0.8
+    trackName: Unknown Track
   levelBGM:
     clip: {fileID: 8300000, guid: c3377ab9e04c0be4f8978ee5b2b9e5fc, type: 3}
     volume: 0.5
+    trackName: Unknown Track
   victoryBGM:
     clip: {fileID: 8300000, guid: 6134a24fbcfbd53468d5968d95607026, type: 3}
     volume: 0.8
+    trackName: Unknown Track
   gameOverBGM:
     clip: {fileID: 0}
     volume: 1
+    trackName: Unknown Track
   shootSounds:
   - {fileID: 8300000, guid: 63d94a6916aea7d42b94f7ee31d0a65c, type: 3}
   reloadSound: {fileID: 8300000, guid: 700974b3656d55043b84d95e276760a4, type: 3}
-  jumpSound: {fileID: 8300000, guid: 538c83e37c47e5d4b8c9c20bf7b9c2a1, type: 3}
+  jumpSound: {fileID: 8300000, guid: 58b2785a8fc2d0e4b8e67207c702614a, type: 3}
   wallJumpSound: {fileID: 8300000, guid: 485070915a1155b44b4097a591a255ea, type: 3}
-  dashSlideSound: {fileID: 0}
+  dashSlideSound: {fileID: 8300000, guid: 7c17bfe3e61835c4e90314659fb2a7d5, type: 3}
   playerHitSound: {fileID: 0}
   swordSpinSound: {fileID: 8300000, guid: cdfb0b4a8eda50545a1a4f93e3c9d217, type: 3}
   swordHitEnemySound: {fileID: 8300000, guid: 8f3aba5d4090a484fa15fb2d38c419af, type: 3}
   parrySuccessSound: {fileID: 8300000, guid: a82009f77f86d924db5e228627f6ec8e, type: 3}
   enemyDeathSound: {fileID: 0}
   enemyShootSound: {fileID: 8300000, guid: 63d94a6916aea7d42b94f7ee31d0a65c, type: 3}
-  slowMoEnterSound: {fileID: 0}
-  slowMoExitSound: {fileID: 0}
+  slowMoEnterSound: {fileID: 8300000, guid: 6a27cd8b0887bf64e86afa010d7a225a, type: 3}
+  slowMoExitSound: {fileID: 8300000, guid: ca460b2a4e3e3864089a4e09261f149a, type: 3}
   pauseOpenSound: {fileID: 8300000, guid: 74563d2d111fc0743846a775048aaee0, type: 3}
   uiHoverSound: {fileID: 8300000, guid: 6eaba46998b0c7241be4b035cbd3c77e, type: 3}
   uiClickSound: {fileID: 8300000, guid: 74563d2d111fc0743846a775048aaee0, type: 3}
