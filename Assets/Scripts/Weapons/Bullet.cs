@@ -113,6 +113,12 @@ public class Bullet : MonoBehaviour
     {
         if (hasHit) return;
 
+        // --- ป้องกันกระสุนผู้เล่นติดกล่อง Interactable Object (เช่น กล่องสำรวจที่ซ้อนอยู่กับศัตรู) ---
+        if (other.GetComponent<InteractableObject>() != null || other.GetComponentInParent<InteractableObject>() != null)
+        {
+            return; // ทะลุผ่านไปเลย ไม่ต้องสนใจ
+        }
+
         // ป้องกันไม่ให้กระสุนผู้เล่นยิงโดนตัวเอง (ไม่ว่าจะใช้ Box Collider หรือ Circle Collider)
         if (other.CompareTag("Player") || 
             other.gameObject.layer == LayerMask.NameToLayer("Player") ||
@@ -163,6 +169,12 @@ public class Bullet : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (hasHit) return;
+
+        // --- ป้องกันกระสุนผู้เล่นติดกล่อง Interactable Object (กรณีกล่องแข็ง) ---
+        if (collision.gameObject.GetComponent<InteractableObject>() != null || collision.gameObject.GetComponentInParent<InteractableObject>() != null)
+        {
+            return;
+        }
 
         // ป้องกันไม่ให้กระสุนผู้เล่นยิงโดนตัวเอง
         if (collision.gameObject.CompareTag("Player") || 

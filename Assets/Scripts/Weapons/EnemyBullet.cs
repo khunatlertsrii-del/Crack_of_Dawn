@@ -176,7 +176,7 @@ public class EnemyBullet : MonoBehaviour
         }
 
         // 2. ชน IDamageable อื่นๆ (ที่ไม่ใช่ศัตรู และไม่ใช่ผู้เล่น) เช่น ถังระเบิด
-        if (!other.CompareTag("Enemy") && other.GetComponent<FriedEggEnemy>() == null)
+        if (!other.CompareTag("Enemy") && other.GetComponent<FriedEggEnemy>() == null && other.GetComponentInParent<FriedEggEnemy>() == null)
         {
             IDamageable damageable = other.GetComponent<IDamageable>();
             if (damageable == null) damageable = other.GetComponentInParent<IDamageable>();
@@ -222,7 +222,7 @@ public class EnemyBullet : MonoBehaviour
             return;
         }
 
-        if (!collision.gameObject.CompareTag("Enemy"))
+        if (!collision.gameObject.CompareTag("Enemy") && collision.gameObject.GetComponent<FriedEggEnemy>() == null && collision.gameObject.GetComponentInParent<FriedEggEnemy>() == null)
         {
             IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
             if (damageable == null) damageable = collision.gameObject.GetComponentInParent<IDamageable>();
