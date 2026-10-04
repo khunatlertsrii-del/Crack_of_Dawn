@@ -189,7 +189,7 @@ MonoBehaviour:
   accuracySpread: 5
   firePoint: {fileID: 7500110097614045434}
   fireRate: 1.5
-  bulletSpeed: 15
+  bulletSpeed: 12
   burstCount: 1
   timeBetweenBurstShots: 0.1
   burstsBeforeReload: 12
@@ -198,6 +198,7 @@ MonoBehaviour:
   yolkRenderer: {fileID: 2437846765032935679}
   headPivot: {fileID: 4964960095303055901}
   gunPivot: {fileID: 4207649433857598197}
+  disableAI: 0
 --- !u!70 &21008441206084270
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
