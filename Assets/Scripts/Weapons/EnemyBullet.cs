@@ -139,6 +139,12 @@ public class EnemyBullet : MonoBehaviour
             return;
         }
 
+        // --- ป้องกันกระสุนติดกล่อง Interactable Object ---
+        if (other.GetComponent<InteractableObject>() != null || other.GetComponentInParent<InteractableObject>() != null)
+        {
+            return; // ทะลุผ่านไปเลย ไม่ต้องสนใจ
+        }
+
         // 1. เช็คก่อนเลย! ชน Player หรือชิ้นส่วนลูกๆ ของ Player หรือไม่? (ไม่ว่าจะตั้ง Tag ว่าอะไร)
         PlayerParry parry = other.GetComponent<PlayerParry>();
         if (parry == null) parry = other.GetComponentInParent<PlayerParry>();
@@ -205,6 +211,14 @@ public class EnemyBullet : MonoBehaviour
         if (parry != null && parry.IsParrying)
         {
             parry.DeflectBullet(this);
+            return;
+        }
+
+        // --- ป้องกันกระสุนติดกล่อง Interactable Object (กรณีกล่องแข็ง) ---
+        if (collision.gameObject.GetComponent<InteractableObject>() != null || collision.gameObject.GetComponentInParent<InteractableObject>() != null)
+        {
+            // ทำลายไม่ได้ เพราะต้องให้กระสุนทะลุ แต่เนื่องจากเป็น Collision มันอาจจะเด้งออกทางฟิสิกส์ไปแล้ว
+            // วิธีแก้คือต้องตั้ง Layer ไว้ แต่เบื้องต้นคือป้องกันไม่ให้มัน Destroy ตัวเอง
             return;
         }
 
