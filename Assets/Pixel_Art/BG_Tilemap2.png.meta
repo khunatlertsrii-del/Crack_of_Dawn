@@ -1,0 +1,949 @@
+fileFormatVersion: 2
+guid: 73dc33efb63d14946aa47ba1656d558d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7874849048647412945
+    second: BG_Tilemap2_0
+  - first:
+      213: 4579653338436061818
+    second: BG_Tilemap2_1
+  - first:
+      213: 5266293259809836995
+    second: BG_Tilemap2_2
+  - first:
+      213: 4473829285976036359
+    second: BG_Tilemap2_3
+  - first:
+      213: -1078451492482807494
+    second: BG_Tilemap2_4
+  - first:
+      213: -1811661317925913517
+    second: BG_Tilemap2_5
+  - first:
+      213: -8311089404001330449
+    second: BG_Tilemap2_6
+  - first:
+      213: -3952614492652660991
+    second: BG_Tilemap2_7
+  - first:
+      213: 6501861204665100569
+    second: BG_Tilemap2_8
+  - first:
+      213: -6484942841127553568
+    second: BG_Tilemap2_9
+  - first:
+      213: -5676430892410257183
+    second: BG_Tilemap2_10
+  - first:
+      213: 6932076281415762843
+    second: BG_Tilemap2_11
+  - first:
+      213: -439412598766904291
+    second: BG_Tilemap2_12
+  - first:
+      213: -6170981985382176210
+    second: BG_Tilemap2_13
+  - first:
+      213: -5063388946143857761
+    second: BG_Tilemap2_14
+  - first:
+      213: 6525459449978610242
+    second: BG_Tilemap2_15
+  - first:
+      213: 1474852923706611363
+    second: BG_Tilemap2_16
+  - first:
+      213: -4909459953920360775
+    second: BG_Tilemap2_17
+  - first:
+      213: -4503188465023066426
+    second: BG_Tilemap2_18
+  - first:
+      213: -3574181253089913058
+    second: BG_Tilemap2_19
+  - first:
+      213: 6928562831214174487
+    second: BG_Tilemap2_20
+  - first:
+      213: -8253592141871701928
+    second: BG_Tilemap2_21
+  - first:
+      213: 8468089490816108619
+    second: BG_Tilemap2_22
+  - first:
+      213: 3449960603393739453
+    second: BG_Tilemap2_23
+  - first:
+      213: -4056240300001761963
+    second: BG_Tilemap2_24
+  - first:
+      213: -7219345805269133597
+    second: BG_Tilemap2_25
+  - first:
+      213: -3488653370342096042
+    second: BG_Tilemap2_26
+  - first:
+      213: 4529603170424737976
+    second: BG_Tilemap2_27
+  - first:
+      213: -5379426739830768359
+    second: BG_Tilemap2_28
+  - first:
+      213: -2008455030460819588
+    second: BG_Tilemap2_29
+  - first:
+      213: 2040492593292689899
+    second: BG_Tilemap2_30
+  - first:
+      213: -1609806859058258817
+    second: BG_Tilemap2_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BG_Tilemap2_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 238
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f235c83538ae6b290800000000000000
+      internalID: -7874849048647412945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_1
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 238
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7ac9ef72723e8f30800000000000000
+      internalID: 4579653338436061818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_2
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 238
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3cfcff951d1a51940800000000000000
+      internalID: 5266293259809836995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_3
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 238
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7045750480c361e30800000000000000
+      internalID: 4473829285976036359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_4
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 238
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a39821bd4129801f0800000000000000
+      internalID: -1078451492482807494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_5
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 206
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35cb5b341afabd6e0800000000000000
+      internalID: -1811661317925913517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_6
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 206
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: feadcf9983419ac80800000000000000
+      internalID: -8311089404001330449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_7
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 206
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 107906f8f0e7529c0800000000000000
+      internalID: -3952614492652660991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_8
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 206
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 919e4fa31504b3a50800000000000000
+      internalID: 6501861204665100569
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_9
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 157
+        width: 28
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e531ed38dad006a0800000000000000
+      internalID: -6484942841127553568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_10
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 158
+        width: 30
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e045d9ad244931b0800000000000000
+      internalID: -5676430892410257183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_11
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 158
+        width: 30
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9382b576aea33060800000000000000
+      internalID: 6932076281415762843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_12
+      rect:
+        serializedVersion: 2
+        x: 126
+        y: 158
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1cdaacc194e6e9f0800000000000000
+      internalID: -439412598766904291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_13
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 158
+        width: 24
+        height: 40
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2ae5fd54944c5aa0800000000000000
+      internalID: -6170981985382176210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_14
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 158
+        width: 24
+        height: 40
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f93b479949a3bb9b0800000000000000
+      internalID: -5063388946143857761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_15
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 158
+        width: 25
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 242e030ebc61f8a50800000000000000
+      internalID: 6525459449978610242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_16
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 125
+        width: 13
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a69a758beab77410800000000000000
+      internalID: 1474852923706611363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_17
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 125
+        width: 13
+        height: 27
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9be329fee281edbb0800000000000000
+      internalID: -4909459953920360775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_18
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 125
+        width: 33
+        height: 21
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ced9a133f57181c0800000000000000
+      internalID: -4503188465023066426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_19
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 132
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1717be4615f56ec0800000000000000
+      internalID: -3574181253089913058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_20
+      rect:
+        serializedVersion: 2
+        x: 151
+        y: 132
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 711ee769f23372060800000000000000
+      internalID: 6928562831214174487
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_21
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 131
+        width: 24
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85028c62da9557d80800000000000000
+      internalID: -8253592141871701928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_22
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 132
+        width: 17
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b48005aa682b48570800000000000000
+      internalID: 8468089490816108619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_23
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 132
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dba406ed3e8b0ef20800000000000000
+      internalID: 3449960603393739453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_24
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 88
+        width: 17
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55565c220f655b7c0800000000000000
+      internalID: -4056240300001761963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_25
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 88
+        width: 21
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e61a366d3bbfcb90800000000000000
+      internalID: -7219345805269133597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_26
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 88
+        width: 36
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6534a4c4e30d59fc0800000000000000
+      internalID: -3488653370342096042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_27
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 88
+        width: 25
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b056aaa5126cde30800000000000000
+      internalID: 4529603170424737976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_28
+      rect:
+        serializedVersion: 2
+        x: 157
+        y: 88
+        width: 16
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91d362da1ef6855b0800000000000000
+      internalID: -5379426739830768359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_29
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 88
+        width: 16
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7759028ac88024e0800000000000000
+      internalID: -2008455030460819588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_30
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 88
+        width: 16
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be1c60ed339415c10800000000000000
+      internalID: 2040492593292689899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BG_Tilemap2_31
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 88
+        width: 18
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7c58d8d031d8a9e0800000000000000
+      internalID: -1609806859058258817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: bec359e4b9f899e42bf130c3d5bfec3f
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      BG_Tilemap2_0: -7874849048647412945
+      BG_Tilemap2_1: 4579653338436061818
+      BG_Tilemap2_10: -5676430892410257183
+      BG_Tilemap2_11: 6932076281415762843
+      BG_Tilemap2_12: -439412598766904291
+      BG_Tilemap2_13: -6170981985382176210
+      BG_Tilemap2_14: -5063388946143857761
+      BG_Tilemap2_15: 6525459449978610242
+      BG_Tilemap2_16: 1474852923706611363
+      BG_Tilemap2_17: -4909459953920360775
+      BG_Tilemap2_18: -4503188465023066426
+      BG_Tilemap2_19: -3574181253089913058
+      BG_Tilemap2_2: 5266293259809836995
+      BG_Tilemap2_20: 6928562831214174487
+      BG_Tilemap2_21: -8253592141871701928
+      BG_Tilemap2_22: 8468089490816108619
+      BG_Tilemap2_23: 3449960603393739453
+      BG_Tilemap2_24: -4056240300001761963
+      BG_Tilemap2_25: -7219345805269133597
+      BG_Tilemap2_26: -3488653370342096042
+      BG_Tilemap2_27: 4529603170424737976
+      BG_Tilemap2_28: -5379426739830768359
+      BG_Tilemap2_29: -2008455030460819588
+      BG_Tilemap2_3: 4473829285976036359
+      BG_Tilemap2_30: 2040492593292689899
+      BG_Tilemap2_31: -1609806859058258817
+      BG_Tilemap2_4: -1078451492482807494
+      BG_Tilemap2_5: -1811661317925913517
+      BG_Tilemap2_6: -8311089404001330449
+      BG_Tilemap2_7: -3952614492652660991
+      BG_Tilemap2_8: 6501861204665100569
+      BG_Tilemap2_9: -6484942841127553568
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
