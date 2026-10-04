@@ -595,6 +595,12 @@ public class PlayerController : MonoBehaviour
 
         // ระเบิดขอบจอ (ความเร็ว)
         ScreenEffectManager.Instance?.TriggerAdrenaline();
+        
+        // เล่นเสียงสไลด์
+        if (AudioManager.Instance != null && AudioManager.Instance.dashSlideSound != null)
+        {
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.dashSlideSound, 0.7f);
+        }
     }
 
     private void EndSlide()

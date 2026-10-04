@@ -1242,12 +1242,12 @@ MonoBehaviour:
     volume: 0.8
     trackName: Unknown Track
   tutorialBGM:
-    clip: {fileID: 8300000, guid: c3377ab9e04c0be4f8978ee5b2b9e5fc, type: 3}
-    volume: 0.5
+    clip: {fileID: 8300000, guid: d80f8a2caed6e864c933130563edad10, type: 3}
+    volume: 0.8
     trackName: Unknown Track
   levelBGM:
     clip: {fileID: 8300000, guid: c3377ab9e04c0be4f8978ee5b2b9e5fc, type: 3}
-    volume: 0.5
+    volume: 0.4
     trackName: Unknown Track
   victoryBGM:
     clip: {fileID: 8300000, guid: 6134a24fbcfbd53468d5968d95607026, type: 3}
@@ -1260,10 +1260,10 @@ MonoBehaviour:
   shootSounds:
   - {fileID: 8300000, guid: 63d94a6916aea7d42b94f7ee31d0a65c, type: 3}
   reloadSound: {fileID: 8300000, guid: 700974b3656d55043b84d95e276760a4, type: 3}
-  jumpSound: {fileID: 8300000, guid: 58b2785a8fc2d0e4b8e67207c702614a, type: 3}
-  wallJumpSound: {fileID: 8300000, guid: 485070915a1155b44b4097a591a255ea, type: 3}
+  jumpSound: {fileID: 8300000, guid: 8736ca7ebc84c474ea3c1c03b2dfc978, type: 3}
+  wallJumpSound: {fileID: 8300000, guid: 72960ac722c3ce548b362c9322cee046, type: 3}
   dashSlideSound: {fileID: 8300000, guid: 7c17bfe3e61835c4e90314659fb2a7d5, type: 3}
-  playerHitSound: {fileID: 0}
+  playerHitSound: {fileID: 8300000, guid: b3aca506cbe5ae24a948a9804f96ebc3, type: 3}
   swordSpinSound: {fileID: 8300000, guid: cdfb0b4a8eda50545a1a4f93e3c9d217, type: 3}
   swordHitEnemySound: {fileID: 8300000, guid: 8f3aba5d4090a484fa15fb2d38c419af, type: 3}
   parrySuccessSound: {fileID: 8300000, guid: a82009f77f86d924db5e228627f6ec8e, type: 3}

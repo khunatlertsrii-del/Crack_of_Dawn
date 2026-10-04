@@ -41,6 +41,13 @@ public class TargetPracticeEgg : MonoBehaviour
 
     private void Start()
     {
+        // ปิด AI ปกติของ FriedEggEnemy เพื่อไม่ให้แย่งกันเล็งและยิง
+        FriedEggEnemy egg = GetComponent<FriedEggEnemy>();
+        if (egg != null)
+        {
+            egg.disableAI = true;
+        }
+
         fireTimer = fireInterval;
 
         // สร้าง firePoint อัตโนมัติถ้าไม่ได้ลากมา
@@ -129,9 +136,50 @@ public class TargetPracticeEgg : MonoBehaviour
             EnemyBullet eb = bullet.GetComponent<EnemyBullet>();
             if (eb != null) eb.Initialize(direction, bulletSpeed);
         }
+        else
+        {
+            SpawnDefaultEnemyBullet(direction);
+        }
 
         // เอฟเฟกต์แสงไฟปลายปืน
         if (HitEffect.Instance != null)
             HitEffect.Instance.PlayMuzzleFlash(firePoint.position, direction);
+            
+        // เล่นเสียงยิง
+        if (AudioManager.Instance != null && AudioManager.Instance.enemyShootSound != null)
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.enemyShootSound, 0.4f);
+    }
+
+    private void SpawnDefaultEnemyBullet(Vector2 direction)
+    {
+        GameObject bullet = new GameObject("EnemyBullet");
+        bullet.transform.position = firePoint.position;
+
+        var sr = bullet.AddComponent<SpriteRenderer>();
+        Texture2D tex = new Texture2D(4, 4);
+        Color[] px = new Color[16];
+        for (int i = 0; i < 16; i++) px[i] = Color.white;
+        tex.SetPixels(px);
+        tex.Apply();
+        tex.filterMode = FilterMode.Point;
+        sr.sprite = Sprite.Create(tex, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4);
+        
+        sr.color = new Color(1f, 0.7f, 0f); // กระสุนสีส้มทอง
+        sr.sortingOrder = 10;
+        bullet.transform.localScale = new Vector3(0.3f, 0.1f, 1f);
+
+        var rb2d = bullet.AddComponent<Rigidbody2D>();
+        rb2d.gravityScale = 0;
+        rb2d.linearVelocity = direction * bulletSpeed;
+
+        var col = bullet.AddComponent<CircleCollider2D>();
+        col.radius = 0.3f;
+        col.isTrigger = true;
+
+        var eb = bullet.AddComponent<EnemyBullet>();
+        eb.Initialize(direction, bulletSpeed);
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        bullet.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 }

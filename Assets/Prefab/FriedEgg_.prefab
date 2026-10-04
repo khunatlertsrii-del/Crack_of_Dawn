@@ -189,7 +189,7 @@ MonoBehaviour:
   accuracySpread: 5
   firePoint: {fileID: 7500110097614045434}
   fireRate: 1.5
-  bulletSpeed: 12
+  bulletSpeed: 15
   burstCount: 1
   timeBetweenBurstShots: 0.1
   burstsBeforeReload: 12

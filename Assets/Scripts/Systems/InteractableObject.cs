@@ -16,8 +16,14 @@ public class InteractableObject : MonoBehaviour
     [Tooltip("ใส่คำสั่งที่จะให้ทำงานทันทีเมื่อกดสำรวจ เช่น ลบประตู, เปลี่ยนเพลง, สปอนศัตรู")]
     public UnityEngine.Events.UnityEvent OnInteract;
 
+    [Header("✨ แอนิเมชั่นปุ่ม (ลอยขึ้นลง)")]
+    public bool enableFloatingAnimation = true;
+    public float floatSpeed = 4f;
+    public float floatHeight = 0.2f;
+
     private bool isPlayerInRange = false;
     private InputAction interactAction;
+    private Vector3 promptInitialLocalPos;
 
     private void Awake()
     {
@@ -27,7 +33,11 @@ public class InteractableObject : MonoBehaviour
         interactAction.AddBinding("<Gamepad>/buttonWest"); // ปุ่ม X บนจอย
         
         // ซ่อนปุ่มเตือนไว้ก่อน
-        if (interactPromptUI != null) interactPromptUI.SetActive(false);
+        if (interactPromptUI != null) 
+        {
+            interactPromptUI.SetActive(false);
+            promptInitialLocalPos = interactPromptUI.transform.localPosition;
+        }
 
         // บังคับให้ Collider เป็น Trigger เสมอ
         GetComponent<BoxCollider2D>().isTrigger = true;
@@ -38,6 +48,13 @@ public class InteractableObject : MonoBehaviour
 
     private void Update()
     {
+        // ถ้าโชว์ปุ่มอยู่ ให้ทำแอนิเมชั่นลอยขึ้นลง
+        if (isPlayerInRange && interactPromptUI != null && enableFloatingAnimation)
+        {
+            float offset = Mathf.Sin(Time.unscaledTime * floatSpeed) * floatHeight;
+            interactPromptUI.transform.localPosition = promptInitialLocalPos + new Vector3(0, offset, 0);
+        }
+
         // ถ้าผู้เล่นอยู่ในระยะ และกดปุ่ม E และกล่องข้อความยังไม่ได้เปิดอยู่
         if (isPlayerInRange && interactAction.WasPressedThisFrame())
         {
@@ -64,7 +81,11 @@ public class InteractableObject : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             isPlayerInRange = true;
-            if (interactPromptUI != null) interactPromptUI.SetActive(true); // โชว์ปุ่ม E
+            if (interactPromptUI != null) 
+            {
+                interactPromptUI.transform.localPosition = promptInitialLocalPos;
+                interactPromptUI.SetActive(true); // โชว์ปุ่ม E
+            }
         }
     }
 

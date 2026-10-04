@@ -184,10 +184,13 @@ public class FriedEggEnemy : MonoBehaviour, IDamageable
 
     private float playerSearchTimer = 0f;
 
+    public bool disableAI = false;
+
     private void Update()
     {
         if (!IsAlive) return;
         if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive) return;
+        if (disableAI) return; // ข้ามการทำงานของ AI ทั้งหมด (ใช้สำหรับ TargetPracticeEgg)
 
         // หา Player (พยายามหาเรื่อยๆ แต่ไม่บล็อค idle และไม่ทำทุกเฟรมเพื่อลดแลค)
         if (playerTransform == null)

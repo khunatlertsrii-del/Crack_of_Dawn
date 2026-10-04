@@ -16,6 +16,12 @@ public class DialogueManager : MonoBehaviour
     [Header("Settings")]
     public float typingSpeed = 0.05f; // ความเร็วในการพิมพ์
 
+    [Header("Audio Settings")]
+    public AudioClip openSound; // เสียงตอนกล่องข้อความเด้งขึ้นมา
+    public AudioClip clickSound; // เสียงตอนกดข้าม/ไปประโยคถัดไป
+    public AudioClip typeSound; // เสียงพิมพ์ดีดตัวอักษร
+    [Range(0f, 1f)] public float soundVolume = 0.5f;
+
     private Queue<string> sentences;
     private bool isTyping = false;
     private string currentSentence = "";
@@ -65,6 +71,8 @@ public class DialogueManager : MonoBehaviour
                 return;
             }
 
+            PlaySound(clickSound); // เล่นเสียงตอนกดปุ่ม
+
             if (isTyping)
             {
                 // ถ้ากำลังพิมพ์อยู่ ให้โชว์ข้อความทั้งหมดทันที (ข้ามแอนิเมชันพิมพ์)
@@ -86,6 +94,8 @@ public class DialogueManager : MonoBehaviour
         skipNextInput = true;
         dialogueBoxPanel.SetActive(true);
         sentences.Clear();
+
+        PlaySound(openSound); // เล่นเสียงเปิดกล่องข้อความ
 
         foreach (string line in lines)
         {
@@ -121,6 +131,14 @@ public class DialogueManager : MonoBehaviour
         for (int i = 0; i <= sentence.Length; i++)
         {
             dialogueText.maxVisibleCharacters = i;
+
+            // เล่นเสียงพิมพ์ดีด (ไม่เล่นทุกตัวอักษรเพื่อไม่ให้หนวกหูเกินไป)
+            if (i % 2 == 0 && sentence.Length > 0 && i < sentence.Length)
+            {
+                // สุ่ม Pitch เล็กน้อยให้เสียงไม่น่าเบื่อ
+                PlaySoundWithPitch(typeSound, Random.Range(0.9f, 1.1f));
+            }
+
             yield return new WaitForSecondsRealtime(typingSpeed); // ใช้ Realtime เพราะเราหยุดเวลา (TimeScale=0)
         }
         
@@ -131,5 +149,27 @@ public class DialogueManager : MonoBehaviour
     {
         dialogueBoxPanel.SetActive(false);
         lastDialogueEndTime = Time.unscaledTime; // เก็บเวลาตอนคุยจบ
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        if (clip != null && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayUISound(clip);
+        }
+    }
+
+    private void PlaySoundWithPitch(AudioClip clip, float pitch)
+    {
+        if (clip == null) return;
+        
+        // เล่นเสียง UI แบบมี Pitch (สร้าง AudioSource ชั่วคราว)
+        GameObject soundObj = new GameObject("TypeSound");
+        AudioSource src = soundObj.AddComponent<AudioSource>();
+        src.clip = clip;
+        src.volume = soundVolume;
+        src.pitch = pitch;
+        src.Play();
+        Destroy(soundObj, clip.length + 0.1f);
     }
 }
