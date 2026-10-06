@@ -139,10 +139,10 @@ TextureImporter:
       name: BG_Tilemap_Brick_0
       rect:
         serializedVersion: 2
-        x: 31
-        y: 187
-        width: 34
-        height: 20
+        x: 32
+        y: 190
+        width: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -249,10 +249,10 @@ TextureImporter:
       name: BG_Tilemap_Brick_5
       rect:
         serializedVersion: 2
-        x: 31
-        y: 125
-        width: 34
-        height: 18
+        x: 32
+        y: 126
+        width: 32
+        height: 16
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
