@@ -113,8 +113,19 @@ public class Bullet : MonoBehaviour
     {
         if (hasHit) return;
 
-        // --- ป้องกันกระสุนผู้เล่นติดกล่อง Interactable Object (เช่น กล่องสำรวจที่ซ้อนอยู่กับศัตรู) ---
-        if (other.GetComponent<InteractableObject>() != null || other.GetComponentInParent<InteractableObject>() != null)
+        // === บังคับให้ยิงถังระเบิดได้เสมอ (เผื่อมีกล่อง Interact บังอยู่) ===
+        ExplosiveBarrel barrel = other.GetComponent<ExplosiveBarrel>();
+        if (barrel == null) barrel = other.GetComponentInParent<ExplosiveBarrel>();
+        if (barrel != null)
+        {
+            hasHit = true;
+            barrel.TakeDamage(damage, transform.position, false, direction);
+            DestroyBullet();
+            return;
+        }
+
+        // --- ป้องกันกระสุนผู้เล่นติดกล่อง Interactable Object ---
+        if (other.GetComponent<InteractableObject>() != null)
         {
             return; // ทะลุผ่านไปเลย ไม่ต้องสนใจ
         }
@@ -170,8 +181,18 @@ public class Bullet : MonoBehaviour
     {
         if (hasHit) return;
 
+        ExplosiveBarrel barrel = collision.gameObject.GetComponent<ExplosiveBarrel>();
+        if (barrel == null) barrel = collision.gameObject.GetComponentInParent<ExplosiveBarrel>();
+        if (barrel != null)
+        {
+            hasHit = true;
+            barrel.TakeDamage(damage, transform.position, false, direction);
+            DestroyBullet();
+            return;
+        }
+
         // --- ป้องกันกระสุนผู้เล่นติดกล่อง Interactable Object (กรณีกล่องแข็ง) ---
-        if (collision.gameObject.GetComponent<InteractableObject>() != null || collision.gameObject.GetComponentInParent<InteractableObject>() != null)
+        if (collision.gameObject.GetComponent<InteractableObject>() != null)
         {
             return;
         }

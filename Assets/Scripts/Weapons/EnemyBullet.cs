@@ -140,7 +140,7 @@ public class EnemyBullet : MonoBehaviour
         }
 
         // --- ป้องกันกระสุนติดกล่อง Interactable Object ---
-        if (other.GetComponent<InteractableObject>() != null || other.GetComponentInParent<InteractableObject>() != null)
+        if (other.GetComponent<InteractableObject>() != null)
         {
             return; // ทะลุผ่านไปเลย ไม่ต้องสนใจ
         }
@@ -215,7 +215,7 @@ public class EnemyBullet : MonoBehaviour
         }
 
         // --- ป้องกันกระสุนติดกล่อง Interactable Object (กรณีกล่องแข็ง) ---
-        if (collision.gameObject.GetComponent<InteractableObject>() != null || collision.gameObject.GetComponentInParent<InteractableObject>() != null)
+        if (collision.gameObject.GetComponent<InteractableObject>() != null)
         {
             // ทำลายไม่ได้ เพราะต้องให้กระสุนทะลุ แต่เนื่องจากเป็น Collision มันอาจจะเด้งออกทางฟิสิกส์ไปแล้ว
             // วิธีแก้คือต้องตั้ง Layer ไว้ แต่เบื้องต้นคือป้องกันไม่ให้มัน Destroy ตัวเอง

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 public class ExplosiveBarrel : MonoBehaviour, IDamageable
 {
     [Header("Explosion Settings")]
+    [Tooltip("เสียงระเบิด")]
+    public AudioClip explosionSound;
     [Tooltip("รัศมีการระเบิด")]
     public float explosionRadius = 3f;
     [Tooltip("ดาเมจที่ทำกับผู้เล่น")]
@@ -39,6 +41,12 @@ public class ExplosiveBarrel : MonoBehaviour, IDamageable
     private void Explode()
     {
         hasExploded = true;
+
+        // 0. เล่นเสียงระเบิด
+        if (explosionSound != null && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX(explosionSound);
+        }
 
         // 1. สั่นกล้อง
         if (CameraFollow.Instance != null)
