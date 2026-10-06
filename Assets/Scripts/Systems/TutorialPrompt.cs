@@ -36,14 +36,13 @@ public class TutorialPrompt : MonoBehaviour
         col.isTrigger = true;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         // ถ้าผู้เล่นอยู่ในเขต และตั้งให้ไอคอนลอยตามหัว
         if (isPlayerInside && followPlayer && playerTransform != null && promptVisual != null && promptVisual.activeSelf)
         {
-            // ย้ายไอคอนไปลอยบนหัวผู้เล่นแบบนุ่มนวล
-            Vector3 targetPos = playerTransform.position + Vector3.up * heightOffset;
-            promptVisual.transform.position = Vector3.Lerp(promptVisual.transform.position, targetPos, 15f * Time.unscaledDeltaTime);
+            // ย้ายไอคอนไปลอยบนหัวผู้เล่นแบบติดเป๊ะๆ เหมือน Katana Zero
+            promptVisual.transform.position = playerTransform.position + Vector3.up * heightOffset;
         }
     }
 

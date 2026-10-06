@@ -1,0 +1,665 @@
+fileFormatVersion: 2
+guid: 79acb17590e43bf45978bb1527fc0b2c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7130634695373304680
+    second: Tutorail_Button_0
+  - first:
+      213: -3899815724434151932
+    second: Tutorail_Button_1
+  - first:
+      213: 2665495035582183296
+    second: Tutorail_Button_2
+  - first:
+      213: 8227497219375598220
+    second: Tutorail_Button_3
+  - first:
+      213: 754452118111056800
+    second: Tutorail_Button_4
+  - first:
+      213: -2574575251829592241
+    second: Tutorail_Button_5
+  - first:
+      213: 6106043562396641750
+    second: Tutorail_Button_6
+  - first:
+      213: -1471903019924717038
+    second: Tutorail_Button_7
+  - first:
+      213: -8475012687903120910
+    second: Tutorail_Button_8
+  - first:
+      213: 6694400972541784484
+    second: Tutorail_Button_9
+  - first:
+      213: -3736985121987250538
+    second: Tutorail_Button_10
+  - first:
+      213: -3626910909868888103
+    second: Tutorail_Button_11
+  - first:
+      213: -3218053704161300361
+    second: Tutorail_Button_12
+  - first:
+      213: 6714515533162842987
+    second: Tutorail_Button_13
+  - first:
+      213: 9135627196819477415
+    second: Tutorail_Button_14
+  - first:
+      213: 9044578626377356032
+    second: Tutorail_Button_15
+  - first:
+      213: -3574674676491886513
+    second: Tutorail_Button_16
+  - first:
+      213: -3670195398922464682
+    second: Tutorail_Button_17
+  - first:
+      213: 1343759700018524984
+    second: Tutorail_Button_18
+  - first:
+      213: 7749619328426236913
+    second: Tutorail_Button_19
+  - first:
+      213: -5779383261576222491
+    second: Tutorail_Button_20
+  - first:
+      213: 408100333082512767
+    second: Tutorail_Button_21
+  - first:
+      213: -6274281709458213477
+    second: Tutorail_Button_22
+  - first:
+      213: -1564570698957611303
+    second: Tutorail_Button_23
+  - first:
+      213: 4555237954982380599
+    second: Tutorail_Button_24
+  - first:
+      213: 2682219449052550059
+    second: Tutorail_Button_25
+  - first:
+      213: -7168649204273403609
+    second: Tutorail_Button_26
+  - first:
+      213: 1843361125002987982
+    second: Tutorail_Button_27
+  - first:
+      213: 5115851845747962128
+    second: Tutorail_Button_28
+  - first:
+      213: -3534311393527542342
+    second: Tutorail_Button_29
+  - first:
+      213: -1278837087033153846
+    second: Tutorail_Button_30
+  - first:
+      213: -6875827791208669635
+    second: Tutorail_Button_31
+  - first:
+      213: -8711637726004070092
+    second: Tutorail_Button_32
+  - first:
+      213: 814045604598767771
+    second: Tutorail_Button_33
+  - first:
+      213: -5122610319200733505
+    second: Tutorail_Button_34
+  - first:
+      213: -5992081195726392543
+    second: Tutorail_Button_35
+  - first:
+      213: 8780161081489337524
+    second: Tutorail_Button_36
+  - first:
+      213: -1307498855779582183
+    second: Tutorail_Button_37
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Tutorail_Button_0
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 238
+        width: 29
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89cc2373685ea0d90800000000000000
+      internalID: -7130634695373304680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_1
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 238
+        width: 29
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 406ae9fb24211e9c0800000000000000
+      internalID: -3899815724434151932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_2
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 238
+        width: 29
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 087717acc9dbdf420800000000000000
+      internalID: 2665495035582183296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_3
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 238
+        width: 29
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8a856f3121fd2270800000000000000
+      internalID: 8227497219375598220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_4
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 250
+        width: 30
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a3fc04443a587a00800000000000000
+      internalID: 754452118111056800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_7
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 186
+        width: 29
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21200997000c29be0800000000000000
+      internalID: -1471903019924717038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_8
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 211
+        width: 29
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f12b96ecd4b26a80800000000000000
+      internalID: -8475012687903120910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_19
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 205
+        width: 30
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1fbd85f48bd2c8b60800000000000000
+      internalID: 7749619328426236913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_20
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 209
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e829e84b818bcfa0800000000000000
+      internalID: -5779383261576222491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_21
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 204
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7d0a1a371dd9a500800000000000000
+      internalID: 408100333082512767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_22
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 204
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b95330f17064de8a0800000000000000
+      internalID: -6274281709458213477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_27
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 205
+        width: 40
+        height: 11
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec941983d2fe49910800000000000000
+      internalID: 1843361125002987982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_28
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 197
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 011755516282ff640800000000000000
+      internalID: 5115851845747962128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_29
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 189
+        width: 40
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abdcc2f538a93fec0800000000000000
+      internalID: -3534311393527542342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_30
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 189
+        width: 30
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac62bc5e178a04ee0800000000000000
+      internalID: -1278837087033153846
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_31
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 184
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3e9f38bd072490a0800000000000000
+      internalID: -6875827791208669635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_32
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 184
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 439b2a9f4ab0a1780800000000000000
+      internalID: -8711637726004070092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tutorail_Button_37
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 143
+        width: 27
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91f3705d7b4dadde0800000000000000
+      internalID: -1307498855779582183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 72b0718efccce974ea2e1149bd2a9543
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Tutorail_Button_0: -7130634695373304680
+      Tutorail_Button_1: -3899815724434151932
+      Tutorail_Button_10: -3736985121987250538
+      Tutorail_Button_11: -3626910909868888103
+      Tutorail_Button_12: -3218053704161300361
+      Tutorail_Button_13: 6714515533162842987
+      Tutorail_Button_14: 9135627196819477415
+      Tutorail_Button_15: 9044578626377356032
+      Tutorail_Button_16: -3574674676491886513
+      Tutorail_Button_17: -3670195398922464682
+      Tutorail_Button_18: 1343759700018524984
+      Tutorail_Button_19: 7749619328426236913
+      Tutorail_Button_2: 2665495035582183296
+      Tutorail_Button_20: -5779383261576222491
+      Tutorail_Button_21: 408100333082512767
+      Tutorail_Button_22: -6274281709458213477
+      Tutorail_Button_23: -1564570698957611303
+      Tutorail_Button_24: 4555237954982380599
+      Tutorail_Button_25: 2682219449052550059
+      Tutorail_Button_26: -7168649204273403609
+      Tutorail_Button_27: 1843361125002987982
+      Tutorail_Button_28: 5115851845747962128
+      Tutorail_Button_29: -3534311393527542342
+      Tutorail_Button_3: 8227497219375598220
+      Tutorail_Button_30: -1278837087033153846
+      Tutorail_Button_31: -6875827791208669635
+      Tutorail_Button_32: -8711637726004070092
+      Tutorail_Button_33: 814045604598767771
+      Tutorail_Button_34: -5122610319200733505
+      Tutorail_Button_35: -5992081195726392543
+      Tutorail_Button_36: 8780161081489337524
+      Tutorail_Button_37: -1307498855779582183
+      Tutorail_Button_4: 754452118111056800
+      Tutorail_Button_5: -2574575251829592241
+      Tutorail_Button_6: 6106043562396641750
+      Tutorail_Button_7: -1471903019924717038
+      Tutorail_Button_8: -8475012687903120910
+      Tutorail_Button_9: 6694400972541784484
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
