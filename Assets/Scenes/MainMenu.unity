@@ -1246,7 +1246,7 @@ MonoBehaviour:
     volume: 0.8
     trackName: Unknown Track
   levelBGM:
-    clip: {fileID: 8300000, guid: c3377ab9e04c0be4f8978ee5b2b9e5fc, type: 3}
+    clip: {fileID: 0}
     volume: 0.4
     trackName: Unknown Track
   victoryBGM:
