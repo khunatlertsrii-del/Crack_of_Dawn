@@ -32,12 +32,18 @@ public class DialogueManager : MonoBehaviour
     // ปุมสำหรับกด Next (ใช้ปุ่ม E หรือ Spacebar หรือเมาส์คลิกซ้ายก็ได้)
     private InputAction nextAction;
 
+    private AudioSource typeAudioSource; // เพิ่ม AudioSource ถาวร
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
         sentences = new Queue<string>();
+
+        // สร้าง AudioSource ถาวรเพื่อเล่นเสียงพิมพ์ (จะได้ตัดเสียงเก่าทิ้งทันที)
+        typeAudioSource = gameObject.AddComponent<AudioSource>();
+        typeAudioSource.playOnAwake = false;
 
         // สร้างปุ่มกด Next 
         nextAction = new InputAction("NextDialogue", InputActionType.Button);
@@ -79,6 +85,7 @@ public class DialogueManager : MonoBehaviour
                 StopAllCoroutines();
                 dialogueText.maxVisibleCharacters = currentSentence.Length;
                 isTyping = false;
+                if (typeAudioSource != null) typeAudioSource.Stop(); // หยุดเสียงพิมพ์ทันทีเมื่อกดข้าม
             }
             else
             {
@@ -115,6 +122,7 @@ public class DialogueManager : MonoBehaviour
 
         currentSentence = sentences.Dequeue();
         StopAllCoroutines();
+        if (typeAudioSource != null) typeAudioSource.Stop(); // หยุดเสียงค้าง
         StartCoroutine(TypeSentence(currentSentence));
     }
 
@@ -132,8 +140,11 @@ public class DialogueManager : MonoBehaviour
         {
             dialogueText.maxVisibleCharacters = i;
 
-            // เล่นเสียงพิมพ์ดีด (ไม่เล่นทุกตัวอักษรเพื่อไม่ให้หนวกหูเกินไป)
-            if (i % 2 == 0 && sentence.Length > 0 && i < sentence.Length)
+            // ตรวจว่าเป็น space หรือไม่
+            bool isSpace = i > 0 && i <= sentence.Length && sentence[i - 1] == ' ';
+
+            // เล่นเสียงพิมพ์ดีด (ไม่เล่นตอนเคาะ space)
+            if (i % 2 == 0 && sentence.Length > 0 && i < sentence.Length && !isSpace)
             {
                 // สุ่ม Pitch เล็กน้อยให้เสียงไม่น่าเบื่อ
                 PlaySoundWithPitch(typeSound, Random.Range(0.9f, 1.1f));
@@ -143,12 +154,14 @@ public class DialogueManager : MonoBehaviour
         }
         
         isTyping = false;
+        if (typeAudioSource != null) typeAudioSource.Stop(); // พิมพ์จบหยุดเสียงทันที
     }
 
     public void EndDialogue()
     {
         dialogueBoxPanel.SetActive(false);
         lastDialogueEndTime = Time.unscaledTime; // เก็บเวลาตอนคุยจบ
+        if (typeAudioSource != null) typeAudioSource.Stop();
     }
 
     private void PlaySound(AudioClip clip)
@@ -161,15 +174,12 @@ public class DialogueManager : MonoBehaviour
 
     private void PlaySoundWithPitch(AudioClip clip, float pitch)
     {
-        if (clip == null) return;
+        if (clip == null || typeAudioSource == null) return;
         
-        // เล่นเสียง UI แบบมี Pitch (สร้าง AudioSource ชั่วคราว)
-        GameObject soundObj = new GameObject("TypeSound");
-        AudioSource src = soundObj.AddComponent<AudioSource>();
-        src.clip = clip;
-        src.volume = soundVolume;
-        src.pitch = pitch;
-        src.Play();
-        Destroy(soundObj, clip.length + 0.1f);
+        // ใช้ AudioSource ถาวรเพื่อเล่นเสียงพิมพ์ (จะตัดเสียงเก่าทิ้งทันทีที่มีเสียงใหม่)
+        typeAudioSource.clip = clip;
+        typeAudioSource.volume = soundVolume;
+        typeAudioSource.pitch = pitch;
+        typeAudioSource.Play();
     }
 }
