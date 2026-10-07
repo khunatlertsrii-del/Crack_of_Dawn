@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f24c2227e5ae7604d91dc65f5ad1ad58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExplosiveBarrel
-  explosionSound: {fileID: 0}
+  explosionSound: {fileID: 8300000, guid: f5074431308f9a74fbd7bc48f38596af, type: 3}
   explosionRadius: 3
   playerDamage: 20
   enemyDamage: 100
