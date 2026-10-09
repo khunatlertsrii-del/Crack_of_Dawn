@@ -124,6 +124,13 @@ public class LevelRatingManager : MonoBehaviour
     public void ShowVictorySummary()
     {
         isLevelActive = false; // หยุดเวลา
+
+        // บังคับหยุด Slow-Mo ก่อน เพื่อไม่ให้ขอบจอค้างอยู่
+        if (SlowMotionManager.Instance != null)
+        {
+            SlowMotionManager.Instance.DeactivateSlowMotion();
+        }
+
         Time.timeScale = 0f; // หยุดเกม
 
         // เล่นเพลงหน้าชนะ

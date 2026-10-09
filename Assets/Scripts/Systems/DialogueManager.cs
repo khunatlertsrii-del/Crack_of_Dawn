@@ -83,7 +83,8 @@ public class DialogueManager : MonoBehaviour
             {
                 // ถ้ากำลังพิมพ์อยู่ ให้โชว์ข้อความทั้งหมดทันที (ข้ามแอนิเมชันพิมพ์)
                 StopAllCoroutines();
-                dialogueText.maxVisibleCharacters = currentSentence.Length;
+                dialogueText.ForceMeshUpdate();
+                dialogueText.maxVisibleCharacters = dialogueText.textInfo.characterCount;
                 isTyping = false;
                 if (typeAudioSource != null) typeAudioSource.Stop(); // หยุดเสียงพิมพ์ทันทีเมื่อกดข้าม
             }
@@ -126,35 +127,42 @@ public class DialogueManager : MonoBehaviour
         StartCoroutine(TypeSentence(currentSentence));
     }
 
-    // ระบบพิมพ์ดีด (โผล่มาทีละตัวอักษร)
+    // ระบบพิมพ์ดีด (โผล่มาทีละตัวอักษร) — ใช้ TMP characterCount แทน string.Length
     IEnumerator TypeSentence(string sentence)
     {
         isTyping = true;
         
-        // ใส่ข้อความไปให้หมดก่อน เพื่อให้มันจัดบรรทัด (Word Wrap) ล่วงหน้า จะได้ไม่กระโดด
+        // ใส่ข้อความไปให้หมดก่อน เพื่อให้มันจัดบรรทัด (Word Wrap) ล่วงหน้า
         dialogueText.text = sentence;
+        dialogueText.ForceMeshUpdate(); // บังคับให้ TMP คำนวณก่อน
+        
+        // นับจำนวนตัวอักษรที่ "มองเห็นจริง" (ไม่นับแท็ก <color>, <link> ฯลฯ)
+        int totalVisibleChars = dialogueText.textInfo.characterCount;
         dialogueText.maxVisibleCharacters = 0; // ซ่อนไว้ก่อน
         
-        // ใช้ regular for loop
-        for (int i = 0; i <= sentence.Length; i++)
+        for (int i = 0; i <= totalVisibleChars; i++)
         {
             dialogueText.maxVisibleCharacters = i;
 
-            // ตรวจว่าเป็น space หรือไม่
-            bool isSpace = i > 0 && i <= sentence.Length && sentence[i - 1] == ' ';
-
-            // เล่นเสียงพิมพ์ดีด (ไม่เล่นตอนเคาะ space)
-            if (i % 2 == 0 && sentence.Length > 0 && i < sentence.Length && !isSpace)
+            // ตรวจว่าตัวอักษรปัจจุบันเป็น space หรือไม่
+            bool isSpace = false;
+            if (i > 0 && i <= totalVisibleChars)
             {
-                // สุ่ม Pitch เล็กน้อยให้เสียงไม่น่าเบื่อ
+                TMP_CharacterInfo charInfo = dialogueText.textInfo.characterInfo[i - 1];
+                isSpace = charInfo.character == ' ';
+            }
+
+            // เล่นเสียงพิมพ์ดีด (ไม่เล่นตอน space)
+            if (i % 2 == 0 && totalVisibleChars > 0 && i < totalVisibleChars && !isSpace)
+            {
                 PlaySoundWithPitch(typeSound, Random.Range(0.9f, 1.1f));
             }
 
-            yield return new WaitForSecondsRealtime(typingSpeed); // ใช้ Realtime เพราะเราหยุดเวลา (TimeScale=0)
+            yield return new WaitForSecondsRealtime(typingSpeed);
         }
         
         isTyping = false;
-        if (typeAudioSource != null) typeAudioSource.Stop(); // พิมพ์จบหยุดเสียงทันที
+        if (typeAudioSource != null) typeAudioSource.Stop();
     }
 
     public void EndDialogue()

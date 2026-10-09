@@ -163,7 +163,7 @@ public class SlowMotionManager : MonoBehaviour
         }
     }
 
-    private void DeactivateSlowMotion()
+    public void DeactivateSlowMotion()
     {
         if (IsSlowMotionActive)
         {

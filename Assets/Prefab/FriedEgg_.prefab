@@ -198,6 +198,7 @@ MonoBehaviour:
   yolkRenderer: {fileID: 2437846765032935679}
   headPivot: {fileID: 4964960095303055901}
   gunPivot: {fileID: 4207649433857598197}
+  disableAI: 0
 --- !u!70 &21008441206084270
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -232,8 +233,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.024499893, y: -0.2604286}
-  m_Size: {x: 1.0026264, y: 1.2563025}
+  m_Offset: {x: -0.057090998, y: -0.25456762}
+  m_Size: {x: 1.0678086, y: 1.2680244}
   m_Direction: 0
 --- !u!1 &1116596475007042141
 GameObject:
