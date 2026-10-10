@@ -57,11 +57,16 @@ public class EnemyBullet : MonoBehaviour
         trail.startColor = glowColor;
         trail.endColor = new Color(glowColor.r, glowColor.g, glowColor.b, 0f);
         
-        trail.sortingOrder = 9;
-        trail.material = new Material(Shader.Find("Sprites/Default"));
+        // ใช้ Material จาก SpriteRenderer (เพื่อหลีกเลี่ยง Shader.Find ใน Build)
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null && sr.material != null)
+        {
+            trail.material = sr.material;
+        }
+
         trail.numCornerVertices = 2;
 
-        var sr = GetComponent<SpriteRenderer>();
+        // ปรับ SpriteRenderer ของกระสุนให้สว่างขึ้นด้วย
         if (sr != null)
         {
             sr.color = new Color(sr.color.r * glowIntensity, sr.color.g * glowIntensity, sr.color.b * glowIntensity, sr.color.a);
