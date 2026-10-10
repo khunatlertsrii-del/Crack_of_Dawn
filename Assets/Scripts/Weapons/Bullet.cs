@@ -300,19 +300,23 @@ public class Bullet : MonoBehaviour
         
         trail.sortingOrder = 9;
         
-        // ใช้ Material จาก SpriteRenderer (เพื่อหลีกเลี่ยง Shader.Find ใน Build)
-        var sr = GetComponent<SpriteRenderer>();
-        if (sr != null && sr.material != null)
-        {
-            trail.material = sr.material;
-        }
-
+        // สร้าง Material ใหม่สำหรับ Trail (ใช้ Sprites/Default ซึ่งไม่โดนตัดทิ้งตอน Build แน่นอน)
+        trail.material = new Material(Shader.Find("Sprites/Default"));
         trail.numCornerVertices = 2;
 
-        // ปรับ SpriteRenderer ของกระสุนให้สว่างขึ้นด้วย
+        // **วิธีแก้ Bloom หายตอน Build:** 
+        // Unity แอบบีบอัดค่าสี (Clamp) ของ SpriteRenderer.color ให้ไม่เกิน 1 เฉพาะตอน Build ทำให้ทะลุ Threshold ของ Bloom ไม่ได้!
+        // เราต้องโยกค่าสี HDR ไปใส่ที่ Material ตรงๆ ผ่าน SetColor เพื่อหลบการบีบอัดนี้
+
+        // 1. ใส่สีเรืองแสงให้ Trail Material
+        trail.material.SetColor("_Color", glowColor);
+
+        // 2. ใส่สีเรืองแสงให้ Sprite Material
+        var sr = GetComponent<SpriteRenderer>();
         if (sr != null)
         {
-            sr.color = new Color(sr.color.r * glowIntensity, sr.color.g * glowIntensity, sr.color.b * glowIntensity, sr.color.a);
+            sr.material.SetColor("_Color", glowColor);
+            sr.color = Color.white; // รีเซ็ตสีปกติเป็นสีขาว เพื่อให้มันใช้สีเรืองแสงจาก Material อย่างเดียว
         }
     }
 }

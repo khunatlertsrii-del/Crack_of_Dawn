@@ -57,19 +57,17 @@ public class EnemyBullet : MonoBehaviour
         trail.startColor = glowColor;
         trail.endColor = new Color(glowColor.r, glowColor.g, glowColor.b, 0f);
         
-        // ใช้ Material จาก SpriteRenderer (เพื่อหลีกเลี่ยง Shader.Find ใน Build)
-        var sr = GetComponent<SpriteRenderer>();
-        if (sr != null && sr.material != null)
-        {
-            trail.material = sr.material;
-        }
-
+        // สร้าง Material ใหม่สำหรับ Trail (ใช้ Sprites/Default)
+        trail.material = new Material(Shader.Find("Sprites/Default"));
         trail.numCornerVertices = 2;
 
-        // ปรับ SpriteRenderer ของกระสุนให้สว่างขึ้นด้วย
+        trail.material.SetColor("_Color", glowColor);
+
+        var sr = GetComponent<SpriteRenderer>();
         if (sr != null)
         {
-            sr.color = new Color(sr.color.r * glowIntensity, sr.color.g * glowIntensity, sr.color.b * glowIntensity, sr.color.a);
+            sr.material.SetColor("_Color", glowColor);
+            sr.color = Color.white;
         }
     }
 
@@ -112,13 +110,18 @@ public class EnemyBullet : MonoBehaviour
         Color cyanGlow = new Color(0f, 1f, 1f, 0.5f) * glowIntensity; // สีฟ้าเรืองแสง
 
         var sr = GetComponent<SpriteRenderer>();
-        if (sr != null) sr.color = cyanGlow;
+        if (sr != null) 
+        {
+            sr.material.SetColor("_Color", cyanGlow);
+            sr.color = Color.white;
+        }
 
         var trail = GetComponent<TrailRenderer>();
         if (trail != null)
         {
             trail.startColor = cyanGlow;
             trail.endColor = new Color(cyanGlow.r, cyanGlow.g, cyanGlow.b, 0f); // ค่อยๆ เฟด
+            if (trail.material != null) trail.material.SetColor("_Color", cyanGlow);
         }
 
         timer = lifetime; // รีเซ็ตเวลา
