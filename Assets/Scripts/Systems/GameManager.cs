@@ -145,6 +145,15 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"[GameManager] Enemy killed! Total: {TotalKills} | Score: {Score} | Critical: {CriticalKills}");
 
+        // --- ระบบฟื้นฟูเลือดสายบวก (Vampiric / DOOM Style) ---
+        // ฆ่าศัตรูแล้วได้เลือด เพื่อให้ผู้เล่นไม่เอาแต่หลบหลังกำแพง
+        PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            float healAmount = wasCritical ? 35f : 15f; // ยิงจุดตายได้เลือดเยอะกว่า!
+            playerHealth.Heal(healAmount);
+        }
+
         // Check victory (ถ้าศัตรูหมด)
         if (activeEnemyCount <= 0 && totalEnemiesInLevel > 0)
         {

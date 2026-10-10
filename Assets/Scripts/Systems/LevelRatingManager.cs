@@ -18,6 +18,12 @@ public class LevelRatingManager : MonoBehaviour
     public int damagePenalty = 500;
     public int missedEnemyPenalty = 1000; // หักเมื่อฆ่าศัตรูไม่ครบ
 
+    [Header("Vampiric Healing (ระบบเลือดสายบวก)")]
+    [Tooltip("เลือดที่ได้เมื่อฆ่าศัตรูธรรมดา")]
+    public float healPerKill = 15f;
+    [Tooltip("เลือดที่ได้เมื่อยิงจุดตาย (Critical)")]
+    public float healPerCriticalKill = 35f;
+
     [Header("Level Stats")]
     private float timeElapsed = 0f;
     private int totalEnemiesInLevel = 0;
@@ -89,6 +95,14 @@ public class LevelRatingManager : MonoBehaviour
     {
         TotalKills++;
         Debug.Log($"[LevelRating] Enemy killed! Total: {TotalKills} / {totalEnemiesInLevel}");
+
+        // --- ระบบฟื้นฟูเลือดสายบวก (Vampiric / DOOM Style) ---
+        PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            float healAmount = isCritical ? healPerCriticalKill : healPerKill; 
+            playerHealth.Heal(healAmount);
+        }
     }
 
     public void PlayerDied()
