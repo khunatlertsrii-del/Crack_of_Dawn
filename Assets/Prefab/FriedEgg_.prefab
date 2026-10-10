@@ -177,7 +177,7 @@ MonoBehaviour:
   patrolDistance: 3
   moveSpeed: 2
   waitTimeAtEnd: 0.5
-  detectionRange: 8
+  detectionRange: 15
   detectionAngle: 90
   obstacleLayer:
     serializedVersion: 2
