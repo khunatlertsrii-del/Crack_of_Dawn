@@ -15,9 +15,17 @@ using System.Collections;
 /// </summary>
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
-    [Header("Health")]
-    [Tooltip("HP สูงสุด")]
-    [SerializeField] private float maxHealth = 100f;
+    [Header("Hit-Based Health (3 ครั้งตาย สไตล์ Mario)")]
+    [Tooltip("เปิดใช้ระบบเลือดแบบนับจำนวนครั้ง (3 ครั้งตาย)")]
+    [SerializeField] private bool useHitBasedHealth = true;
+    [Tooltip("จำนวนครั้งที่โดนยิงได้ก่อนตาย")]
+    [SerializeField] private int maxHits = 3;
+    [Tooltip("โดนโจมตีแต่ละครั้ง ลดกี่ขีด")]
+    [SerializeField] private float damagePerHit = 1f;
+
+    [Header("Health (Classic Mode)")]
+    [Tooltip("HP สูงสุด (ใช้เมื่อปิด useHitBasedHealth)")]
+    [SerializeField] private float maxHealth = 3f;
 
     [Header("I-Frame (Invincibility)")]
     [Tooltip("ระยะเวลาอมตะหลังโดนยิง (วินาที)")]
@@ -29,9 +37,9 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     [Tooltip("แรง Knockback เมื่อโดนยิง")]
     [SerializeField] private float knockbackForce = 5f;
 
-    [Header("Auto Regeneration")]
-    [Tooltip("เปิดใช้รีเจนเลือดอัตโนมัติ (เหมือน My Friend Pedro/CoD)")]
-    [SerializeField] private bool enableAutoRegen = true;
+    [Header("Auto Regeneration (ปิดไว้เพื่อความดุเดือด)")]
+    [Tooltip("เปิดใช้รีเจนเลือดอัตโนมัติ (แนะนำให้ปิดเพื่อให้เกมกดดัน)")]
+    [SerializeField] private bool enableAutoRegen = false;
     [Tooltip("ต้องไม่โดนโจมตีกี่วินาที เลือดถึงจะเริ่มเด้ง")]
     [SerializeField] private float regenDelay = 4.0f;
     [Tooltip("ความเร็วในการรีเจน (HP ต่อวินาที)")]
@@ -68,6 +76,14 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     {
         spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+
+        // โหมด 3 ครั้งตาย (Mario Style)
+        if (useHitBasedHealth)
+        {
+            maxHealth = maxHits;
+            enableAutoRegen = false; // บังคับปิด Auto Regen ทันที
+        }
+
         CurrentHealth = maxHealth;
     }
 
@@ -106,25 +122,28 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
 
 
-        CurrentHealth -= damage;
+        // คำนวณดาเมจ: ถ้าใช้โหมด 3 ครั้งตาย จะลดทีละ 1 ขีด
+        float damageToApply = useHitBasedHealth ? damagePerHit : damage;
+        CurrentHealth -= damageToApply;
         CurrentHealth = Mathf.Max(0, CurrentHealth);
         timeSinceLastHit = 0f; // รีเซ็ตเวลารีเจนเมื่อโดนโจมตี
 
         OnHealthChanged?.Invoke(HealthPercent);
         ScreenEffectManager.Instance?.UpdateHealthPercent(HealthPercent);
-        OnDamaged?.Invoke(damage, hitPoint);
+        OnDamaged?.Invoke(damageToApply, hitPoint);
 
         // เรียกจอแดง!
         ScreenEffectManager.Instance?.PlayDamageEffect();
         ScreenEffectManager.Instance?.TriggerAdrenaline();
 
-        // หักคะแนน
+        // หักคะแนน และหักเวลาจำกัด (Katana Zero Time Penalty)
         if (LevelRatingManager.Instance != null)
         {
             LevelRatingManager.Instance.ApplyPenalty("Damage Taken", LevelRatingManager.Instance.damagePenalty);
+            LevelRatingManager.Instance.ApplyTimePenalty();
         }
 
-        Debug.Log($"[Player] โดนยิง! Damage: {damage} | HP: {CurrentHealth}/{maxHealth}");
+        Debug.Log($"[Player] โดนยิง! เสียเลือด {damageToApply} | HP: {CurrentHealth}/{maxHealth}");
 
         // Knockback
         if (rb != null)
@@ -148,7 +167,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     // DEATH
     // =========================================================
 
-    private void Die()
+    public void Die()
     {
         Debug.Log("[Player] ไข่เจียวตาย! GAME OVER!");
         OnDied?.Invoke();
@@ -221,7 +240,8 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     public void Heal(float amount)
     {
         if (!IsAlive) return;
-        CurrentHealth = Mathf.Min(maxHealth, CurrentHealth + amount);
+        float actualHeal = useHitBasedHealth ? 1f : amount;
+        CurrentHealth = Mathf.Min(maxHealth, CurrentHealth + actualHeal);
         OnHealthChanged?.Invoke(HealthPercent);
         ScreenEffectManager.Instance?.UpdateHealthPercent(HealthPercent);
     }

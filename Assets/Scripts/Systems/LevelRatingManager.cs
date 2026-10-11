@@ -18,11 +18,26 @@ public class LevelRatingManager : MonoBehaviour
     public int damagePenalty = 500;
     public int missedEnemyPenalty = 1000; // หักเมื่อฆ่าศัตรูไม่ครบ
 
-    [Header("Vampiric Healing (ระบบเลือดสายบวก)")]
+    [Header("Katana Zero Countdown Timer (ระบบเวลากดดัน)")]
+    [Tooltip("เปิดใช้ระบบจับเวลานับถอยหลัง")]
+    public bool enableCountdownTimer = true;
+
+    [Tooltip("เวลาจำกัดของด่าน (วินาที) เช่น 45 หรือ 60 วิ")]
+    public float levelTimeLimit = 60f;
+
+    [Tooltip("โดนยิงแล้วหักเวลาลงกี่วินาที")]
+    public float timePenaltyOnHit = 5f;
+
+    [Tooltip("เวลาที่เหลือต่ำกว่ากี่วินาที จึงจะเริ่มกระพริบเตือน (ค่าเริ่มต้น 20 วินาที ปรับได้ตามใจชอบ)")]
+    public float warningTimeThreshold = 20f;
+
+    public float RemainingTime { get; private set; }
+
+    [Header("Vampiric Healing (ระบบเลือดสายบวก - เด้งทีละ 1 ขีด)")]
     [Tooltip("เลือดที่ได้เมื่อฆ่าศัตรูธรรมดา")]
-    public float healPerKill = 15f;
+    public float healPerKill = 1f;
     [Tooltip("เลือดที่ได้เมื่อยิงจุดตาย (Critical)")]
-    public float healPerCriticalKill = 35f;
+    public float healPerCriticalKill = 1f;
 
     [Header("Level Stats")]
     private float timeElapsed = 0f;
@@ -52,6 +67,9 @@ public class LevelRatingManager : MonoBehaviour
     // Events
     public event Action<int> OnScoreChanged;
     public event Action<string> OnGradeCalculated;
+    public event Action<float> OnRemainingTimeChanged;
+    public event Action<float> OnTimePenaltyApplied;
+    public event Action OnTimeOver;
 
     private void Awake()
     {
@@ -59,6 +77,7 @@ public class LevelRatingManager : MonoBehaviour
         {
             Instance = this;
             currentScore = maxScore;
+            RemainingTime = levelTimeLimit;
             if (victoryPanel != null) victoryPanel.SetActive(false);
             if (gameOverPanel != null) gameOverPanel.SetActive(false);
         }
@@ -80,6 +99,78 @@ public class LevelRatingManager : MonoBehaviour
         if (isLevelActive)
         {
             timeElapsed += Time.deltaTime;
+
+            // ระบบนับถอยหลัง Katana Zero Timer
+            if (enableCountdownTimer)
+            {
+                RemainingTime -= Time.deltaTime;
+                OnRemainingTimeChanged?.Invoke(RemainingTime);
+
+                if (RemainingTime <= 0f)
+                {
+                    RemainingTime = 0f;
+                    TriggerTimeOver();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// หักเวลาจำกัดเมื่อโดนยิง (Katana Zero Time Penalty)
+    /// </summary>
+    public void ApplyTimePenalty()
+    {
+        if (!isLevelActive || !enableCountdownTimer) return;
+
+        RemainingTime = Mathf.Max(0f, RemainingTime - timePenaltyOnHit);
+        OnRemainingTimeChanged?.Invoke(RemainingTime);
+        OnTimePenaltyApplied?.Invoke(timePenaltyOnHit);
+        Debug.Log($"[Timer] โดนยิง! เวลาลด {timePenaltyOnHit}s เหลือ: {RemainingTime:F2}s");
+
+        if (RemainingTime <= 0f)
+        {
+            TriggerTimeOver();
+        }
+    }
+
+    /// <summary>
+    /// เรียกเมื่อหมดเวลา
+    /// </summary>
+    public void TriggerTimeOver()
+    {
+        if (!isLevelActive) return;
+        isLevelActive = false;
+
+        Debug.Log("[Timer] หมดเวลา! TIME OVER -> GAME OVER");
+        OnTimeOver?.Invoke();
+
+        // หยุด Slow-Mo ก่อน
+        if (SlowMotionManager.Instance != null)
+        {
+            SlowMotionManager.Instance.DeactivateSlowMotion();
+        }
+
+        // แจ้ง Player ให้ตาย
+        PlayerHealth player = FindFirstObjectByType<PlayerHealth>();
+        if (player != null && player.IsAlive)
+        {
+            player.Die();
+        }
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetState(GameManager.GameState.GameOver);
+        }
+
+        // เล่นเพลง Game Over
+        if (AudioManager.Instance != null && AudioManager.Instance.gameOverBGM != null && AudioManager.Instance.gameOverBGM.clip != null)
+        {
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.gameOverBGM);
         }
     }
 

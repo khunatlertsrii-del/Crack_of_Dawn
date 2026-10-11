@@ -24,6 +24,16 @@ public class UIManager : MonoBehaviour
     [Header("References (Auto-create if empty)")]
     [SerializeField] private Slider hpSlider;
     [SerializeField] private Slider slowMoSlider;
+
+    [Header("Segmented Health Blocks (ระบบช่องเลือดทีละขีด)")]
+    [Tooltip("ลาก GameObject ช่องเลือดแต่ละช่องมาใส่ตรงนี้ (เช่น 3 ช่องตามในภาพ) โดนยิงจะปิดทีละช่อง")]
+    [SerializeField] private GameObject[] healthBlocks;
+
+    [Header("Katana Zero Timer HUD (Auto-create if empty)")]
+    [SerializeField] private GameObject timerContainer;
+    [SerializeField] private Text timerText;
+    [SerializeField] private Text timerPenaltyText;
+    private Coroutine penaltyCoroutine;
     
     // Dynamic HUD (หลบขอบจอตอนเปิด Slow-Mo)
     private RectTransform hpRect;
@@ -82,6 +92,11 @@ public class UIManager : MonoBehaviour
         {
             playerHealth.OnHealthChanged += HandleHealthChanged;
         }
+
+        if (LevelRatingManager.Instance != null)
+        {
+            LevelRatingManager.Instance.OnTimePenaltyApplied += HandleTimePenalty;
+        }
     }
 
     private void Start()
@@ -100,20 +115,19 @@ public class UIManager : MonoBehaviour
             playerHealth.OnHealthChanged += HandleHealthChanged;
         }
 
+        if (LevelRatingManager.Instance != null)
+        {
+            LevelRatingManager.Instance.OnTimePenaltyApplied -= HandleTimePenalty;
+            LevelRatingManager.Instance.OnTimePenaltyApplied += HandleTimePenalty;
+        }
+
         // Initialize values
         UpdateKillCount(0);
         UpdateScore(0);
 
-        // บังคับเปลี่ยนสี UI (ในกรณีที่ Component มีการเซฟค่าสีเก่าไว้ใน Inspector)
         if (hpSlider != null)
         {
-            var bg = hpSlider.transform.Find("Background")?.GetComponent<Image>();
-            if (bg != null) bg.color = Color.black;
-            
-            var label = hpSlider.transform.Find("Label")?.GetComponent<Text>();
-            if (label != null) label.color = Color.black;
-            
-            // อัปเดตสีหลอดเลือดปัจจุบัน
+            // อัปเดตสถานะเลือดเริ่มต้น
             HandleHealthChanged(hpSlider.value);
         }
 
@@ -166,12 +180,40 @@ public class UIManager : MonoBehaviour
             slowMoRect.anchoredPosition = slowPos;
         }
 
+        // อัปเดต Katana Zero Countdown Timer (ไม่ใช้ทศนิยมตามที่ขอ)
+        if (LevelRatingManager.Instance != null && LevelRatingManager.Instance.enableCountdownTimer && timerText != null)
+        {
+            float t = LevelRatingManager.Instance.RemainingTime;
+            int minutes = Mathf.FloorToInt(t / 60F);
+            int seconds = Mathf.FloorToInt(t % 60F);
+            timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+
+            // กระพริบสีเตือนเมื่อเวลาเหลือน้อยกว่า warningTimeThreshold ที่ตั้งไว้
+            float warnTime = LevelRatingManager.Instance.warningTimeThreshold;
+            if (t <= warnTime && t > 0f)
+            {
+                float pulse = Mathf.PingPong(Time.unscaledTime * 6f, 1f);
+                timerText.color = Color.Lerp(Color.red, Color.yellow, pulse);
+            }
+            else if (t <= 0f)
+            {
+                timerText.color = Color.red;
+                timerText.text = "00:00";
+            }
+            else
+            {
+                timerText.color = Color.white;
+            }
+        }
+
         // ซ่อน HUD เมื่อจบด่าน
         bool isActive = LevelRatingManager.Instance == null || LevelRatingManager.Instance.isLevelActive;
         if (hpSlider != null && hpSlider.gameObject.activeSelf != isActive)
             hpSlider.gameObject.SetActive(isActive);
         if (slowMoSlider != null && slowMoSlider.gameObject.activeSelf != isActive)
             slowMoSlider.gameObject.SetActive(isActive);
+        if (timerContainer != null && timerContainer.activeSelf != isActive)
+            timerContainer.SetActive(isActive);
     }
 
     private void OnDisable()
@@ -180,14 +222,62 @@ public class UIManager : MonoBehaviour
         {
             SlowMotionManager.Instance.OnMeterChanged -= HandleSlowMoChanged;
         }
+
+        if (LevelRatingManager.Instance != null)
+        {
+            LevelRatingManager.Instance.OnTimePenaltyApplied -= HandleTimePenalty;
+        }
     }
 
     // =========================================================
     // EVENT HANDLERS
     // =========================================================
 
+    private void HandleTimePenalty(float penaltySeconds)
+    {
+        if (timerPenaltyText != null)
+        {
+            if (penaltyCoroutine != null) StopCoroutine(penaltyCoroutine);
+            penaltyCoroutine = StartCoroutine(ShowPenaltyPopupRoutine(penaltySeconds));
+        }
+    }
+
+    private System.Collections.IEnumerator ShowPenaltyPopupRoutine(float penalty)
+    {
+        timerPenaltyText.text = $"-{penalty:0}s";
+        timerPenaltyText.gameObject.SetActive(true);
+
+        float elapsed = 0f;
+        float duration = 0.8f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            timerPenaltyText.color = new Color(1f, 0.2f, 0.2f, alpha);
+            yield return null;
+        }
+
+        timerPenaltyText.gameObject.SetActive(false);
+    }
+
     private void HandleHealthChanged(float percent)
     {
+        PlayerHealth ph = FindAnyObjectByType<PlayerHealth>();
+        int currentHits = ph != null ? Mathf.RoundToInt(ph.CurrentHealth) : Mathf.RoundToInt(percent * 3f);
+
+        // ระบบช่องเลือดทีละขีด (Segmented Health Blocks)
+        // เมื่อโดนยิง ช่องจะหายไปทีละช่องตามจำนวนเลือดที่เหลือ
+        if (healthBlocks != null && healthBlocks.Length > 0)
+        {
+            for (int i = 0; i < healthBlocks.Length; i++)
+            {
+                if (healthBlocks[i] != null)
+                {
+                    healthBlocks[i].SetActive(i < currentHits);
+                }
+            }
+        }
+
         if (hpSlider != null)
         {
             hpSlider.value = percent;
@@ -202,7 +292,7 @@ public class UIManager : MonoBehaviour
             if (fill != null)
             {
                 // เปลี่ยนสีเมื่อ HP ต่ำ
-                fill.color = percent < 0.3f ? hpBarLowColor : hpBarColor;
+                fill.color = percent < 0.35f ? hpBarLowColor : hpBarColor;
 
                 // ถ้ายกเลิกการผูก Fill Rect เอาไว้ (เพื่อทำ Center Fill)
                 // เราจะใช้การสเกลแกน X แทน (ต้องตั้ง Pivot X ของรูปให้เป็น 0.5)
@@ -293,6 +383,70 @@ public class UIManager : MonoBehaviour
                 new Vector2(20, -50), new Vector2(200, 15),
                 slowMoBarColor, "SLOW-MO");
         }
+
+        // === Katana Zero Timer (ตรงกลางด้านบน) ===
+        if (timerText == null)
+        {
+            CreateTimerUI();
+        }
+    }
+
+    private void CreateTimerUI()
+    {
+        // Container
+        timerContainer = new GameObject("Timer_Container");
+        timerContainer.transform.SetParent(canvas.transform, false);
+
+        RectTransform containerRect = timerContainer.AddComponent<RectTransform>();
+        containerRect.anchorMin = new Vector2(0.5f, 1f);
+        containerRect.anchorMax = new Vector2(0.5f, 1f);
+        containerRect.pivot = new Vector2(0.5f, 1f);
+        containerRect.anchoredPosition = new Vector2(0, -15);
+        containerRect.sizeDelta = new Vector2(170, 38);
+
+        // พื้นหลังสีดำโปร่งสไตล์ Katana Zero
+        Image bgImg = timerContainer.AddComponent<Image>();
+        bgImg.color = new Color(0f, 0f, 0f, 0.8f);
+
+        // ข้อความตัวเลขเวลา
+        GameObject textObj = new GameObject("Timer_Text");
+        textObj.transform.SetParent(timerContainer.transform, false);
+        timerText = textObj.AddComponent<Text>();
+        timerText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        timerText.fontSize = 20;
+        timerText.fontStyle = FontStyle.Bold;
+        timerText.alignment = TextAnchor.MiddleCenter;
+        timerText.color = Color.white;
+        timerText.text = "00:00";
+
+        Shadow shadow = textObj.AddComponent<Shadow>();
+        shadow.effectColor = Color.black;
+        shadow.effectDistance = new Vector2(1, -1);
+
+        RectTransform textRect = textObj.GetComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.sizeDelta = Vector2.zero;
+
+        // Popup ข้อความแจ้งเตือนเวลาโดนหัก (เช่น "-5s" สีแดงสด)
+        GameObject penaltyObj = new GameObject("Penalty_Text");
+        penaltyObj.transform.SetParent(timerContainer.transform, false);
+        timerPenaltyText = penaltyObj.AddComponent<Text>();
+        timerPenaltyText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        timerPenaltyText.fontSize = 18;
+        timerPenaltyText.fontStyle = FontStyle.Bold;
+        timerPenaltyText.alignment = TextAnchor.MiddleLeft;
+        timerPenaltyText.color = Color.red;
+        timerPenaltyText.text = "-5s";
+
+        RectTransform penaltyRect = penaltyObj.GetComponent<RectTransform>();
+        penaltyRect.anchorMin = new Vector2(1f, 0.5f);
+        penaltyRect.anchorMax = new Vector2(1f, 0.5f);
+        penaltyRect.pivot = new Vector2(0f, 0.5f);
+        penaltyRect.anchoredPosition = new Vector2(10, 0);
+        penaltyRect.sizeDelta = new Vector2(60, 30);
+
+        penaltyObj.SetActive(false);
     }
 
     // =========================================================
