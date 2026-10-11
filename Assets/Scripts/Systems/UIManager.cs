@@ -4,6 +4,7 @@
 // ============================================================
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// จัดการ UI ทั้งหมด:
@@ -29,10 +30,18 @@ public class UIManager : MonoBehaviour
     [Tooltip("ลาก GameObject ช่องเลือดแต่ละช่องมาใส่ตรงนี้ (เช่น 3 ช่องตามในภาพ) โดนยิงจะปิดทีละช่อง")]
     [SerializeField] private GameObject[] healthBlocks;
 
-    [Header("Katana Zero Timer HUD (Auto-create if empty)")]
+    [Header("Katana Zero Time Bar HUD (Auto-create if empty)")]
     [SerializeField] private GameObject timerContainer;
-    [SerializeField] private Text timerText;
-    [SerializeField] private Text timerPenaltyText;
+    [SerializeField] private Slider timerSlider;
+    [SerializeField] private RectTransform timerRect;
+    [SerializeField] private TMP_Text timerText;
+    [SerializeField] private TMP_Text timerPenaltyText;
+    [Tooltip("สีหลอดเวลาตอนเต็ม (ค่าเริ่มต้น สีเหลืองสด)")]
+    [SerializeField] private Color timeBarFullColor = new Color(1f, 0.9f, 0.1f);
+    [Tooltip("สีหลอดเวลาตอนปานกลาง (ค่าเริ่มต้น สีส้ม)")]
+    [SerializeField] private Color timeBarMidColor = new Color(1f, 0.5f, 0f);
+    [Tooltip("สีหลอดเวลาตอนใกล้หมด (ค่าเริ่มต้น สีแดงสด)")]
+    [SerializeField] private Color timeBarLowColor = new Color(0.95f, 0.15f, 0.15f);
     private Coroutine penaltyCoroutine;
     
     // Dynamic HUD (หลบขอบจอตอนเปิด Slow-Mo)
@@ -40,6 +49,7 @@ public class UIManager : MonoBehaviour
     private RectTransform slowMoRect;
     private Vector2 hpOriginalPos;
     private Vector2 slowMoOriginalPos;
+    private Vector2 timerOriginalPos;
     // UI
     // (Removed Score and KillCount)
     [SerializeField] private GameObject gameOverPanel;
@@ -153,6 +163,17 @@ public class UIManager : MonoBehaviour
             slowMoRect = slowMoSlider.GetComponent<RectTransform>();
             if (slowMoRect != null) slowMoOriginalPos = slowMoRect.anchoredPosition;
         }
+        if (timerRect == null)
+        {
+            if (timerContainer != null)
+                timerRect = timerContainer.GetComponent<RectTransform>();
+            else if (timerSlider != null)
+                timerRect = timerSlider.GetComponent<RectTransform>();
+        }
+        if (timerRect != null)
+        {
+            timerOriginalPos = timerRect.anchoredPosition;
+        }
 
         // Hide panels
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
@@ -161,48 +182,98 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        // Dynamic HUD หลบขอบจอตอนเปิด Slow-Mo หรือ Cinematic Borders
-        if (SlowMotionManager.Instance != null && hpRect != null && slowMoRect != null)
+        // Dynamic HUD (หลบขอบจอตอนเปิด Slow-Mo หรือ Cinematic Borders)
+        if (SlowMotionManager.Instance != null)
         {
             bool isSlowMo = SlowMotionManager.Instance.IsSlowMotionActive;
-            float hpDodgeDir = (hpRect.anchorMin.y < 0.5f || hpOriginalPos.y > 0) ? Mathf.Abs(hudDodgeOffsetY) : -Mathf.Abs(hudDodgeOffsetY);
-            float slowDodgeDir = (slowMoRect.anchorMin.y < 0.5f || slowMoOriginalPos.y > 0) ? Mathf.Abs(hudDodgeOffsetY) : -Mathf.Abs(hudDodgeOffsetY);
 
-            float hpTargetY = isSlowMo ? (hpOriginalPos.y + hpDodgeDir) : hpOriginalPos.y;
-            float slowTargetY = isSlowMo ? (slowMoOriginalPos.y + slowDodgeDir) : slowMoOriginalPos.y;
+            if (hpRect != null)
+            {
+                float hpDodgeDir = (hpRect.anchorMin.y < 0.5f || hpOriginalPos.y > 0) ? Mathf.Abs(hudDodgeOffsetY) : -Mathf.Abs(hudDodgeOffsetY);
+                float hpTargetY = isSlowMo ? (hpOriginalPos.y + hpDodgeDir) : hpOriginalPos.y;
+                Vector2 hpPos = hpRect.anchoredPosition;
+                hpPos.y = Mathf.Lerp(hpPos.y, hpTargetY, 15f * Time.unscaledDeltaTime);
+                hpRect.anchoredPosition = hpPos;
+            }
 
-            Vector2 hpPos = hpRect.anchoredPosition;
-            hpPos.y = Mathf.Lerp(hpPos.y, hpTargetY, 15f * Time.unscaledDeltaTime);
-            hpRect.anchoredPosition = hpPos;
+            if (slowMoRect != null)
+            {
+                float slowDodgeDir = (slowMoRect.anchorMin.y < 0.5f || slowMoOriginalPos.y > 0) ? Mathf.Abs(hudDodgeOffsetY) : -Mathf.Abs(hudDodgeOffsetY);
+                float slowTargetY = isSlowMo ? (slowMoOriginalPos.y + slowDodgeDir) : slowMoOriginalPos.y;
+                Vector2 slowPos = slowMoRect.anchoredPosition;
+                slowPos.y = Mathf.Lerp(slowPos.y, slowTargetY, 15f * Time.unscaledDeltaTime);
+                slowMoRect.anchoredPosition = slowPos;
+            }
 
-            Vector2 slowPos = slowMoRect.anchoredPosition;
-            slowPos.y = Mathf.Lerp(slowPos.y, slowTargetY, 15f * Time.unscaledDeltaTime);
-            slowMoRect.anchoredPosition = slowPos;
+            if (timerRect != null)
+            {
+                float timerDodgeDir = (timerRect.anchorMin.y < 0.5f || timerOriginalPos.y > 0) ? Mathf.Abs(hudDodgeOffsetY) : -Mathf.Abs(hudDodgeOffsetY);
+                float timerTargetY = isSlowMo ? (timerOriginalPos.y + timerDodgeDir) : timerOriginalPos.y;
+                Vector2 timerPos = timerRect.anchoredPosition;
+                timerPos.y = Mathf.Lerp(timerPos.y, timerTargetY, 15f * Time.unscaledDeltaTime);
+                timerRect.anchoredPosition = timerPos;
+            }
         }
 
-        // อัปเดต Katana Zero Countdown Timer (ไม่ใช้ทศนิยมตามที่ขอ)
-        if (LevelRatingManager.Instance != null && LevelRatingManager.Instance.enableCountdownTimer && timerText != null)
+        // อัปเดต Katana Zero Countdown Timer & หลอดเวลา (Katana Zero Time Bar)
+        if (LevelRatingManager.Instance != null && LevelRatingManager.Instance.enableCountdownTimer)
         {
             float t = LevelRatingManager.Instance.RemainingTime;
+            float maxTime = LevelRatingManager.Instance.levelTimeLimit;
+            float timePercent = maxTime > 0f ? Mathf.Clamp01(t / maxTime) : 0f;
+
             int minutes = Mathf.FloorToInt(t / 60F);
             int seconds = Mathf.FloorToInt(t % 60F);
-            timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+
+            if (timerText != null)
+            {
+                timerText.text = t > 0f ? string.Format("{0:00}:{1:00}", minutes, seconds) : "00:00";
+            }
+
+            // ปรับขนาดหลอดเวลาและไล่สี (เหลือง -> ส้ม -> แดง)
+            if (timerSlider != null)
+            {
+                timerSlider.value = timePercent; // Slider normalized 0-1
+                Image fillImg = timerSlider.fillRect != null ? timerSlider.fillRect.GetComponent<Image>() : null;
+                if (fillImg == null)
+                {
+                    var fillChild = timerSlider.transform.Find("Fill Area/Fill");
+                    if (fillChild != null) fillImg = fillChild.GetComponent<Image>();
+                }
+                if (fillImg != null)
+                {
+                    Color currentColor;
+                    if (timePercent >= 0.5f)
+                    {
+                        float subT = (timePercent - 0.5f) / 0.5f;
+                        currentColor = Color.Lerp(timeBarMidColor, timeBarFullColor, subT);
+                    }
+                    else
+                    {
+                        float subT = timePercent / 0.5f;
+                        currentColor = Color.Lerp(timeBarLowColor, timeBarMidColor, subT);
+                    }
+                    fillImg.color = currentColor;
+                }
+            }
 
             // กระพริบสีเตือนเมื่อเวลาเหลือน้อยกว่า warningTimeThreshold ที่ตั้งไว้
             float warnTime = LevelRatingManager.Instance.warningTimeThreshold;
-            if (t <= warnTime && t > 0f)
+            if (timerText != null)
             {
-                float pulse = Mathf.PingPong(Time.unscaledTime * 6f, 1f);
-                timerText.color = Color.Lerp(Color.red, Color.yellow, pulse);
-            }
-            else if (t <= 0f)
-            {
-                timerText.color = Color.red;
-                timerText.text = "00:00";
-            }
-            else
-            {
-                timerText.color = Color.white;
+                if (t <= warnTime && t > 0f)
+                {
+                    float pulse = Mathf.PingPong(Time.unscaledTime * 6f, 1f);
+                    timerText.color = Color.Lerp(Color.red, Color.yellow, pulse);
+                }
+                else if (t <= 0f)
+                {
+                    timerText.color = Color.red;
+                }
+                else
+                {
+                    timerText.color = Color.white;
+                }
             }
         }
 
@@ -393,7 +464,7 @@ public class UIManager : MonoBehaviour
 
     private void CreateTimerUI()
     {
-        // Container
+        // Container หลอดเวลาสไตล์ Katana Zero
         timerContainer = new GameObject("Timer_Container");
         timerContainer.transform.SetParent(canvas.transform, false);
 
@@ -402,20 +473,68 @@ public class UIManager : MonoBehaviour
         containerRect.anchorMax = new Vector2(0.5f, 1f);
         containerRect.pivot = new Vector2(0.5f, 1f);
         containerRect.anchoredPosition = new Vector2(0, -15);
-        containerRect.sizeDelta = new Vector2(170, 38);
+        containerRect.sizeDelta = new Vector2(240, 26);
 
-        // พื้นหลังสีดำโปร่งสไตล์ Katana Zero
+        // กรอบพื้นหลังสีดำทึบสไตล์ Katana Zero
         Image bgImg = timerContainer.AddComponent<Image>();
-        bgImg.color = new Color(0f, 0f, 0f, 0.8f);
+        bgImg.color = new Color(0.05f, 0.05f, 0.05f, 0.9f);
 
-        // ข้อความตัวเลขเวลา
+        // Slider สำหรับหลอดเวลา (Slider แท้ๆ ย่อจากขวามาซ้าย)
+        GameObject sliderObj = new GameObject("Timer_Slider");
+        sliderObj.transform.SetParent(timerContainer.transform, false);
+        RectTransform sliderRect = sliderObj.AddComponent<RectTransform>();
+        sliderRect.anchorMin = Vector2.zero;
+        sliderRect.anchorMax = Vector2.one;
+        sliderRect.offsetMin = new Vector2(2, 2);
+        sliderRect.offsetMax = new Vector2(-2, -2);
+
+        // Background
+        Image bg = sliderObj.AddComponent<Image>();
+        bg.color = Color.black;
+
+        // Fill Area
+        GameObject fillArea = new GameObject("Fill Area");
+        fillArea.transform.SetParent(sliderObj.transform, false);
+        RectTransform fillAreaRect = fillArea.AddComponent<RectTransform>();
+        fillAreaRect.anchorMin = Vector2.zero;
+        fillAreaRect.anchorMax = Vector2.one;
+        fillAreaRect.offsetMin = new Vector2(2, 2);
+        fillAreaRect.offsetMax = new Vector2(-2, -2);
+
+        // Fill (หลอด Slider สีเต็ม)
+        GameObject fill = new GameObject("Fill");
+        fill.transform.SetParent(fillArea.transform, false);
+        Image fillImage = fill.AddComponent<Image>();
+        fillImage.color = timeBarFullColor;
+        RectTransform fillRect = fill.GetComponent<RectTransform>();
+        fillRect.anchorMin = Vector2.zero;
+        fillRect.anchorMax = Vector2.one;
+        fillRect.sizeDelta = Vector2.zero;
+
+        // Slider component
+        Slider slider = sliderObj.AddComponent<Slider>();
+        slider.fillRect = fillRect;
+        slider.direction = Slider.Direction.LeftToRight;
+        slider.minValue = 0f;
+        slider.maxValue = 1f;
+        slider.value = 1f;
+        slider.interactable = false;
+        slider.transition = Selectable.Transition.None;
+
+        timerSlider = slider;
+
+        // บันทึก timerRect และ timerOriginalPos เพื่อให้หลบขอบจอสโลว์โมชั่นได้
+        timerRect = containerRect;
+        timerOriginalPos = containerRect.anchoredPosition;
+
+        // Timer Text (TMP)
         GameObject textObj = new GameObject("Timer_Text");
         textObj.transform.SetParent(timerContainer.transform, false);
-        timerText = textObj.AddComponent<Text>();
-        timerText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        timerText.fontSize = 20;
-        timerText.fontStyle = FontStyle.Bold;
-        timerText.alignment = TextAnchor.MiddleCenter;
+        TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
+        timerText = tmp;
+        timerText.fontSize = 16;
+        timerText.fontStyle = FontStyles.Bold;
+        timerText.alignment = TextAlignmentOptions.Center;
         timerText.color = Color.white;
         timerText.text = "00:00";
 
@@ -428,14 +547,14 @@ public class UIManager : MonoBehaviour
         textRect.anchorMax = Vector2.one;
         textRect.sizeDelta = Vector2.zero;
 
-        // Popup ข้อความแจ้งเตือนเวลาโดนหัก (เช่น "-5s" สีแดงสด)
+        // Penalty Text (TMP)
         GameObject penaltyObj = new GameObject("Penalty_Text");
         penaltyObj.transform.SetParent(timerContainer.transform, false);
-        timerPenaltyText = penaltyObj.AddComponent<Text>();
-        timerPenaltyText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        TextMeshProUGUI tmpPenalty = penaltyObj.AddComponent<TextMeshProUGUI>();
+        timerPenaltyText = tmpPenalty;
         timerPenaltyText.fontSize = 18;
-        timerPenaltyText.fontStyle = FontStyle.Bold;
-        timerPenaltyText.alignment = TextAnchor.MiddleLeft;
+        timerPenaltyText.fontStyle = FontStyles.Bold;
+        timerPenaltyText.alignment = TextAlignmentOptions.Left;
         timerPenaltyText.color = Color.red;
         timerPenaltyText.text = "-5s";
 

@@ -72,8 +72,19 @@ public class ScreenEffectManager : MonoBehaviour
 
 
 
+    [Header("Katana Zero Time Urgency (ขอบจอค่อยๆ แดงเมื่อใกล้หมดเวลา)")]
+    [Tooltip("เปิด/ปิด ระบบจอค่อยๆ แดงเตือนเมื่อใกล้หมดเวลา")]
+    public bool enableTimeUrgencyVignette = true;
+    [Tooltip("สีแดงของขอบจอ")]
+    public Color timeUrgencyColor = new Color(0.85f, 0.05f, 0.05f, 1f);
+    [Tooltip("ความเข้มสีแดงสูงสุดตอนเหลือ 0 วินาที (Alpha: 0.0 - 1.0 เช่น 0.75)")]
+    [Range(0f, 1f)] public float maxTimeUrgencyAlpha = 0.75f;
+    [Tooltip("ความเร็วกระพริบหัวใจเต้นตึกตักตอนวิกฤต (0 = แดงนิ่งๆ ไม่กระพริบ)")]
+    public float urgencyPulseSpeed = 4f;
+
     private Image damageImage;
     private Image slowMoImage;
+    private Image timeUrgencyImage;
     private float currentDamageTimer = 0f;
     private Canvas screenCanvas;
 
@@ -129,6 +140,15 @@ public class ScreenEffectManager : MonoBehaviour
         damageImage.color = new Color(damageColor.r, damageColor.g, damageColor.b, 0f);
         damageImage.sprite = CreateVignetteSprite(); // สร้างภาพขอบแดงไล่สี
         SetFullScreen(damageImage.rectTransform);
+
+        // 6. สร้าง Image สำหรับ Time Urgency Vignette (ขอบจอแดงเตือนเวลา ค่อยๆ แดงขึ้นตามเวลาที่เหลือน้อย)
+        GameObject urgencyObj = new GameObject("TimeUrgencyVignette");
+        urgencyObj.transform.SetParent(canvasObj.transform, false);
+        timeUrgencyImage = urgencyObj.AddComponent<Image>();
+        timeUrgencyImage.raycastTarget = false;
+        timeUrgencyImage.color = new Color(timeUrgencyColor.r, timeUrgencyColor.g, timeUrgencyColor.b, 0f);
+        timeUrgencyImage.sprite = CreateVignetteSprite();
+        SetFullScreen(timeUrgencyImage.rectTransform);
 
         CreateCinematicBorders(canvasObj);
     }
@@ -265,6 +285,36 @@ public class ScreenEffectManager : MonoBehaviour
             // Lerp เล็กน้อยให้สมูท
             c.a = Mathf.Lerp(c.a, targetDamageAlpha, 15f * Time.unscaledDeltaTime);
             damageImage.color = c;
+        }
+
+        // 1.5 อัปเดตขอบจอค่อยๆ แดงเมื่อใกล้หมดเวลา (Katana Zero Time Urgency)
+        if (enableTimeUrgencyVignette && timeUrgencyImage != null)
+        {
+            float targetUrgencyAlpha = 0f;
+            if (LevelRatingManager.Instance != null && LevelRatingManager.Instance.isLevelActive && LevelRatingManager.Instance.enableCountdownTimer)
+            {
+                float rem = LevelRatingManager.Instance.RemainingTime;
+                float warn = LevelRatingManager.Instance.warningTimeThreshold;
+                if (rem < warn && warn > 0f)
+                {
+                    // ค่อยๆ ไต่จาก 0.0 -> 1.0 ตามเวลาที่เหลือน้อยลงเรื่อยๆ
+                    float t = 1f - Mathf.Clamp01(rem / warn);
+                    float smoothT = Mathf.SmoothStep(0f, 1f, t);
+                    targetUrgencyAlpha = smoothT * maxTimeUrgencyAlpha;
+
+                    // มีจังหวะกระพริบเต้นตุบๆ ตามความกดดัน
+                    if (urgencyPulseSpeed > 0f && t > 0.2f)
+                    {
+                        float pulse = (Mathf.Sin(Time.unscaledTime * urgencyPulseSpeed * (1f + t * 0.5f)) + 1f) * 0.5f;
+                        targetUrgencyAlpha += pulse * 0.15f * t;
+                        targetUrgencyAlpha = Mathf.Clamp01(targetUrgencyAlpha);
+                    }
+                }
+            }
+
+            Color uc = timeUrgencyColor;
+            uc.a = Mathf.Lerp(timeUrgencyImage.color.a, targetUrgencyAlpha, 10f * Time.unscaledDeltaTime);
+            timeUrgencyImage.color = uc;
         }
 
         // หน้าเทาเอาออกไปตามคำขอ แต่เผื่อไว้ให้มันค่อยๆ จางหายไปถ้าค้างอยู่

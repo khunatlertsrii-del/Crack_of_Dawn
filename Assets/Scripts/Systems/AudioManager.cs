@@ -53,6 +53,12 @@ public class AudioManager : MonoBehaviour
     [Header("Slow-Mo Pitch Settings")]
     [Tooltip("ความเบี้ยวของเสียงเวลาสโลว์ (เช่น 0.5 คือเสียงทุ้มและยืดยาว)")]
     public float slowMoPitch = 0.6f;
+
+    [Header("Time Urgency Pitch Settings (เร่งสปีดเพลงตอนใกล้หมดเวลา)")]
+    [Tooltip("เปิดใช้ระบบเร่งสปีดเพลงเมื่อใกล้หมดเวลา (Katana Zero Urgency)")]
+    public bool enableTimeUrgencyPitch = true;
+    [Tooltip("ความเร็วเพลงสูงสุดเมื่อเวลาใกล้หมด 0 วินาที (เช่น 1.25 คือเร็วขึ้น 25% ปรับได้ตามใจชอบ)")]
+    public float maxUrgencyPitch = 1.25f;
     
     private AudioSource musicSource;
     private List<AudioSource> sfxSources = new List<AudioSource>();
@@ -127,13 +133,31 @@ public class AudioManager : MonoBehaviour
     {
         // ปรับ Pitch ของเพลงและเสียงประกอบตาม TimeScale ถ้าอยู่ในฉากเลเวล
         float currentPitch = 1f;
+
+        // คำนวณ Pitch เพิ่มเติมจากความกดดันของเวลา (Katana Zero Time Urgency)
+        float urgencyPitchMult = 1f;
+        if (enableTimeUrgencyPitch && LevelRatingManager.Instance != null && LevelRatingManager.Instance.isLevelActive && LevelRatingManager.Instance.enableCountdownTimer)
+        {
+            float rem = LevelRatingManager.Instance.RemainingTime;
+            float warn = LevelRatingManager.Instance.warningTimeThreshold;
+            if (rem < warn && warn > 0f)
+            {
+                // ค่อยๆ เร่งจาก 1.0 -> maxUrgencyPitch เมื่อเวลาเหลือน้อยลงเรื่อยๆ
+                float t = 1f - Mathf.Clamp01(rem / warn);
+                urgencyPitchMult = Mathf.Lerp(1f, maxUrgencyPitch, t);
+            }
+        }
         
         if (SlowMotionManager.Instance != null && SlowMotionManager.Instance.IsSlowMotionActive)
         {
             currentPitch = slowMoPitch;
         }
+        else
+        {
+            currentPitch = urgencyPitchMult;
+        }
 
-        // ทำให้ดนตรีค่อยๆ บิดเบี้ยวตามสโลว์โมชั่น
+        // ทำให้ดนตรีค่อยๆ บิดเบี้ยวตามสโลว์โมชั่น หรือเร่งสปีดตอนใกล้หมดเวลา
         musicSource.pitch = Mathf.Lerp(musicSource.pitch, currentPitch, Time.unscaledDeltaTime * 10f);
 
         // จัดการ list ของ SFX ที่กำลังเล่น และปรับ Pitch
