@@ -1546,7 +1546,7 @@ MonoBehaviour:
     volume: 0.8
     trackName: 'Round Report! '
   gameOverBGM:
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 59aeacb9e7518d3438fde67029f33ddd, type: 3}
     volume: 1
     trackName: Unknown Track
   shootSounds:
@@ -1570,6 +1570,8 @@ MonoBehaviour:
   sfxVolume: 0.8
   uiVolume: 1
   slowMoPitch: 0.8
+  enableTimeUrgencyPitch: 1
+  maxUrgencyPitch: 1.25
 --- !u!4 &1450052993
 Transform:
   m_ObjectHideFlags: 0
