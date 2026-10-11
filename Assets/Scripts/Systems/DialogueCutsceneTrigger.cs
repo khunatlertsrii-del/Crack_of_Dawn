@@ -94,7 +94,15 @@ public class DialogueCutsceneTrigger : MonoBehaviour
         // 7. คืนการควบคุมให้ผู้เล่น
         if (cameraFollow != null) cameraFollow.enabled = true;
         if (playerController != null) playerController.enabled = true;
-        if (playerShooting != null) playerShooting.enabled = true;
+        if (playerShooting != null)
+        {
+            playerShooting.enabled = true;
+            playerShooting.ShowAmmoUI();
+        }
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.ShowGameplayHUD();
+        }
 
         // ปิด Trigger นี้ไปเลย
         Destroy(gameObject, 2f);

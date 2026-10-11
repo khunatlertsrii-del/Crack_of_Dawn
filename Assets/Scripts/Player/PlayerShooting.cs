@@ -91,6 +91,7 @@ public class PlayerShooting : MonoBehaviour
     public float ammoUIDodgeOffsetY = 85f;
     private RectTransform ammoRect;
     private Vector2 ammoOriginalPos;
+    private GameObject cachedAmmoBoxObj;
 
     // =========================================================
     // UNITY LIFECYCLE
@@ -178,6 +179,11 @@ public class PlayerShooting : MonoBehaviour
             ammoOriginalPos = ammoRect.anchoredPosition;
         }
 
+        if (cachedAmmoBoxObj == null)
+        {
+            cachedAmmoBoxObj = GameObject.Find("AmmoBox_BG");
+        }
+
         if (gunPivot != null)
         {
             originalGunPivotLocalPos = gunPivot.localPosition;
@@ -188,6 +194,11 @@ public class PlayerShooting : MonoBehaviour
     {
         shootAction.Enable();
         reloadAction.Enable();
+
+        if (LevelRatingManager.Instance == null || LevelRatingManager.Instance.isLevelActive)
+        {
+            ShowAmmoUI();
+        }
     }
 
     private void OnDisable()
@@ -222,12 +233,87 @@ public class PlayerShooting : MonoBehaviour
             reloadProgressBar.gameObject.SetActive(false);
         }
 
-        // ค้นหากล่อง AmmoBox_BG เพิ่มเติมเพื่อความแน่ใจว่าจะถูกปิดเสมอ
-        var ammoBoxObj = GameObject.Find("AmmoBox_BG");
-        if (ammoBoxObj != null && ammoBoxObj.activeSelf)
+        // ค้นหาและปิดกล่อง AmmoBox_BG
+        if (cachedAmmoBoxObj != null)
         {
-            ammoBoxObj.SetActive(false);
+            if (cachedAmmoBoxObj.activeSelf) cachedAmmoBoxObj.SetActive(false);
         }
+        else
+        {
+            var ammoBoxObj = GameObject.Find("AmmoBox_BG");
+            if (ammoBoxObj != null)
+            {
+                cachedAmmoBoxObj = ammoBoxObj;
+                if (cachedAmmoBoxObj.activeSelf) cachedAmmoBoxObj.SetActive(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// แสดงกล่องและ UI กระสุนทั้งหมดกลับคืนมา (เช่น หลังจบคัตซีนหรือบทสนทนา)
+    /// </summary>
+    public void ShowAmmoUI()
+    {
+        if (GameManager.Instance != null && (GameManager.Instance.CurrentState == GameManager.GameState.GameOver || GameManager.Instance.CurrentState == GameManager.GameState.Victory))
+        {
+            return;
+        }
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive)
+        {
+            return;
+        }
+
+        if (ammoRect != null && !ammoRect.gameObject.activeSelf) 
+        {
+            ammoRect.gameObject.SetActive(true);
+        }
+
+        if (ammoText != null)
+        {
+            if (!ammoText.gameObject.activeSelf)
+                ammoText.gameObject.SetActive(true);
+
+            if (ammoText.transform.parent != null && ammoText.transform.parent.GetComponent<Canvas>() == null)
+            {
+                if (!ammoText.transform.parent.gameObject.activeSelf)
+                    ammoText.transform.parent.gameObject.SetActive(true);
+            }
+        }
+
+        if (reloadProgressBar != null && !reloadProgressBar.gameObject.activeSelf)
+        {
+            reloadProgressBar.gameObject.SetActive(true);
+        }
+
+        if (cachedAmmoBoxObj != null)
+        {
+            if (!cachedAmmoBoxObj.activeSelf) cachedAmmoBoxObj.SetActive(true);
+        }
+        else
+        {
+            var ammoBoxObj = GameObject.Find("AmmoBox_BG");
+            if (ammoBoxObj != null)
+            {
+                cachedAmmoBoxObj = ammoBoxObj;
+                if (!cachedAmmoBoxObj.activeSelf) cachedAmmoBoxObj.SetActive(true);
+            }
+            else
+            {
+                // ค้นหาเผื่อไว้แม้จะปิดอยู่
+                var all = Resources.FindObjectsOfTypeAll<Transform>();
+                foreach (var t in all)
+                {
+                    if (t.name == "AmmoBox_BG" && t.hideFlags == HideFlags.None)
+                    {
+                        cachedAmmoBoxObj = t.gameObject;
+                        cachedAmmoBoxObj.SetActive(true);
+                        break;
+                    }
+                }
+            }
+        }
+
+        UpdateAmmoUI();
     }
 
     private void Update()
@@ -237,6 +323,14 @@ public class PlayerShooting : MonoBehaviour
             // ซ่อน UI กระสุนเมื่อจบด่านหรือ Game Over
             HideAmmoUI();
             return;
+        }
+        else
+        {
+            // กู้คืน UI กระสุนถ้าเผลอปิดไประหว่างคัตซีน/บทสนทนา
+            if (ammoText != null && !ammoText.gameObject.activeSelf)
+            {
+                ShowAmmoUI();
+            }
         }
 
         if (PauseManager.Instance != null && PauseManager.Instance.IsPaused)

@@ -652,6 +652,45 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// แสดง Gameplay HUD ทั้งหมดกลับคืนมา (เช่น หลังจบคัตซีนหรือบทสนทนา)
+    /// </summary>
+    public void ShowGameplayHUD()
+    {
+        if (GameManager.Instance != null && (GameManager.Instance.CurrentState == GameManager.GameState.GameOver || GameManager.Instance.CurrentState == GameManager.GameState.Victory))
+        {
+            return;
+        }
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive)
+        {
+            return;
+        }
+
+        if (hpSlider != null && !hpSlider.gameObject.activeSelf) hpSlider.gameObject.SetActive(true);
+        if (slowMoSlider != null && !slowMoSlider.gameObject.activeSelf) slowMoSlider.gameObject.SetActive(true);
+
+        bool showTimer = !isTimerHiddenByTrigger;
+        if (timerContainer != null && timerContainer.activeSelf != showTimer) timerContainer.SetActive(showTimer);
+        if (timerSlider != null && timerSlider.gameObject.activeSelf != showTimer) timerSlider.gameObject.SetActive(showTimer);
+        if (timerRect != null && timerRect.gameObject.activeSelf != showTimer) timerRect.gameObject.SetActive(showTimer);
+        if (timerText != null && timerText.gameObject.activeSelf != showTimer) timerText.gameObject.SetActive(showTimer);
+
+        if (healthBlocks != null)
+        {
+            for (int i = 0; i < healthBlocks.Length; i++)
+            {
+                if (healthBlocks[i] != null && !healthBlocks[i].activeSelf)
+                    healthBlocks[i].SetActive(true);
+            }
+        }
+
+        var playerShooting = FindFirstObjectByType<PlayerShooting>();
+        if (playerShooting != null)
+        {
+            playerShooting.ShowAmmoUI();
+        }
+    }
+
     // =========================================================
     // UI HELPERS
     // =========================================================

@@ -27,6 +27,9 @@ public class MainMenuManager : MonoBehaviour
     {
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (levelSelectPanel != null) levelSelectPanel.SetActive(true);
+
+        // รีเฟรชสถานะล็อคของปุ่มทุกปุ่ม
+        RefreshLevelButtons();
     }
 
     /// <summary>
@@ -56,5 +59,55 @@ public class MainMenuManager : MonoBehaviour
     {
         Debug.Log("ออกจากเกม!");
         Application.Quit();
+    }
+
+    // ==========================================
+    // LEVEL LOCK UTILITIES
+    // ==========================================
+
+    /// <summary>
+    /// รีเฟรชสถานะล็อค/ปลดล็อคของปุ่มเลือกด่านทุกปุ่ม
+    /// </summary>
+    public void RefreshLevelButtons()
+    {
+        LevelSelectButton[] buttons = FindObjectsByType<LevelSelectButton>(FindObjectsSortMode.None);
+        foreach (var btn in buttons)
+        {
+            btn.CheckUnlockStatus();
+        }
+    }
+
+    /// <summary>
+    /// เช็คว่าด่านนี้ผ่านแล้วหรือยัง
+    /// </summary>
+    public static bool IsLevelCompleted(string sceneName)
+    {
+        return PlayerPrefs.GetInt("LevelCompleted_" + sceneName, 0) == 1;
+    }
+
+    /// <summary>
+    /// ปลดล็อคทุกด่าน (สำหรับ Debug)
+    /// </summary>
+    [ContextMenu("DEBUG: ปลดล็อคทุกด่าน")]
+    public void DebugUnlockAll()
+    {
+        PlayerPrefs.SetInt("LevelCompleted_Tutorial", 1);
+        PlayerPrefs.SetInt("LevelCompleted_Level_2", 1);
+        PlayerPrefs.Save();
+        RefreshLevelButtons();
+        Debug.Log("[DEBUG] ปลดล็อคทุกด่านแล้ว!");
+    }
+
+    /// <summary>
+    /// ล็อคทุกด่านกลับ (สำหรับ Debug)
+    /// </summary>
+    [ContextMenu("DEBUG: ล็อคทุกด่าน")]
+    public void DebugLockAll()
+    {
+        PlayerPrefs.DeleteKey("LevelCompleted_Tutorial");
+        PlayerPrefs.DeleteKey("LevelCompleted_Level_2");
+        PlayerPrefs.Save();
+        RefreshLevelButtons();
+        Debug.Log("[DEBUG] ล็อคทุกด่านแล้ว!");
     }
 }

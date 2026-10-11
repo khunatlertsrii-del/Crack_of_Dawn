@@ -286,6 +286,7 @@ GameObject:
   - component: {fileID: 544786671}
   - component: {fileID: 544786670}
   - component: {fileID: 544786669}
+  - component: {fileID: 544786673}
   m_Layer: 5
   m_Name: Level_2
   m_TagString: Untagged
@@ -427,6 +428,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 544786667}
   m_CullTransparentMesh: 1
+--- !u!114 &544786673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544786667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01de72c541d9c184fb064ba24900fd81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSelectButton
+  sceneName: Level_2
+  requiredLevelScene: Tutorial
+  lockedOverlay: {fileID: 0}
+  lockedSprite: {fileID: 0}
+  lockedColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.85}
+  lockedText: 
+  lockedSound: {fileID: 0}
 --- !u!1 &801877777
 GameObject:
   m_ObjectHideFlags: 0

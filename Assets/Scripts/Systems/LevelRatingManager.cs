@@ -282,6 +282,12 @@ public class LevelRatingManager : MonoBehaviour
     {
         isLevelActive = false; // หยุดเวลา
 
+        // บันทึกว่าด่านนี้ผ่านแล้ว (สำหรับระบบล็อคด่าน)
+        string currentScene = SceneManager.GetActiveScene().name;
+        PlayerPrefs.SetInt("LevelCompleted_" + currentScene, 1);
+        PlayerPrefs.Save();
+        Debug.Log($"[LevelRatingManager] บันทึกผ่านด่าน: {currentScene}");
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.SetState(GameManager.GameState.Victory);

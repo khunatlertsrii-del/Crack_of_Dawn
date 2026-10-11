@@ -477,7 +477,11 @@ public class IntroCutscene : MonoBehaviour
     private void UnlockAllPlayerSystems()
     {
         if (playerController != null) playerController.enabled = true;
-        if (playerShooting != null) playerShooting.enabled = true;
+        if (playerShooting != null)
+        {
+            playerShooting.enabled = true;
+            playerShooting.ShowAmmoUI();
+        }
         if (playerParry != null) playerParry.enabled = true;
         if (slowMotionManager != null) slowMotionManager.enabled = true;
         if (playerAnimatorScript != null) playerAnimatorScript.enabled = true;
