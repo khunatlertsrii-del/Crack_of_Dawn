@@ -184,6 +184,27 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
+        // ตรวจสอบสถานะเกม: ถ้าจบด่านหรือ Game Over ให้ซ่อน Gameplay HUD ทั้งหมดทันที
+        bool isActive = LevelRatingManager.Instance == null || LevelRatingManager.Instance.isLevelActive;
+        if (GameManager.Instance != null && (GameManager.Instance.CurrentState == GameManager.GameState.GameOver || GameManager.Instance.CurrentState == GameManager.GameState.Victory))
+        {
+            isActive = false;
+        }
+
+        if (!isActive)
+        {
+            HideGameplayHUD();
+            return;
+        }
+
+        // เมื่ออยู่ในเกมเพลย์ปกติ แสดงองค์ประกอบ HUD ตามสถานะ
+        if (hpSlider != null && !hpSlider.gameObject.activeSelf) hpSlider.gameObject.SetActive(true);
+        if (slowMoSlider != null && !slowMoSlider.gameObject.activeSelf) slowMoSlider.gameObject.SetActive(true);
+        bool showTimer = !isTimerHiddenByTrigger;
+        if (timerContainer != null && timerContainer.activeSelf != showTimer) timerContainer.SetActive(showTimer);
+        if (timerSlider != null && timerSlider.gameObject.activeSelf != showTimer) timerSlider.gameObject.SetActive(showTimer);
+        if (timerRect != null && timerRect.gameObject.activeSelf != showTimer) timerRect.gameObject.SetActive(showTimer);
+
         // Dynamic HUD (หลบขอบจอตอนเปิด Slow-Mo หรือ Cinematic Borders)
         if (SlowMotionManager.Instance != null)
         {
@@ -278,16 +299,6 @@ public class UIManager : MonoBehaviour
                 }
             }
         }
-
-        // ซ่อน HUD เมื่อจบด่าน
-        bool isActive = LevelRatingManager.Instance == null || LevelRatingManager.Instance.isLevelActive;
-        if (hpSlider != null && hpSlider.gameObject.activeSelf != isActive)
-            hpSlider.gameObject.SetActive(isActive);
-        if (slowMoSlider != null && slowMoSlider.gameObject.activeSelf != isActive)
-            slowMoSlider.gameObject.SetActive(isActive);
-        bool showTimer = isActive && !isTimerHiddenByTrigger;
-        if (timerContainer != null && timerContainer.activeSelf != showTimer)
-            timerContainer.SetActive(showTimer);
     }
 
     private void OnDisable()
@@ -582,6 +593,62 @@ public class UIManager : MonoBehaviour
         if (timerContainer != null)
         {
             timerContainer.SetActive(visible);
+        }
+    }
+
+    /// <summary>
+    /// สั่งปิดซ่อน UI Gameplay ทั้งหมด (หลอดเลือด, สโลว์, หลอดเวลา, กล่องกระสุน) ตอนจบด่านและ Game Over
+    /// </summary>
+    public void HideGameplayHUD()
+    {
+        if (hpSlider != null && hpSlider.gameObject.activeSelf) hpSlider.gameObject.SetActive(false);
+        if (slowMoSlider != null && slowMoSlider.gameObject.activeSelf) slowMoSlider.gameObject.SetActive(false);
+
+        // ซ่อนหลอดเวลาและคอมโพเนนต์ที่เกี่ยวข้องทั้งหมด
+        if (timerContainer != null && timerContainer.activeSelf) timerContainer.SetActive(false);
+        if (timerSlider != null && timerSlider.gameObject.activeSelf) timerSlider.gameObject.SetActive(false);
+        if (timerRect != null && timerRect.gameObject.activeSelf) timerRect.gameObject.SetActive(false);
+        if (timerText != null && timerText.gameObject.activeSelf) timerText.gameObject.SetActive(false);
+        if (timerPenaltyText != null && timerPenaltyText.gameObject.activeSelf) timerPenaltyText.gameObject.SetActive(false);
+
+        if (timerSlider != null && timerSlider.transform.parent != null && timerSlider.transform.parent.GetComponent<Canvas>() == null)
+        {
+            if (timerSlider.transform.parent.gameObject.activeSelf)
+                timerSlider.transform.parent.gameObject.SetActive(false);
+        }
+        if (timerText != null && timerText.transform.parent != null && timerText.transform.parent.GetComponent<Canvas>() == null)
+        {
+            if (timerText.transform.parent.gameObject.activeSelf)
+                timerText.transform.parent.gameObject.SetActive(false);
+        }
+
+        var timerObj = GameObject.Find("Timer_Container");
+        if (timerObj != null && timerObj.activeSelf)
+        {
+            timerObj.SetActive(false);
+        }
+
+        // ซ่อน Segmented Health Blocks (ถ้ามี)
+        if (healthBlocks != null)
+        {
+            for (int i = 0; i < healthBlocks.Length; i++)
+            {
+                if (healthBlocks[i] != null && healthBlocks[i].activeSelf)
+                    healthBlocks[i].SetActive(false);
+            }
+        }
+
+        // ซ่อนกล่องกระสุน
+        var playerShooting = FindFirstObjectByType<PlayerShooting>();
+        if (playerShooting != null)
+        {
+            playerShooting.HideAmmoUI();
+        }
+        else
+        {
+            var ammoBoxObj = GameObject.Find("AmmoBox_BG");
+            if (ammoBoxObj != null && ammoBoxObj.activeSelf)
+                ammoBoxObj.SetActive(false);
         }
     }
 

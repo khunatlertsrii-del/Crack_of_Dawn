@@ -55,6 +55,12 @@ public class NowPlayingUI : MonoBehaviour
     /// </summary>
     public void ShowNowPlaying(string trackName)
     {
+        // ไม่ต้องแสดงชื่อเพลงตอน Game Over หรือถ้าเป็นเพลง Game Over
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.GameOver) return;
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive && LevelRatingManager.Instance.RemainingTime <= 0f) return;
+        if (AudioManager.Instance != null && AudioManager.Instance.gameOverBGM != null && trackName == AudioManager.Instance.gameOverBGM.trackName) return;
+        if (string.IsNullOrEmpty(trackName) || trackName.ToLower().Contains("game over") || trackName.ToLower().Contains("gameover")) return;
+
         if (trackNameText != null)
         {
             // ทำตัวหนังสือให้เหมือน Katana Zero (มีสีๆ หน่อย)
@@ -66,6 +72,21 @@ public class NowPlayingUI : MonoBehaviour
             StopCoroutine(slideCoroutine);
         }
         slideCoroutine = StartCoroutine(SlideRoutine());
+    }
+
+    /// <summary>
+    /// สั่งซ่อนทันทีเมื่อจบด่านหรือ Game Over
+    /// </summary>
+    public void HideImmediately()
+    {
+        if (slideCoroutine != null)
+        {
+            StopCoroutine(slideCoroutine);
+        }
+        if (uiPanel != null)
+        {
+            uiPanel.anchoredPosition = hiddenPos;
+        }
     }
 
     private IEnumerator SlideRoutine()

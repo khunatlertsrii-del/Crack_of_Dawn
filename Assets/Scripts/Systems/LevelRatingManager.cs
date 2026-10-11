@@ -195,11 +195,20 @@ public class LevelRatingManager : MonoBehaviour
             GameManager.Instance.SetState(GameManager.GameState.GameOver);
         }
 
-        // เล่นเพลง Game Over
+        // เล่นเพลง Game Over (notifyUI: false ป้องกันไม่ให้เด้งป้ายชื่อเพลง)
         if (AudioManager.Instance != null && AudioManager.Instance.gameOverBGM != null && AudioManager.Instance.gameOverBGM.clip != null)
         {
-            AudioManager.Instance.PlayMusic(AudioManager.Instance.gameOverBGM);
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.gameOverBGM, notifyUI: false);
         }
+
+        // ซ่อน Gameplay HUD ทั้งหมด (หลอดเวลา, กล่องกระสุน ฯลฯ)
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.HideGameplayHUD();
+        }
+        FindFirstObjectByType<PlayerShooting>()?.HideAmmoUI();
+        FindFirstObjectByType<MusicTitleUI>()?.HideImmediately();
+        FindFirstObjectByType<NowPlayingUI>()?.HideImmediately();
     }
 
     public void ApplyPenalty(string reason, int penaltyAmount)
@@ -227,16 +236,31 @@ public class LevelRatingManager : MonoBehaviour
     public void PlayerDied()
     {
         isLevelActive = false;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetState(GameManager.GameState.GameOver);
+        }
+
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
         }
 
-        // เล่นเพลง Game Over
+        // เล่นเพลง Game Over (notifyUI: false ป้องกันไม่ให้เด้งป้ายชื่อเพลง)
         if (AudioManager.Instance != null && AudioManager.Instance.gameOverBGM != null && AudioManager.Instance.gameOverBGM.clip != null)
         {
-            AudioManager.Instance.PlayMusic(AudioManager.Instance.gameOverBGM);
+            AudioManager.Instance.PlayMusic(AudioManager.Instance.gameOverBGM, notifyUI: false);
         }
+
+        // ซ่อน Gameplay HUD ทั้งหมด (หลอดเวลา, กล่องกระสุน ฯลฯ)
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.HideGameplayHUD();
+        }
+        FindFirstObjectByType<PlayerShooting>()?.HideAmmoUI();
+        FindFirstObjectByType<MusicTitleUI>()?.HideImmediately();
+        FindFirstObjectByType<NowPlayingUI>()?.HideImmediately();
     }
 
     public string CalculateFinalGrade()
@@ -257,6 +281,20 @@ public class LevelRatingManager : MonoBehaviour
     public void ShowVictorySummary()
     {
         isLevelActive = false; // หยุดเวลา
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetState(GameManager.GameState.Victory);
+        }
+
+        // ซ่อน Gameplay HUD ทั้งหมด (หลอดเวลา, กล่องกระสุน ฯลฯ)
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.HideGameplayHUD();
+        }
+        FindFirstObjectByType<PlayerShooting>()?.HideAmmoUI();
+        FindFirstObjectByType<MusicTitleUI>()?.HideImmediately();
+        FindFirstObjectByType<NowPlayingUI>()?.HideImmediately();
 
         // บังคับหยุด Slow-Mo ก่อน เพื่อไม่ให้ขอบจอค้างอยู่
         if (SlowMotionManager.Instance != null)

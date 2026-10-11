@@ -194,26 +194,48 @@ public class PlayerShooting : MonoBehaviour
     {
         shootAction.Disable();
         reloadAction.Disable();
+        HideAmmoUI();
+    }
+
+    /// <summary>
+    /// ซ่อนกล่องและ UI กระสุนทั้งหมด (เรียกเมื่อจบด่านหรือ Game Over)
+    /// </summary>
+    public void HideAmmoUI()
+    {
+        if (ammoRect != null && ammoRect.gameObject.activeSelf) 
+        {
+            ammoRect.gameObject.SetActive(false);
+        }
+        if (ammoText != null)
+        {
+            if (ammoText.gameObject.activeSelf)
+                ammoText.gameObject.SetActive(false);
+
+            if (ammoText.transform.parent != null && ammoText.transform.parent.GetComponent<Canvas>() == null)
+            {
+                if (ammoText.transform.parent.gameObject.activeSelf)
+                    ammoText.transform.parent.gameObject.SetActive(false);
+            }
+        }
+        if (reloadProgressBar != null && reloadProgressBar.gameObject.activeSelf)
+        {
+            reloadProgressBar.gameObject.SetActive(false);
+        }
+
+        // ค้นหากล่อง AmmoBox_BG เพิ่มเติมเพื่อความแน่ใจว่าจะถูกปิดเสมอ
+        var ammoBoxObj = GameObject.Find("AmmoBox_BG");
+        if (ammoBoxObj != null && ammoBoxObj.activeSelf)
+        {
+            ammoBoxObj.SetActive(false);
+        }
     }
 
     private void Update()
     {
         if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive)
         {
-            // ซ่อน UI กระสุนเมื่อจบด่าน
-            if (ammoRect != null && ammoRect.gameObject.activeSelf) 
-            {
-                ammoRect.gameObject.SetActive(false);
-            }
-            else if (ammoText != null && ammoText.gameObject.activeSelf)
-            {
-                ammoText.gameObject.SetActive(false);
-            }
-            if (reloadProgressBar != null && reloadProgressBar.gameObject.activeSelf)
-            {
-                reloadProgressBar.gameObject.SetActive(false);
-            }
-
+            // ซ่อน UI กระสุนเมื่อจบด่านหรือ Game Over
+            HideAmmoUI();
             return;
         }
 

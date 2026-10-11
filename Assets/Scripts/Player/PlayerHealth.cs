@@ -183,7 +183,16 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (controller != null) controller.enabled = false;
 
         var shooting = GetComponent<PlayerShooting>();
-        if (shooting != null) shooting.enabled = false;
+        if (shooting != null)
+        {
+            shooting.HideAmmoUI();
+            shooting.enabled = false;
+        }
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.HideGameplayHUD();
+        }
 
         // เล่น Animation ตาย (ถ้ามี Animator)
         // ตอนนี้แค่เปลี่ยนสีเป็นแดง

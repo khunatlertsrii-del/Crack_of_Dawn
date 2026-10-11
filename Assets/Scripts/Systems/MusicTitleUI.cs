@@ -70,6 +70,12 @@ public class MusicTitleUI : MonoBehaviour
     // ฟังก์ชันที่ถูกเรียกอัตโนมัติเมื่อเพลงเปลี่ยน
     private void ShowMusicTitle(string trackName)
     {
+        // ไม่ต้องแสดงชื่อเพลงตอน Game Over หรือถ้าเป็นเพลง Game Over
+        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameManager.GameState.GameOver) return;
+        if (LevelRatingManager.Instance != null && !LevelRatingManager.Instance.isLevelActive && LevelRatingManager.Instance.RemainingTime <= 0f) return;
+        if (AudioManager.Instance != null && AudioManager.Instance.gameOverBGM != null && trackName == AudioManager.Instance.gameOverBGM.trackName) return;
+        if (string.IsNullOrEmpty(trackName) || trackName.ToLower().Contains("game over") || trackName.ToLower().Contains("gameover")) return;
+
         if (titleText != null)
         {
             titleText.text = trackName;
@@ -80,6 +86,16 @@ public class MusicTitleUI : MonoBehaviour
             StopCoroutine(displayCoroutine);
         }
         displayCoroutine = StartCoroutine(AnimateUI());
+    }
+
+    /// <summary>
+    /// สั่งซ่อนกล่องชื่อเพลงทันที (เรียกเมื่อ Game Over)
+    /// </summary>
+    public void HideImmediately()
+    {
+        if (displayCoroutine != null) StopCoroutine(displayCoroutine);
+        if (canvasGroup != null) canvasGroup.alpha = 0f;
+        if (targetRect != null) targetRect.anchoredPosition = hiddenPosition;
     }
 
     private IEnumerator AnimateUI()

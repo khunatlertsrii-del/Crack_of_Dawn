@@ -188,7 +188,7 @@ public class AudioManager : MonoBehaviour
     // Event สำหรับส่งชื่อเพลงไปให้ UI แสดง
     public event System.Action<string> OnMusicChanged;
 
-    public void PlayMusic(MusicTrack track)
+    public void PlayMusic(MusicTrack track, bool notifyUI = true)
     {
         if (track == null || track.clip == null) return;
         if (musicSource.clip == track.clip && musicSource.isPlaying) return;
@@ -198,8 +198,11 @@ public class AudioManager : MonoBehaviour
         musicSource.volume = musicVolume * track.volume;
         musicSource.Play();
         
-        // ส่ง Event ไปบอก UI ว่าเปลี่ยนเพลงแล้ว
-        OnMusicChanged?.Invoke(track.trackName);
+        // ส่ง Event ไปบอก UI ว่าเปลี่ยนเพลงแล้ว (เว้นแต่จะระบุว่าไม่ต้องแจ้ง หรือเป็นเพลง Game Over)
+        if (notifyUI && track != gameOverBGM)
+        {
+            OnMusicChanged?.Invoke(track.trackName);
+        }
     }
 
     public void PauseMusic()
