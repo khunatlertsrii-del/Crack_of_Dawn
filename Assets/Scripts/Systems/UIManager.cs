@@ -36,6 +36,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private RectTransform timerRect;
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private TMP_Text timerPenaltyText;
+    [Tooltip("สีข้อความตัวเลขเวลาปกติ (ค่าเริ่มต้น สีดำ)")]
+    [SerializeField] private Color timerTextColor = Color.black;
     [Tooltip("สีหลอดเวลาตอนเต็ม (ค่าเริ่มต้น สีเหลืองสด)")]
     [SerializeField] private Color timeBarFullColor = new Color(1f, 0.9f, 0.1f);
     [Tooltip("สีหลอดเวลาตอนปานกลาง (ค่าเริ่มต้น สีส้ม)")]
@@ -272,7 +274,7 @@ public class UIManager : MonoBehaviour
                 }
                 else
                 {
-                    timerText.color = Color.white;
+                    timerText.color = timerTextColor;
                 }
             }
         }
@@ -283,8 +285,9 @@ public class UIManager : MonoBehaviour
             hpSlider.gameObject.SetActive(isActive);
         if (slowMoSlider != null && slowMoSlider.gameObject.activeSelf != isActive)
             slowMoSlider.gameObject.SetActive(isActive);
-        if (timerContainer != null && timerContainer.activeSelf != isActive)
-            timerContainer.SetActive(isActive);
+        bool showTimer = isActive && !isTimerHiddenByTrigger;
+        if (timerContainer != null && timerContainer.activeSelf != showTimer)
+            timerContainer.SetActive(showTimer);
     }
 
     private void OnDisable()
@@ -535,11 +538,11 @@ public class UIManager : MonoBehaviour
         timerText.fontSize = 16;
         timerText.fontStyle = FontStyles.Bold;
         timerText.alignment = TextAlignmentOptions.Center;
-        timerText.color = Color.white;
+        timerText.color = timerTextColor;
         timerText.text = "00:00";
 
         Shadow shadow = textObj.AddComponent<Shadow>();
-        shadow.effectColor = Color.black;
+        shadow.effectColor = new Color(1f, 1f, 1f, 0.35f);
         shadow.effectDistance = new Vector2(1, -1);
 
         RectTransform textRect = textObj.GetComponent<RectTransform>();
@@ -566,6 +569,20 @@ public class UIManager : MonoBehaviour
         penaltyRect.sizeDelta = new Vector2(60, 30);
 
         penaltyObj.SetActive(false);
+    }
+
+    private bool isTimerHiddenByTrigger = false;
+
+    /// <summary>
+    /// สั่งเปิด/ปิดการแสดงผลของ UI หลอดเวลา (ใช้โดย TimerStartTrigger เมื่อต้องการซ่อนหลอดไว้ก่อน)
+    /// </summary>
+    public void SetTimerUIVisible(bool visible)
+    {
+        isTimerHiddenByTrigger = !visible;
+        if (timerContainer != null)
+        {
+            timerContainer.SetActive(visible);
+        }
     }
 
     // =========================================================

@@ -31,7 +31,11 @@ public class LevelRatingManager : MonoBehaviour
     [Tooltip("เวลาที่เหลือต่ำกว่ากี่วินาที จึงจะเริ่มกระพริบเตือน (ค่าเริ่มต้น 20 วินาที ปรับได้ตามใจชอบ)")]
     public float warningTimeThreshold = 20f;
 
+    [Tooltip("รอให้ผู้เล่นเดินผ่าน TimerStartTrigger ก่อนจึงจะเริ่มนับเวลาถอยหลัง (ถ้าในฉากมี TimerStartTrigger ระบบจะตรวจจับและรอให้อัตโนมัติ)")]
+    public bool requireTriggerToStart = false;
+
     public float RemainingTime { get; private set; }
+    public bool IsTimerRunning { get; private set; } = true;
 
     [Header("Vampiric Healing (ระบบเลือดสายบวก - เด้งทีละ 1 ขีด)")]
     [Tooltip("เลือดที่ได้เมื่อฆ่าศัตรูธรรมดา")]
@@ -70,6 +74,7 @@ public class LevelRatingManager : MonoBehaviour
     public event Action<float> OnRemainingTimeChanged;
     public event Action<float> OnTimePenaltyApplied;
     public event Action OnTimeOver;
+    public event Action OnTimerStarted;
 
     private void Awake()
     {
@@ -92,6 +97,17 @@ public class LevelRatingManager : MonoBehaviour
         // นับจำนวนศัตรูทั้งหมดในฉากตอนเริ่มเกม
         FriedEggEnemy[] enemies = FindObjectsByType<FriedEggEnemy>(FindObjectsSortMode.None);
         totalEnemiesInLevel = enemies.Length;
+
+        // ถ้าระบุว่าต้องรอ Trigger หรือพบ TimerStartTrigger ในฉาก ให้หยุดเวลารอไว้ก่อน
+        if (requireTriggerToStart || FindFirstObjectByType<TimerStartTrigger>() != null)
+        {
+            IsTimerRunning = false;
+            Debug.Log("[Timer] พบ TimerStartTrigger ในฉาก -> รอ Player เดินผ่านเขตก่อนเริ่มนับเวลา");
+        }
+        else
+        {
+            IsTimerRunning = true;
+        }
     }
 
     private void Update()
@@ -100,8 +116,8 @@ public class LevelRatingManager : MonoBehaviour
         {
             timeElapsed += Time.deltaTime;
 
-            // ระบบนับถอยหลัง Katana Zero Timer
-            if (enableCountdownTimer)
+            // ระบบนับถอยหลัง Katana Zero Timer (นับเมื่อ IsTimerRunning เป็นจริงเท่านั้น)
+            if (enableCountdownTimer && IsTimerRunning)
             {
                 RemainingTime -= Time.deltaTime;
                 OnRemainingTimeChanged?.Invoke(RemainingTime);
@@ -116,11 +132,23 @@ public class LevelRatingManager : MonoBehaviour
     }
 
     /// <summary>
+    /// สั่งเริ่มนับถอยหลัง (เรียกโดย TimerStartTrigger เมื่อ Player เดินผ่านเขต)
+    /// </summary>
+    public void StartCountdownTimer()
+    {
+        if (!enableCountdownTimer || IsTimerRunning) return;
+
+        IsTimerRunning = true;
+        Debug.Log("[Timer] ผู้เล่นเดินผ่านเขต Trigger -> เริ่มนับถอยหลัง!");
+        OnTimerStarted?.Invoke();
+    }
+
+    /// <summary>
     /// หักเวลาจำกัดเมื่อโดนยิง (Katana Zero Time Penalty)
     /// </summary>
     public void ApplyTimePenalty()
     {
-        if (!isLevelActive || !enableCountdownTimer) return;
+        if (!isLevelActive || !enableCountdownTimer || !IsTimerRunning) return;
 
         RemainingTime = Mathf.Max(0f, RemainingTime - timePenaltyOnHit);
         OnRemainingTimeChanged?.Invoke(RemainingTime);

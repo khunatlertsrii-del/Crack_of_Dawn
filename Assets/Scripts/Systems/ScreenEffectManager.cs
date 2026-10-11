@@ -291,7 +291,7 @@ public class ScreenEffectManager : MonoBehaviour
         if (enableTimeUrgencyVignette && timeUrgencyImage != null)
         {
             float targetUrgencyAlpha = 0f;
-            if (LevelRatingManager.Instance != null && LevelRatingManager.Instance.isLevelActive && LevelRatingManager.Instance.enableCountdownTimer)
+            if (LevelRatingManager.Instance != null && LevelRatingManager.Instance.isLevelActive && LevelRatingManager.Instance.enableCountdownTimer && LevelRatingManager.Instance.IsTimerRunning)
             {
                 float rem = LevelRatingManager.Instance.RemainingTime;
                 float warn = LevelRatingManager.Instance.warningTimeThreshold;

@@ -136,7 +136,7 @@ public class AudioManager : MonoBehaviour
 
         // คำนวณ Pitch เพิ่มเติมจากความกดดันของเวลา (Katana Zero Time Urgency)
         float urgencyPitchMult = 1f;
-        if (enableTimeUrgencyPitch && LevelRatingManager.Instance != null && LevelRatingManager.Instance.isLevelActive && LevelRatingManager.Instance.enableCountdownTimer)
+        if (enableTimeUrgencyPitch && LevelRatingManager.Instance != null && LevelRatingManager.Instance.isLevelActive && LevelRatingManager.Instance.enableCountdownTimer && LevelRatingManager.Instance.IsTimerRunning)
         {
             float rem = LevelRatingManager.Instance.RemainingTime;
             float warn = LevelRatingManager.Instance.warningTimeThreshold;
