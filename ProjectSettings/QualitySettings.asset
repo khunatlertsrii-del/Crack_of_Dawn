@@ -60,6 +60,7 @@ QualitySettings:
     terrainMaxTrees: 50
     excludedTargetPlatforms:
     - Standalone
+    - WebGL
   - serializedVersion: 5
     name: Low
     pixelLightCount: 0
@@ -114,6 +115,7 @@ QualitySettings:
     terrainMaxTrees: 50
     excludedTargetPlatforms:
     - Standalone
+    - WebGL
   - serializedVersion: 5
     name: Medium
     pixelLightCount: 1
@@ -168,6 +170,7 @@ QualitySettings:
     terrainMaxTrees: 50
     excludedTargetPlatforms:
     - Standalone
+    - WebGL
   - serializedVersion: 5
     name: High
     pixelLightCount: 2
@@ -222,6 +225,7 @@ QualitySettings:
     terrainMaxTrees: 50
     excludedTargetPlatforms:
     - Standalone
+    - WebGL
   - serializedVersion: 5
     name: Very High
     pixelLightCount: 3
@@ -276,6 +280,7 @@ QualitySettings:
     terrainMaxTrees: 50
     excludedTargetPlatforms:
     - Standalone
+    - WebGL
   - serializedVersion: 5
     name: Ultra
     pixelLightCount: 4
@@ -341,7 +346,7 @@ QualitySettings:
     PS5: 5
     Stadia: 5
     Standalone: 5
-    WebGL: 3
+    WebGL: 5
     Windows Store Apps: 5
     XboxOne: 5
     iPhone: 2

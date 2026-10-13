@@ -101,6 +101,24 @@ public class MainMenuManager : MonoBehaviour
     }
 
     /// <summary>
+    /// ผูกกับปุ่ม "Reset Progress" บน UI ได้โดยตรง เพื่อล้างข้อมูลเซฟทั้งหมดในเครื่อง!
+    /// (สามารถปิดซ่อนปุ่มนี้ก่อนบิวด์ได้เลย ไม่มีผลเสียใดๆ)
+    /// </summary>
+    public void ResetAllProgress()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+        RefreshLevelButtons();
+        
+        if (LevelPreviewManager.Instance != null)
+        {
+            LevelPreviewManager.Instance.HidePreview();
+        }
+
+        Debug.Log("[MainMenuManager] ล้างข้อมูลเซฟทั้งหมด (PlayerPrefs) เรียบร้อยแล้ว! ทุกด่านกลับมาล็อคเหมือนเริ่มเกมใหม่");
+    }
+
+    /// <summary>
     /// ปลดล็อคทุกด่าน (สำหรับ Debug)
     /// </summary>
     [ContextMenu("DEBUG: ปลดล็อคทุกด่าน")]
@@ -119,10 +137,6 @@ public class MainMenuManager : MonoBehaviour
     [ContextMenu("DEBUG: ล็อคทุกด่าน")]
     public void DebugLockAll()
     {
-        PlayerPrefs.DeleteKey("LevelCompleted_Tutorial");
-        PlayerPrefs.DeleteKey("LevelCompleted_Level_2");
-        PlayerPrefs.Save();
-        RefreshLevelButtons();
-        Debug.Log("[DEBUG] ล็อคทุกด่านแล้ว!");
+        ResetAllProgress();
     }
 }
