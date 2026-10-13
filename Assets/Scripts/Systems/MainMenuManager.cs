@@ -10,6 +10,15 @@ public class MainMenuManager : MonoBehaviour
     [Tooltip("Panel หน้าจอเลือกด่าน (ที่มีปุ่มด่านต่างๆ และปุ่ม Back)")]
     public GameObject levelSelectPanel;
 
+    private void Awake()
+    {
+        // สร้าง LevelPreviewManager ให้อัตโนมัติหากยังไม่มีในฉาก
+        if (FindFirstObjectByType<LevelPreviewManager>() == null)
+        {
+            gameObject.AddComponent<LevelPreviewManager>();
+        }
+    }
+
     private void Start()
     {
         // เริ่มมาให้โชว์หน้า Main Menu และซ่อนหน้า Level Select
@@ -30,6 +39,14 @@ public class MainMenuManager : MonoBehaviour
 
         // รีเฟรชสถานะล็อคของปุ่มทุกปุ่ม
         RefreshLevelButtons();
+
+        // โชว์พรีวิวด่านแรกเป็นค่าเริ่มต้น
+        LevelSelectButton[] buttons = FindObjectsByType<LevelSelectButton>(FindObjectsSortMode.None);
+        if (buttons != null && buttons.Length > 0 && LevelPreviewManager.Instance != null)
+        {
+            System.Array.Sort(buttons, (a, b) => string.Compare(a.name, b.name));
+            LevelPreviewManager.Instance.ShowPreview(buttons[0]);
+        }
     }
 
     /// <summary>

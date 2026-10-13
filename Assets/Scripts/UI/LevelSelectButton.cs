@@ -1,20 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 /// <summary>
 /// แปะไว้บนปุ่มเลือกด่านแต่ละปุ่มในหน้า Level Select
-/// จัดการล็อค/ปลดล็อคด่านอัตโนมัติ
-/// 
-/// วิธีใช้:
-/// 1. ลากสคริปต์นี้ไปแปะบนปุ่มด่าน (เช่น Level_2)
-/// 2. ตั้ง sceneName = ชื่อ Scene ที่ปุ่มนี้จะโหลด (เช่น "Level_2")
-/// 3. ตั้ง requiredLevelScene = ชื่อ Scene ที่ต้องผ่านก่อน (เช่น "Tutorial")
-///    ถ้าเป็นด่านแรก ปล่อยว่างไว้ = ไม่ต้องล็อค
-/// 4. ลาก Image ที่จะแสดงตอนล็อคมาใส่ lockedOverlay (ถ้าไม่ใส่จะสร้างอัตโนมัติ)
+/// - จัดการล็อค/ปลดล็อคด่านอัตโนมัติ
+/// - ส่งข้อมูลพรีวิว (ชื่อด่าน, ภาพ, คำอธิบาย, ระดับความยาก) ไปที่ LevelPreviewManager เมื่อเอาเมาส์ชี้
+/// - ซ่อนตัวหนังสือเดิมเมื่อล็อค ป้องกันปัญหาตัวหนังสือซ้อนกัน
 /// </summary>
 [RequireComponent(typeof(Button))]
-public class LevelSelectButton : MonoBehaviour
+public class LevelSelectButton : MonoBehaviour, IPointerEnterHandler, ISelectHandler
 {
     [Header("=== ตั้งค่าด่าน ===")]
     [Tooltip("ชื่อ Scene ที่ปุ่มนี้จะโหลด")]
@@ -22,6 +18,34 @@ public class LevelSelectButton : MonoBehaviour
 
     [Tooltip("ชื่อ Scene ด่านก่อนหน้าที่ต้องผ่านก่อนถึงจะปลดล็อค (ปล่อยว่างถ้าเป็นด่านแรก)")]
     public string requiredLevelScene;
+
+    [Header("=== ข้อมูลสำหรับพรีวิว (Preview Details) ===")]
+    [Tooltip("ชื่อด่านที่จะแสดงบนจอพรีวิว (เช่น LEVEL 01)")]
+    public string displayName = "LEVEL 01";
+
+    [Tooltip("ชื่อตอน / สถานที่ (เช่น TUTORIAL: KITCHEN INVASION)")]
+    public string subTitle = "แหล่งกบดานไข่ดาว";
+
+    [TextArea(2, 4)]
+    [Tooltip("คำอธิบายภารกิจย่อ")]
+    public string description = "บุกทลายรังศัตรูไข่ดาว และฝึกฝนการใช้งานระบบเวลาสโลว์โมชั่น";
+
+    [Tooltip("รูปภาพพรีวิวของด่านนี้ (ลากรูป Screenshot ด่านมาใส่ได้เลย)")]
+    public Sprite previewSprite;
+
+    [Tooltip("ระดับความยาก / อันตราย (เช่น THREAT: LOW หรือ ★☆☆☆☆)")]
+    public string threatLevel = "THREAT: LOW";
+
+    [Header("=== ข้อความเมื่อด่านล็อค (Locked Info) ===")]
+    [Tooltip("ข้อความบนปุ่มเมื่อล็อคอยู่")]
+    public string lockedText = "LOCKED";
+
+    [Tooltip("หัวข้อตัวหนังสือสีแดงตอนล็อคบนจอมอนิเตอร์ (แก้ได้ตามใจชอบ เช่น RESTRICTED ACCESS)")]
+    public string lockedPreviewTitle = "RESTRICTED ACCESS";
+
+    [TextArea(2, 3)]
+    [Tooltip("ข้อความสีแดงบรรทัดล่างบนจอมอนิเตอร์ (แก้ได้ตามใจชอบ เช่น COMPLETE TUTORIAL FIRST หรือ เคลียร์ด่าน 1 ก่อน)")]
+    public string lockedPreviewReason = "COMPLETE TUTORIAL TO UNLOCK";
 
     [Header("=== ภาพล็อค ===")]
     [Tooltip("ภาพ Overlay แสดงตอนด่านล็อคอยู่ (ถ้าไม่ลากใส่จะสร้างอัตโนมัติ)")]
@@ -31,10 +55,7 @@ public class LevelSelectButton : MonoBehaviour
     public Sprite lockedSprite;
 
     [Tooltip("สีของรูปล็อค")]
-    public Color lockedColor = new Color(0.2f, 0.2f, 0.2f, 0.85f);
-
-    [Tooltip("ข้อความแสดงตอนล็อค (เช่น 'ล็อคอยู่')")]
-    public string lockedText = "🔒";
+    public Color lockedColor = new Color(0.18f, 0.18f, 0.22f, 0.95f);
 
     [Header("=== เสียง ===")]
     [Tooltip("เสียงตอนกดปุ่มที่ล็อค")]
@@ -42,6 +63,8 @@ public class LevelSelectButton : MonoBehaviour
 
     private Button button;
     private bool isUnlocked = false;
+    public bool IsUnlocked => isUnlocked;
+
     private TMP_Text buttonText;
     private string originalButtonText;
 
@@ -52,6 +75,12 @@ public class LevelSelectButton : MonoBehaviour
         if (buttonText != null)
         {
             originalButtonText = buttonText.text;
+        }
+
+        // ตั้งค่าชื่อเริ่มต้นถ้ายังไม่ได้กรอก
+        if (string.IsNullOrEmpty(displayName) && !string.IsNullOrEmpty(sceneName))
+        {
+            displayName = sceneName.ToUpper();
         }
     }
 
@@ -92,23 +121,31 @@ public class LevelSelectButton : MonoBehaviour
             button.interactable = unlocked;
         }
 
-        // แสดง/ซ่อน Locked Overlay
+        // แสดง/ซ่อน Locked Overlay + จัดการตัวหนังสือไม่ให้ทับซ้อนกัน!
         if (unlocked)
         {
-            // ปลดล็อคแล้ว — ซ่อนภาพล็อค
+            // ปลดล็อคแล้ว — ซ่อนภาพล็อค คืนตัวหนังสือเดิม
             if (lockedOverlay != null) lockedOverlay.SetActive(false);
 
-            // คืนข้อความเดิม
-            if (buttonText != null && !string.IsNullOrEmpty(originalButtonText))
+            if (buttonText != null)
             {
-                buttonText.text = originalButtonText;
+                buttonText.gameObject.SetActive(true);
+                if (!string.IsNullOrEmpty(originalButtonText))
+                {
+                    buttonText.text = originalButtonText;
+                }
             }
         }
         else
         {
-            // ยังล็อคอยู่ — แสดงภาพล็อค
+            // ยังล็อคอยู่ — แสดงภาพล็อค และซ่อนตัวหนังสือเดิม ป้องกันบั๊กซ้อนกัน!
             EnsureLockedOverlay();
             if (lockedOverlay != null) lockedOverlay.SetActive(true);
+
+            if (buttonText != null)
+            {
+                buttonText.gameObject.SetActive(false); // ซ่อนตัวหนังสือเดิมเพื่อไม่ให้ซ้อนกับ LOCKED
+            }
         }
     }
 
@@ -143,7 +180,7 @@ public class LevelSelectButton : MonoBehaviour
         }
         img.raycastTarget = false; // ไม่กั้น Raycast ของปุ่มเดิม
 
-        // ใส่ Text แสดงกุญแจ 🔒
+        // ใส่ Text แสดงสถานะล็อค
         if (!string.IsNullOrEmpty(lockedText))
         {
             GameObject textObj = new GameObject("LockedText");
@@ -157,13 +194,36 @@ public class LevelSelectButton : MonoBehaviour
 
             TMP_Text tmpText = textObj.AddComponent<TextMeshProUGUI>();
             tmpText.text = lockedText;
-            tmpText.fontSize = 24;
+            tmpText.fontSize = 20;
+            tmpText.fontStyle = FontStyles.Bold;
             tmpText.alignment = TextAlignmentOptions.Center;
-            tmpText.color = Color.white;
+            tmpText.color = new Color(0.9f, 0.4f, 0.4f, 1f); // สีแดงส้มบ่งบอกว่าล็อค
             tmpText.raycastTarget = false;
         }
 
         lockedOverlay = overlay;
+    }
+
+    // =========================================================
+    // เมาส์ชี้ / ไฮไลต์ปุ่ม -> อัปเดตพรีวิว
+    // =========================================================
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        TriggerPreview();
+    }
+
+    public void OnSelect(BaseEventData eventData)
+    {
+        TriggerPreview();
+    }
+
+    private void TriggerPreview()
+    {
+        if (LevelPreviewManager.Instance != null)
+        {
+            LevelPreviewManager.Instance.ShowPreview(this);
+        }
     }
 
     /// <summary>
@@ -191,12 +251,9 @@ public class LevelSelectButton : MonoBehaviour
     }
 
     // =========================================================
-    // DEBUG — สำหรับทดสอบ (ลบทิ้งตอนส่งเกมจริงได้)
+    // DEBUG — สำหรับทดสอบ
     // =========================================================
 
-    /// <summary>
-    /// ปลดล็อคด่านทุกด่าน (สำหรับทดสอบ)
-    /// </summary>
     [ContextMenu("DEBUG: ปลดล็อคทุกด่าน")]
     public void DebugUnlockAll()
     {
@@ -204,12 +261,10 @@ public class LevelSelectButton : MonoBehaviour
         PlayerPrefs.SetInt("LevelCompleted_Level_2", 1);
         PlayerPrefs.Save();
         CheckUnlockStatus();
+        TriggerPreview();
         Debug.Log("[DEBUG] ปลดล็อคทุกด่านแล้ว!");
     }
 
-    /// <summary>
-    /// ล็อคด่านทุกด่าน (สำหรับทดสอบ)
-    /// </summary>
     [ContextMenu("DEBUG: ล็อคทุกด่าน")]
     public void DebugLockAll()
     {
@@ -217,6 +272,7 @@ public class LevelSelectButton : MonoBehaviour
         PlayerPrefs.DeleteKey("LevelCompleted_Level_2");
         PlayerPrefs.Save();
         CheckUnlockStatus();
+        TriggerPreview();
         Debug.Log("[DEBUG] ล็อคทุกด่านแล้ว!");
     }
 }
