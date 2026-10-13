@@ -3433,7 +3433,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelPreviewManager
   preserveAspectRatio: 1
   defaultLockedTitle: RESTRICTED ACCESS
-  defaultLockedReason: 
+  defaultLockedReason: ...
   previewPanel: {fileID: 522322898}
   previewImage: {fileID: 1748513386}
   titleText: {fileID: 225778933}
