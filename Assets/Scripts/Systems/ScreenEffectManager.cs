@@ -18,10 +18,30 @@ public class ScreenEffectManager : MonoBehaviour
     public Color grayscaleColor = new Color(0.1f, 0.1f, 0.1f, 0.85f); // เทาเข้มทึบๆ
     [Tooltip("เปิด/ปิด ให้หน้าจอเทาค้างไว้เวลาเลือดน้อย")]
     public bool enableLowHealthGray = true;
-    [Tooltip("เปอร์เซ็นต์เลือดที่ถือว่าน้อย (0.0 - 1.0)")]
-    public float lowHealthThreshold = 0.3f;
+    [Tooltip("เปอร์เซ็นต์เลือดที่ถือว่าน้อย (0.0 - 1.0) ค่า 0.4 จะจับ HP 1/3 = 0.333 ได้")]
+    public float lowHealthThreshold = 0.4f;
     
+    [Header("Low Health Effects (เอฟเฟคตอนเลือดน้อย สไตล์ Katana Zero)")]
+    [Tooltip("เปิด/ปิด เอฟเฟคเลือดน้อยแบบเต็มรูปแบบ (จอแดงเต้น + สั่น + เสียงหัวใจ)")]
+    public bool enableLowHealthEffects = true;
+    [Tooltip("ความเร็วจังหวะหัวใจเต้น (แนะนำ 1.2 = เต้นตุบๆ สมจริง)")]
+    public float heartbeatSpeed = 1.2f;
+    [Tooltip("ความเข้มขอบจอแดงต่ำสุดตอนเลือดน้อย (0.0 - 1.0)")]
+    [Range(0f, 1f)] public float lowHealthMinAlpha = 0.15f;
+    [Tooltip("ความเข้มขอบจอแดงสูงสุดตอนเลือดน้อย (0.0 - 1.0)")]
+    [Range(0f, 1f)] public float lowHealthMaxAlpha = 0.65f;
+    [Tooltip("เปิด/ปิด กล้องสั่นเล็กน้อยเมื่อเลือดน้อย")]
+    public bool enableLowHealthShake = true;
+    [Tooltip("ความแรงของกล้องสั่น (ยิ่งน้อยยิ่งสั่นน้อย แนะนำ 0.03)")]
+    public float lowHealthShakeIntensity = 0.03f;
+    [Tooltip("สีของ Overlay เลือดน้อย (แดงเข้ม)")]
+    public Color lowHealthOverlayColor = new Color(0.6f, 0f, 0f, 1f);
+
     private float currentHealthPercent = 1f;
+    private float heartbeatTimer = 0f;
+    private bool isLowHealthActive = false;
+    private Camera mainCamera;
+    private Vector3 originalCameraPos;
 
     [Header("Slow Motion Filter (ฟิลเตอร์ตอนเปิดสโลว์)")]
     [Tooltip("เปิด/ปิด ฟิลเตอร์ตอน Slow")]
@@ -100,6 +120,16 @@ public class ScreenEffectManager : MonoBehaviour
         }
 
         CreateScreenCanvas();
+    }
+
+    private void Start()
+    {
+        // เก็บ reference กล้องหลักเพื่อทำ Screen Shake ตอนเลือดน้อย
+        mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            originalCameraPos = mainCamera.transform.localPosition;
+        }
     }
 
     private void CreateScreenCanvas()
@@ -260,12 +290,48 @@ public class ScreenEffectManager : MonoBehaviour
         // 1. อัปเดตขอบจอแดง
         float targetDamageAlpha = 0f;
         
-        // ถ้าเลือดน้อย ให้ขอบจอแดงกระพริบตลอดเวลา
-        if (enableLowHealthGray && currentHealthPercent <= lowHealthThreshold)
+        // ถ้าเลือดน้อย ให้ขอบจอแดงกระพริบจังหวะหัวใจเต้น (lub-dub)
+        bool lowHealth = enableLowHealthEffects && currentHealthPercent <= lowHealthThreshold && currentHealthPercent > 0f;
+        if (lowHealth)
         {
-            // กระพริบด้วย Sin wave (0 ถึง 1)
-            float pulse = (Mathf.Sin(Time.unscaledTime * 5f) + 1f) * 0.5f; 
-            targetDamageAlpha = damageColor.a * (0.3f + pulse * 0.4f); // กระพริบระหว่าง 30% - 70% ของ Alpha สูงสุด
+            heartbeatTimer += Time.unscaledDeltaTime * heartbeatSpeed;
+            
+            // สร้างจังหวะหัวใจเต้นแบบ Double-Pulse (ตุบ-ตุบ...พัก...ตุบ-ตุบ...)
+            // t ไล่จาก 0→1 ในแต่ละรอบ
+            float t = heartbeatTimer % 1f;
+            float pulse;
+            if (t < 0.1f) // ตุบแรก (lub) — sharp peak
+                pulse = Mathf.Sin(t / 0.1f * Mathf.PI);
+            else if (t < 0.2f) // ช่วงพักสั้นๆ
+                pulse = Mathf.Lerp(0f, 0.3f, (t - 0.1f) / 0.1f);
+            else if (t < 0.3f) // ตุบที่สอง (dub) — smaller peak
+                pulse = 0.3f + 0.7f * Mathf.Sin((t - 0.2f) / 0.1f * Mathf.PI);
+            else // ช่วงพักยาว (diastole)
+                pulse = Mathf.Lerp(0.3f, 0f, Mathf.Clamp01((t - 0.3f) / 0.4f));
+            
+            targetDamageAlpha = Mathf.Lerp(lowHealthMinAlpha, lowHealthMaxAlpha, pulse);
+            
+            // กล้องสั่นเล็กน้อยตามจังหวะชีพจรเต้นตุบๆ
+            if (enableLowHealthShake && pulse > 0.6f && CameraFollow.Instance != null)
+            {
+                CameraFollow.Instance.ShakeCamera(lowHealthShakeIntensity * pulse, 0.08f);
+            }
+            
+            if (!isLowHealthActive)
+            {
+                isLowHealthActive = true;
+                // แจ้ง AudioManager ให้เล่นเสียงหัวใจเต้น
+                AudioManager.Instance?.StartHeartbeat();
+            }
+        }
+        else
+        {
+            if (isLowHealthActive)
+            {
+                isLowHealthActive = false;
+                heartbeatTimer = 0f;
+                AudioManager.Instance?.StopHeartbeat();
+            }
         }
 
         if (currentDamageTimer > 0)

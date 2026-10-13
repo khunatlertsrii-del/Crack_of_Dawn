@@ -10,7 +10,7 @@ using TMPro;
 /// - ซ่อนตัวหนังสือเดิมเมื่อล็อค ป้องกันปัญหาตัวหนังสือซ้อนกัน
 /// </summary>
 [RequireComponent(typeof(Button))]
-public class LevelSelectButton : MonoBehaviour, IPointerEnterHandler, ISelectHandler
+public class LevelSelectButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler
 {
     [Header("=== ตั้งค่าด่าน ===")]
     [Tooltip("ชื่อ Scene ที่ปุ่มนี้จะโหลด")]
@@ -213,9 +213,19 @@ public class LevelSelectButton : MonoBehaviour, IPointerEnterHandler, ISelectHan
         TriggerPreview();
     }
 
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        DismissPreview();
+    }
+
     public void OnSelect(BaseEventData eventData)
     {
         TriggerPreview();
+    }
+
+    public void OnDeselect(BaseEventData eventData)
+    {
+        DismissPreview();
     }
 
     private void TriggerPreview()
@@ -223,6 +233,14 @@ public class LevelSelectButton : MonoBehaviour, IPointerEnterHandler, ISelectHan
         if (LevelPreviewManager.Instance != null)
         {
             LevelPreviewManager.Instance.ShowPreview(this);
+        }
+    }
+
+    private void DismissPreview()
+    {
+        if (LevelPreviewManager.Instance != null)
+        {
+            LevelPreviewManager.Instance.HidePreview(this);
         }
     }
 

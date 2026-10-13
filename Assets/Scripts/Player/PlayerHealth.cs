@@ -194,6 +194,10 @@ public class PlayerHealth : MonoBehaviour, IDamageable
             UIManager.Instance.HideGameplayHUD();
         }
 
+        // ปิดเสียงหัวใจเต้นและเอฟเฟคเลือดน้อยทันทีเมื่อตาย
+        ScreenEffectManager.Instance?.UpdateHealthPercent(0f);
+        AudioManager.Instance?.StopHeartbeat();
+
         // เล่น Animation ตาย (ถ้ามี Animator)
         // ตอนนี้แค่เปลี่ยนสีเป็นแดง
         SetSpriteColor(new Color(0.5f, 0f, 0f, 0.7f));

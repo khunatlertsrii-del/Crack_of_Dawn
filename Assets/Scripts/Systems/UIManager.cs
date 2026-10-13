@@ -69,6 +69,21 @@ public class UIManager : MonoBehaviour
     [Tooltip("ระยะที่ UI หลอดเลือดและสโลว์เลื่อนหลบขอบจอ (ค่าลบ = เลื่อนลงข้างล่าง แนะนำ -65)")]
     public float hudDodgeOffsetY = -65f;
 
+    [Header("Low Health Block Blink (ช่องเลือดกระพริบตอนเลือดน้อย)")]
+    [Tooltip("เปิด/ปิด ช่องเลือดสุดท้ายกระพริบ-เต้นตุบๆ เมื่อเหลือขีดเดียว")]
+    [SerializeField] private bool enableLastBlockBlink = true;
+    [Tooltip("ความเร็วกระพริบ (ยิ่งมากยิ่งเร็ว)")]
+    [SerializeField] private float lastBlockBlinkSpeed = 3f;
+    [Tooltip("สีกระพริบของช่องเลือดขีดสุดท้าย (แดง)")]
+    [SerializeField] private Color lastBlockBlinkColor = new Color(1f, 0.2f, 0.2f, 1f);
+    [Tooltip("ขนาดที่ขยายตุบตอนเลือดน้อย (เช่น 1.15 = ขยาย 15%)")]
+    [SerializeField] private float lastBlockPulseScale = 1.15f;
+    
+    private bool isLastBlockBlinking = false;
+    private Vector3[] healthBlockOriginalScales;
+    private Color[] healthBlockOriginalColors;
+    private Image[] healthBlockImages;
+
     private Canvas canvas;
 
     // =========================================================
@@ -180,6 +195,9 @@ public class UIManager : MonoBehaviour
         // Hide panels
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (victoryPanel != null) victoryPanel.SetActive(false);
+
+        // เก็บ Original Scale/Color ของช่องเลือดเพื่อทำ Blink Effect
+        CacheHealthBlockOriginals();
     }
 
     private void Update()
@@ -299,6 +317,9 @@ public class UIManager : MonoBehaviour
                 }
             }
         }
+
+        // เอฟเฟคขีดเลือดสุดท้ายกระพริบ + ขยายตุบๆ (Low Health Block Pulse)
+        UpdateHealthBlockBlink();
     }
 
     private void OnDisable()
@@ -361,6 +382,17 @@ public class UIManager : MonoBehaviour
                     healthBlocks[i].SetActive(i < currentHits);
                 }
             }
+
+            // ถ้าเหลือแค่ 1 ขีด ให้เปิดโหมดกระพริบเต้นตุบๆ
+            if (currentHits == 1)
+            {
+                isLastBlockBlinking = true;
+            }
+            else
+            {
+                isLastBlockBlinking = false;
+                ResetHealthBlockVisuals();
+            }
         }
 
         if (hpSlider != null)
@@ -384,6 +416,79 @@ public class UIManager : MonoBehaviour
                 if (hpSlider.fillRect == null)
                 {
                     fill.transform.localScale = new Vector3(percent, 1f, 1f);
+                }
+            }
+        }
+    }
+
+    private void CacheHealthBlockOriginals()
+    {
+        if (healthBlocks == null || healthBlocks.Length == 0) return;
+
+        int len = healthBlocks.Length;
+        healthBlockOriginalScales = new Vector3[len];
+        healthBlockOriginalColors = new Color[len];
+        healthBlockImages = new Image[len];
+
+        for (int i = 0; i < len; i++)
+        {
+            if (healthBlocks[i] != null)
+            {
+                healthBlockOriginalScales[i] = healthBlocks[i].transform.localScale;
+                Image img = healthBlocks[i].GetComponent<Image>();
+                if (img == null) img = healthBlocks[i].GetComponentInChildren<Image>();
+                healthBlockImages[i] = img;
+                if (img != null)
+                {
+                    healthBlockOriginalColors[i] = img.color;
+                }
+            }
+        }
+    }
+
+    private void UpdateHealthBlockBlink()
+    {
+        if (!enableLastBlockBlink || !isLastBlockBlinking) return;
+        if (healthBlocks == null || healthBlocks.Length == 0) return;
+
+        // ช่องแรก (Index 0) คือขีดสุดท้ายที่เหลืออยู่
+        GameObject lastBlock = healthBlocks[0];
+        if (lastBlock == null || !lastBlock.activeSelf) return;
+
+        // จังหวะหัวใจ / กระพริบตุบๆ
+        float t = Mathf.PingPong(Time.unscaledTime * lastBlockBlinkSpeed, 1f);
+        
+        // ขยาย/หด ขนาด (Pulse scale)
+        Vector3 baseScale = (healthBlockOriginalScales != null && healthBlockOriginalScales.Length > 0) 
+            ? healthBlockOriginalScales[0] 
+            : Vector3.one;
+        lastBlock.transform.localScale = baseScale * Mathf.Lerp(1f, lastBlockPulseScale, t);
+
+        // เปลี่ยนสีกระพริบ (ส้ม/แดงเต้น)
+        if (healthBlockImages != null && healthBlockImages.Length > 0 && healthBlockImages[0] != null)
+        {
+            Color baseColor = (healthBlockOriginalColors != null && healthBlockOriginalColors.Length > 0)
+                ? healthBlockOriginalColors[0]
+                : Color.white;
+            healthBlockImages[0].color = Color.Lerp(baseColor, lastBlockBlinkColor, t);
+        }
+    }
+
+    private void ResetHealthBlockVisuals()
+    {
+        if (healthBlocks == null || healthBlocks.Length == 0) return;
+
+        for (int i = 0; i < healthBlocks.Length; i++)
+        {
+            if (healthBlocks[i] != null)
+            {
+                if (healthBlockOriginalScales != null && i < healthBlockOriginalScales.Length && healthBlockOriginalScales[i] != Vector3.zero)
+                {
+                    healthBlocks[i].transform.localScale = healthBlockOriginalScales[i];
+                }
+                if (healthBlockImages != null && i < healthBlockImages.Length && healthBlockImages[i] != null && healthBlockOriginalColors != null && i < healthBlockOriginalColors.Length)
+                {
+                    healthBlockImages[i].color = healthBlockOriginalColors[i];
                 }
             }
         }

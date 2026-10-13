@@ -73,6 +73,9 @@ public class LevelPreviewManager : MonoBehaviour
     private Coroutine recBlinkCoroutine;
     private Coroutine punchScaleCoroutine;
 
+    // ปุ่มที่กำลังชี้อยู่ปัจจุบัน
+    private LevelSelectButton currentActiveButton;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -84,6 +87,12 @@ public class LevelPreviewManager : MonoBehaviour
 
         GenerateDefaultSprites();
         EnsureUIExists();
+        HidePreview();
+    }
+
+    private void Start()
+    {
+        HidePreview();
     }
 
     private void OnEnable()
@@ -93,7 +102,8 @@ public class LevelPreviewManager : MonoBehaviour
             recBlinkCoroutine = StartCoroutine(BlinkRecRoutine());
         }
 
-        StartCoroutine(SelectFirstAvailableButtonNextFrame());
+        // เริ่มต้นด้วยการซ่อนหน้าต่างพรีวิวไว้ก่อน จนกว่าผู้เล่นจะเอาเมาส์มาชี้
+        HidePreview();
     }
 
     private void OnDisable()
@@ -103,16 +113,26 @@ public class LevelPreviewManager : MonoBehaviour
             StopCoroutine(recBlinkCoroutine);
             recBlinkCoroutine = null;
         }
+
+        HidePreview();
     }
 
-    private IEnumerator SelectFirstAvailableButtonNextFrame()
+    /// <summary>
+    /// ซ่อนหน้าต่างพรีวิวเมื่อผู้เล่นเลื่อนเมาส์ออกจากปุ่ม
+    /// </summary>
+    public void HidePreview(LevelSelectButton buttonData = null)
     {
-        yield return null; // รอ 1 เฟรม
-        LevelSelectButton[] buttons = FindObjectsByType<LevelSelectButton>(FindObjectsSortMode.None);
-        if (buttons != null && buttons.Length > 0)
+        // ถ้าส่ง buttonData มา ให้เช็คว่าเป็นปุ่มเดิมที่กำลังแสดงอยู่หรือไม่
+        // ป้องกันกรณีที่ผู้เล่นเลื่อนเมาส์จากปุ่ม Level 1 ไป Level 2 ทันที แล้วปุ่มเดิมมาสั่งปิดทับ
+        if (buttonData != null && currentActiveButton != buttonData)
         {
-            System.Array.Sort(buttons, (a, b) => string.Compare(a.name, b.name));
-            ShowPreview(buttons[0]);
+            return;
+        }
+
+        currentActiveButton = null;
+        if (previewPanel != null && previewPanel.activeSelf)
+        {
+            previewPanel.SetActive(false);
         }
     }
 
@@ -122,6 +142,7 @@ public class LevelPreviewManager : MonoBehaviour
     public void ShowPreview(LevelSelectButton buttonData)
     {
         if (buttonData == null) return;
+        currentActiveButton = buttonData;
         EnsureUIExists();
 
         if (previewPanel != null && !previewPanel.activeSelf)

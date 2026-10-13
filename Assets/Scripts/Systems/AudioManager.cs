@@ -45,6 +45,14 @@ public class AudioManager : MonoBehaviour
     public AudioClip uiHoverSound;
     public AudioClip uiClickSound;
 
+    [Header("Low Health Heartbeat (เสียงหัวใจเต้นตอนเลือดน้อย)")]
+    [Tooltip("เสียงหัวใจเต้น (ใส่คลิปเสียง 'lub-dub' สั้นๆ ถ้าไม่ใส่จะไม่มีเสียง)")]
+    public AudioClip heartbeatSound;
+    [Tooltip("ความดังเสียงหัวใจเต้น (0.0 - 1.0)")]
+    [Range(0f, 1f)] public float heartbeatVolume = 0.6f;
+    [Tooltip("ช่วงเวลาระหว่างเสียงหัวใจแต่ละครั้ง (วินาที) ค่าน้อย = เต้นเร็ว")]
+    public float heartbeatInterval = 0.83f;
+
     [Header("Settings")]
     [Range(0f, 1f)] public float musicVolume = 0.5f;
     [Range(0f, 1f)] public float sfxVolume = 0.8f;
@@ -61,6 +69,8 @@ public class AudioManager : MonoBehaviour
     public float maxUrgencyPitch = 1.25f;
     
     private AudioSource musicSource;
+    private AudioSource heartbeatSource; // แยก AudioSource สำหรับเสียงหัวใจเต้น
+    private Coroutine heartbeatCoroutine;
     private List<AudioSource> sfxSources = new List<AudioSource>();
 
     private void Awake()
@@ -306,6 +316,70 @@ public class AudioManager : MonoBehaviour
         if (isSFX && !sfxSources.Contains(source))
         {
             sfxSources.Add(source); // เก็บลง List เพื่ออัปเดต Pitch เรียลไทม์
+        }
+    }
+
+    // ==========================================
+    // HEARTBEAT (เสียงหัวใจเต้นเมื่อเลือดน้อย)
+    // ==========================================
+
+    /// <summary>
+    /// เริ่มเล่นเสียงหัวใจเต้นวนซ้ำ (เรียกจาก ScreenEffectManager เมื่อเลือดน้อย)
+    /// </summary>
+    public void StartHeartbeat()
+    {
+        if (heartbeatSound == null) return;
+        if (heartbeatCoroutine != null) return; // กำลังเล่นอยู่แล้ว
+
+        // สร้าง AudioSource แยกสำหรับเสียงหัวใจ (ไม่ใช้ Pool เพราะต้องวนซ้ำ)
+        if (heartbeatSource == null)
+        {
+            GameObject hbObj = new GameObject("HeartbeatSource");
+            hbObj.transform.SetParent(transform);
+            heartbeatSource = hbObj.AddComponent<AudioSource>();
+            heartbeatSource.playOnAwake = false;
+            heartbeatSource.loop = false;
+        }
+
+        heartbeatCoroutine = StartCoroutine(HeartbeatLoop());
+    }
+
+    /// <summary>
+    /// หยุดเล่นเสียงหัวใจเต้น (เรียกจาก ScreenEffectManager เมื่อเลือดฟื้น)
+    /// </summary>
+    public void StopHeartbeat()
+    {
+        if (heartbeatCoroutine != null)
+        {
+            StopCoroutine(heartbeatCoroutine);
+            heartbeatCoroutine = null;
+        }
+
+        if (heartbeatSource != null)
+        {
+            heartbeatSource.Stop();
+        }
+    }
+
+    private System.Collections.IEnumerator HeartbeatLoop()
+    {
+        while (true)
+        {
+            if (heartbeatSource != null && heartbeatSound != null)
+            {
+                heartbeatSource.clip = heartbeatSound;
+                heartbeatSource.volume = heartbeatVolume * sfxVolume;
+                heartbeatSource.pitch = 1f;
+                heartbeatSource.Play();
+            }
+
+            // รอด้วย unscaledTime เพื่อให้เสียงหัวใจเต้นแม้ตอน SlowMo หรือ Pause
+            float waited = 0f;
+            while (waited < heartbeatInterval)
+            {
+                waited += Time.unscaledDeltaTime;
+                yield return null;
+            }
         }
     }
 }

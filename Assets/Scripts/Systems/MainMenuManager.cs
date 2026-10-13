@@ -40,12 +40,10 @@ public class MainMenuManager : MonoBehaviour
         // รีเฟรชสถานะล็อคของปุ่มทุกปุ่ม
         RefreshLevelButtons();
 
-        // โชว์พรีวิวด่านแรกเป็นค่าเริ่มต้น
-        LevelSelectButton[] buttons = FindObjectsByType<LevelSelectButton>(FindObjectsSortMode.None);
-        if (buttons != null && buttons.Length > 0 && LevelPreviewManager.Instance != null)
+        // ซ่อนหน้าต่างพรีวิวไว้ก่อน จนกว่าผู้เล่นจะเอาเมาส์ไปชี้ปุ่มเลเวล
+        if (LevelPreviewManager.Instance != null)
         {
-            System.Array.Sort(buttons, (a, b) => string.Compare(a.name, b.name));
-            LevelPreviewManager.Instance.ShowPreview(buttons[0]);
+            LevelPreviewManager.Instance.HidePreview();
         }
     }
 
